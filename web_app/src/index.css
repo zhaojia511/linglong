@@ -146,6 +146,43 @@ body {
 
 .error {
   color: #dc3545;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
   font-size: 14px;
-  margin-top: 10px;
+}
+
+.success {
+  color: #28a745;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 4px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  font-size: 14px;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0.5rem 0;
+}
+
+.link-btn:hover {
+  color: #0056b3;
+}
+
+.auth-links {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.auth-links .link-btn {
+  display: block;
+  margin: 0.5rem 0;
 }

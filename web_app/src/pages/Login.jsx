@@ -6,26 +6,35 @@ function Login({ onLogin }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isRegister, setIsRegister] = useState(false)
+  const [isForgotPassword, setIsForgotPassword] = useState(false)
   const [name, setName] = useState('')
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    setSuccess('')
     setLoading(true)
 
     try {
-      if (isRegister) {
+      if (isForgotPassword) {
+        const result = await authService.resetPassword(email)
+        setSuccess(result.message)
+        setIsForgotPassword(false)
+      } else if (isRegister) {
         await authService.register(email, password, name)
+        onLogin()
+        navigate('/')
       } else {
         await authService.login(email, password)
+        onLogin()
+        navigate('/')
       }
-      onLogin()
-      navigate('/')
     } catch (err) {
-      setError(err.response?.data?.error?.message || 'An error occurred')
+      setError(err?.message || err?.response?.data?.error?.message || 'An error occurred')
     } finally {
       setLoading(false)
     }
@@ -33,9 +42,9 @@ function Login({ onLogin }) {
 
   return (
     <div className="login-form">
-      <h2>{isRegister ? 'Register' : 'Login'}</h2>
+      <h2>{isForgotPassword ? 'Reset Password' : isRegister ? 'Register' : 'Login'}</h2>
       <form onSubmit={handleSubmit}>
-        {isRegister && (
+        {isRegister && !isForgotPassword && (
           <div className="form-group">
             <label>Name</label>
             <input
@@ -55,34 +64,65 @@ function Login({ onLogin }) {
             required
           />
         </div>
-        <div className="form-group">
-          <label>Password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
-          />
-        </div>
+        {!isForgotPassword && (
+          <div className="form-group">
+            <label>Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+            />
+          </div>
+        )}
         {error && <div className="error">{error}</div>}
+        {success && <div className="success">{success}</div>}
         <button type="submit" className="btn btn-primary" disabled={loading}>
-          {loading ? 'Loading...' : isRegister ? 'Register' : 'Login'}
+          {loading ? 'Loading...' : isForgotPassword ? 'Send Reset Email' : isRegister ? 'Register' : 'Login'}
         </button>
       </form>
-      <p style={{ marginTop: '20px', textAlign: 'center' }}>
-        {isRegister ? 'Already have an account?' : "Don't have an account?"}{' '}
-        <button
-          type="button"
+      
+      {!isForgotPassword && (
+        <div className="auth-links">
+          <button 
+            type="button" 
+            className="link-btn"
+            onClick={() => setIsForgotPassword(true)}
+          >
+            Forgot Password?
+          </button>
+        </div>
+      )}
+      
+      <div className="auth-links">
+        <button 
+          type="button" 
+          className="link-btn"
           onClick={() => {
             setIsRegister(!isRegister)
+            setIsForgotPassword(false)
             setError('')
+            setSuccess('')
           }}
-          style={{ background: 'none', border: 'none', color: '#007bff', cursor: 'pointer' }}
         >
-          {isRegister ? 'Login' : 'Register'}
+          {isRegister ? 'Already have an account? Login' : "Don't have an account? Register"}
         </button>
-      </p>
+        {isForgotPassword && (
+          <button 
+            type="button" 
+            className="link-btn"
+            onClick={() => {
+              setIsForgotPassword(false)
+              setError('')
+              setSuccess('')
+            }}
+          >
+            Back to Login
+          </button>
+        )}
+      </div>
+
     </div>
   )
 }

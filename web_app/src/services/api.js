@@ -1,56 +1,71 @@
-import axios from 'axios';
+import axios from 'axios'
+import { supabase } from './supabaseClient'
 
-const API_BASE_URL = '/api';
+const API_BASE_URL = '/api'
 
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-});
+})
 
-// Add token to requests
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
+// Inject Supabase access token into backend requests
+api.interceptors.request.use(async (config) => {
+  const { data } = await supabase.auth.getSession()
+  const token = data.session?.access_token
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    config.headers.Authorization = `Bearer ${token}`
   }
-  return config;
-});
+  return config
+})
 
 export const authService = {
   login: async (email, password) => {
-    const response = await api.post('/auth/login', { email, password });
-    if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-    }
-    return response.data;
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) throw error
+    return { user: data.user, session: data.session }
   },
 
   register: async (email, password, name) => {
-    const response = await api.post('/auth/register', { email, password, name });
-    if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-    }
-    return response.data;
+    // signUp returns a session if email confirmation disabled; otherwise user only
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { name } },
+    })
+    if (error) throw error
+    return { user: data.user, session: data.session }
   },
 
-  logout: () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+  resetPassword: async (email) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`
+    })
+    if (error) throw error
+    return { message: 'Password reset email sent successfully' }
   },
 
-  getCurrentUser: () => {
-    const user = localStorage.getItem('user');
-    return user ? JSON.parse(user) : null;
+  updatePassword: async (newPassword) => {
+    const { data, error } = await supabase.auth.updateUser({ password: newPassword })
+    if (error) throw error
+    return data
   },
 
-  isAuthenticated: () => {
-    return !!localStorage.getItem('token');
+  logout: async () => {
+    await supabase.auth.signOut()
   },
-};
+
+  getCurrentUser: async () => {
+    const { data } = await supabase.auth.getUser()
+    return data.user || null
+  },
+
+  isAuthenticated: async () => {
+    const { data } = await supabase.auth.getSession()
+    return !!data.session?.access_token
+  },
+}
 
 export const sessionService = {
   getSessions: async (params = {}) => {
