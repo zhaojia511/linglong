@@ -7,6 +7,7 @@ function Dashboard() {
   const [stats, setStats] = useState(null)
   const [recentSessions, setRecentSessions] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -15,14 +16,29 @@ function Dashboard() {
 
   const loadDashboardData = async () => {
     try {
+      setError(null)
+      console.log('Starting to fetch dashboard data...')
+      
       const [statsData, sessionsData] = await Promise.all([
         sessionService.getStats(),
         sessionService.getSessions({ limit: 5 })
       ])
-      setStats(statsData.data)
-      setRecentSessions(sessionsData.data)
+      
+      console.log('Stats data:', statsData)
+      console.log('Sessions data:', sessionsData)
+      
+      setStats(statsData.data || statsData)
+      setRecentSessions(sessionsData.data || sessionsData || [])
     } catch (error) {
       console.error('Error loading dashboard:', error)
+      console.error('Error details:', {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        url: error.config?.url,
+        data: error.response?.data
+      })
+      setError(`Failed to load dashboard: ${error.message}. Check console for details.`)
     } finally {
       setLoading(false)
     }
@@ -44,6 +60,33 @@ function Dashboard() {
 
   if (loading) {
     return <div className="container">Loading...</div>
+  }
+
+  if (error) {
+    return (
+      <div>
+        <div className="header">
+          <div className="container">
+            <h1>Linglong HR Monitor Dashboard</h1>
+            <div className="nav">
+              <Link to="/" className="active">Dashboard</Link>
+              <Link to="/sessions">All Sessions</Link>
+              <button onClick={handleLogout} className="btn btn-primary">Logout</button>
+            </div>
+          </div>
+        </div>
+        <div className="container">
+          <div className="error" style={{padding: '20px', fontSize: '16px'}}>
+            <strong>Error Loading Dashboard:</strong>
+            <p>{error}</p>
+            <p style={{fontSize: '12px', color: '#666'}}>
+              Check browser console (F12) for full error details.
+            </p>
+            <button onClick={loadDashboardData} className="btn btn-primary">Retry</button>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

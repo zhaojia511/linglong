@@ -1,7 +1,25 @@
 import axios from 'axios'
 import { supabase } from './supabaseClient'
 
-const API_BASE_URL = '/api'
+// Determine API base URL based on environment
+const getAPIBaseURL = () => {
+  // Check for environment variable first (for production)
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL
+  }
+  
+  // Fallback for development
+  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+    return 'http://localhost:3000/api'
+  }
+  
+  // Default to relative path (proxy setup needed)
+  return '/api'
+}
+
+const API_BASE_URL = getAPIBaseURL()
+
+console.log('API Base URL:', API_BASE_URL) // For debugging
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -16,9 +34,27 @@ api.interceptors.request.use(async (config) => {
   const token = data.session?.access_token
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
+  } else {
+    console.warn('No auth token available')
   }
   return config
 })
+
+// Add response error logging
+api.interceptors.response.use(
+  response => response,
+  error => {
+    console.error('API Error:', {
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      url: error.config?.url,
+      method: error.config?.method,
+      data: error.response?.data,
+      message: error.message
+    })
+    return Promise.reject(error)
+  }
+)
 
 export const authService = {
   login: async (email, password) => {
