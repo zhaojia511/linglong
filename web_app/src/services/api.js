@@ -40,7 +40,7 @@ export const authService = {
 
   resetPassword: async (email) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`
+      redirectTo: 'https://linglong-test.pages.dev/reset-password'
     })
     if (error) throw error
     return { message: 'Password reset email sent successfully' }
