@@ -1,48 +1,14 @@
-import React, { useState, useEffect } from 'react'
+
+import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { sessionService, authService } from '../services/api'
+import { authService } from '../services/api'
+import { useDashboardData } from './hooks/useDashboardData'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
+
 function Dashboard() {
-  const [stats, setStats] = useState(null)
-  const [recentSessions, setRecentSessions] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
   const navigate = useNavigate()
-
-  useEffect(() => {
-    loadDashboardData()
-  }, [])
-
-  const loadDashboardData = async () => {
-    try {
-      setError(null)
-      console.log('Starting to fetch dashboard data...')
-      
-      const [statsData, sessionsData] = await Promise.all([
-        sessionService.getStats(),
-        sessionService.getSessions({ limit: 5 })
-      ])
-      
-      console.log('Stats data:', statsData)
-      console.log('Sessions data:', sessionsData)
-      
-      setStats(statsData.data || statsData)
-      setRecentSessions(sessionsData.data || sessionsData || [])
-    } catch (error) {
-      console.error('Error loading dashboard:', error)
-      console.error('Error details:', {
-        message: error.message,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        url: error.config?.url,
-        data: error.response?.data
-      })
-      setError(`Failed to load dashboard: ${error.message}. Check console for details.`)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const { statsQuery, sessionsQuery } = useDashboardData()
 
   const handleLogout = () => {
     authService.logout()
@@ -58,31 +24,21 @@ function Dashboard() {
     return `${minutes}m`
   }
 
-  if (loading) {
+  if (statsQuery.isLoading || sessionsQuery.isLoading) {
     return <div className="container">Loading...</div>
   }
 
-  if (error) {
+  if (statsQuery.isError || sessionsQuery.isError) {
     return (
       <div>
-        <div className="header">
-          <div className="container">
-            <h1>Linglong HR Monitor Dashboard</h1>
-            <div className="nav">
-              <Link to="/" className="active">Dashboard</Link>
-              <Link to="/sessions">All Sessions</Link>
-              <button onClick={handleLogout} className="btn btn-primary">Logout</button>
-            </div>
-          </div>
-        </div>
         <div className="container">
           <div className="error" style={{padding: '20px', fontSize: '16px'}}>
             <strong>Error Loading Dashboard:</strong>
-            <p>{error}</p>
+            <p>{statsQuery.error?.message || sessionsQuery.error?.message}</p>
             <p style={{fontSize: '12px', color: '#666'}}>
               Check browser console (F12) for full error details.
             </p>
-            <button onClick={loadDashboardData} className="btn btn-primary">Retry</button>
+            <button onClick={() => { statsQuery.refetch(); sessionsQuery.refetch(); }} className="btn btn-primary">Retry</button>
           </div>
         </div>
       </div>
@@ -96,6 +52,9 @@ function Dashboard() {
           <h1>Linglong HR Monitor Dashboard</h1>
           <div className="nav">
             <Link to="/" className="active">Dashboard</Link>
+            <Link to="/persons">Persons</Link>
+            <Link to="/recordings">Recordings</Link>
+            <Link to="/analysis">Analysis</Link>
             <Link to="/sessions">All Sessions</Link>
             <button onClick={handleLogout} className="btn btn-primary">Logout</button>
           </div>
@@ -103,7 +62,18 @@ function Dashboard() {
       </div>
 
       <div className="container">
-        {stats && (
+        {/* Quick Actions */}
+        <div className="card" style={{ marginBottom: '30px' }}>
+          <h2>Quick Actions</h2>
+          <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', marginTop: '15px' }}>
+            <Link to="/persons" className="btn btn-primary">Manage Persons</Link>
+            <Link to="/recordings" className="btn btn-primary">Add Recording</Link>
+            <Link to="/analysis" className="btn btn-primary">View Analysis</Link>
+            <Link to="/sessions" className="btn btn-primary">All Sessions</Link>
+          </div>
+        </div>
+
+        {statsQuery.data && (
           <>
             <div className="stats-grid">
               <div className="stat-card">
@@ -141,11 +111,11 @@ function Dashboard() {
 
         <div className="card">
           <h2>Recent Training Sessions</h2>
-          {recentSessions.length === 0 ? (
+          {sessionsQuery.data?.length === 0 ? (
             <p>No training sessions yet.</p>
           ) : (
             <ul className="session-list">
-              {recentSessions.map((session) => (
+              {sessionsQuery.data?.map((session) => (
                 <li key={session.id} className="session-item">
                   <div>
                     <strong>{session.title}</strong>
