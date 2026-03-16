@@ -1,0 +1,1118 @@
+- generic [active] [ref=e1]:
+  - link "Skip to main content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - region "Official website of the United States government" [ref=e3]:
+    - generic [ref=e6]:
+      - img [ref=e8]
+      - paragraph [ref=e10]: An official website of the United States government
+      - button "Here's how you know" [ref=e11] [cursor=pointer]
+  - banner [ref=e12]:
+    - generic [ref=e14]:
+      - link "NCBI home page" [ref=e15] [cursor=pointer]:
+        - /url: https://www.ncbi.nlm.nih.gov/
+        - img "NCBI home page" [ref=e16]
+      - button "Show menu" [ref=e17]:
+        - img [ref=e18]
+  - region "PMC Header with search box" [ref=e20]:
+    - generic [ref=e21]:
+      - generic [ref=e22]:
+        - link "PMC Home" [ref=e24] [cursor=pointer]:
+          - /url: /
+        - button "Open search" [ref=e25] [cursor=pointer]:
+          - img
+      - text: "|"
+  - generic [ref=e26]:
+    - complementary "Actions bar" [ref=e27]:
+      - generic [ref=e29]:
+        - list [ref=e31]:
+          - listitem [ref=e32]:
+            - button "Open resources" [ref=e33] [cursor=pointer]:
+              - img "Open resources icon"
+          - listitem [ref=e34]:
+            - button "View on publisher site" [ref=e36] [cursor=pointer]:
+              - img "View on publisher site icon"
+          - listitem [ref=e37]:
+            - button "Download PDF" [ref=e39] [cursor=pointer]:
+              - img
+          - listitem [ref=e40]:
+            - button "Save article in MyNCBI collections." [ref=e42] [cursor=pointer]:
+              - img
+          - listitem [ref=e43]:
+            - button "Open dialog with citation text in different styles" [ref=e45] [cursor=pointer]:
+              - img
+          - listitem [ref=e46]:
+            - button "Show article permalink" [ref=e48] [cursor=pointer]:
+              - img
+        - button "Open article navigation" [ref=e49] [cursor=pointer]:
+          - img
+    - generic [ref=e53]:
+      - complementary "Disclaimer note" [ref=e56]:
+        - text: As a library, NLM provides access to scientific literature. Inclusion in an NLM database does not imply endorsement of, or agreement with, the contents by NLM or the National Institutes of Health.
+        - text: "Learn more:"
+        - link "PMC Disclaimer" [ref=e57] [cursor=pointer]:
+          - /url: /about/disclaimer/
+        - text: "|"
+        - link "PMC Copyright Notice" [ref=e58] [cursor=pointer]:
+          - /url: /about/copyright/
+      - main [ref=e60]:
+        - region "Journal banner" [ref=e61]:
+          - img "Health Science Reports logo" [ref=e62]
+          - generic:
+            - link "Link to Health Science Reports":
+              - /url: https://onlinelibrary.wiley.com/journal/23988835
+        - article [ref=e63]:
+          - region "Article citation and metadata" [ref=e64]:
+            - generic [ref=e66]:
+              - button "▸ Health Sci Rep" [ref=e68] [cursor=pointer]
+              - text: ". 2022 Jan 19;5(1):e477. doi:"
+              - link "External, opens in a new tab. 10.1002/hsr2.477" [ref=e69] [cursor=pointer]:
+                - /url: https://doi.org/10.1002/hsr2.477
+            - generic [ref=e71]:
+              - 'heading "Heart rate variability and heart rate monitoring of nurses using PPG and ECG signals during working condition: A pilot study" [level=1] [ref=e73]'
+              - generic [ref=e74]:
+                - link "Xinxia Li" [ref=e75] [cursor=pointer]:
+                  - /url: https://pubmed.ncbi.nlm.nih.gov/?term="Li%20X"[Author]
+                - superscript [ref=e76]: "1"
+                - text: ","
+                - link "Chenghong Hu" [ref=e77] [cursor=pointer]:
+                  - /url: https://pubmed.ncbi.nlm.nih.gov/?term="Hu%20C"[Author]
+                - superscript [ref=e78]: 2,
+                - superscript [ref=e79]: ✉
+                - text: ","
+                - link "Airong Meng" [ref=e80] [cursor=pointer]:
+                  - /url: https://pubmed.ncbi.nlm.nih.gov/?term="Meng%20A"[Author]
+                - superscript [ref=e81]: "3"
+                - text: ","
+                - link "Yanmei Guo" [ref=e82] [cursor=pointer]:
+                  - /url: https://pubmed.ncbi.nlm.nih.gov/?term="Guo%20Y"[Author]
+                - superscript [ref=e83]: "4"
+                - text: ","
+                - link "Yang Chen" [ref=e84] [cursor=pointer]:
+                  - /url: https://pubmed.ncbi.nlm.nih.gov/?term="Chen%20Y"[Author]
+                - superscript [ref=e85]: "5"
+                - text: ","
+                - link "Rongqing Dang" [ref=e86] [cursor=pointer]:
+                  - /url: https://pubmed.ncbi.nlm.nih.gov/?term="Dang%20R"[Author]
+                - superscript [ref=e87]: "1"
+              - list [ref=e88]:
+                - listitem [ref=e89]:
+                  - button "▸ Author information" [ref=e90] [cursor=pointer]
+                - listitem [ref=e91]:
+                  - button "▸ Article notes" [ref=e92] [cursor=pointer]
+                - listitem [ref=e93]:
+                  - button "▸ Copyright and License information" [ref=e94] [cursor=pointer]
+              - generic: External, opens in a new tab.
+              - generic [ref=e95]:
+                - text: "PMCID: PMC8865060 PMID:"
+                - link "35229043" [ref=e96] [cursor=pointer]:
+                  - /url: https://pubmed.ncbi.nlm.nih.gov/35229043/
+          - region "Article content" [ref=e97]:
+            - generic [ref=e98]:
+              - generic [ref=e99]:
+                - heading "Abstract" [level=2] [ref=e100]: Abstract
+                - paragraph [ref=e101]: The use of wearable photoplethysmography (PPG) technology for estimating heart rate (HR) and HR variability (HRV) in the health care system is gaining attention in recent years. However, the performance of these devices remains questionable in their ability to collect data in real working conditions for long‐term monitoring. The present study aimed to examine the data collected from nurses during working hours by PPG and electrocardiography (ECG) devices. Twenty‐two nurses underwent a 60‐minute work protocol during the normal working conditions while wearing a PPG device and an ECG device. HR, low‐frequency component (LF) and high‐frequency component (HF), LF/HF ratio, and percent LF distribution in total spectral power, and steps were examined. Pearson's correlation analysis and Bland‐Altman method was performed to examine the relationships between the two devices based on HR and HRV indices. The results found strong positive correlations between HR estimates of both devices, and moderate correlations between LF/HF ratio and percent LF indices estimates, respectively. Moreover, the Bland‐Altman analysis showed a small mean bias in general between the captured data of both devices. This pilot study suggested that the PPG device appears to demonstrate good overall reliability in measuring HR, LF/HF ratio, and percent LF. A further large‐scale study is required to investigate the feasibility and practicality for HR and HRV analysis in nurses during real working conditions using PPG devices.
+                - paragraph [ref=e103]:
+                  - strong [ref=e104]: "Keywords:"
+                  - text: heart rate, heart rate variability, photoplethysmography, stress tracking, wearable biosensors
+              - generic [ref=e105]:
+                - heading "1. INTRODUCTION" [level=2] [ref=e106]: 1. INTRODUCTION
+                - paragraph [ref=e107]:
+                  - text: Nursing is perceived as a strenuous job, in which nurses regularly suffered from serious musculoskeletal disorders and psychological disturbances, such as back pain and stress‐related problems.
+                  - link "1" [ref=e108] [cursor=pointer]:
+                    - /url: "#hsr2477-bib-0001"
+                    - superscript [ref=e109]: "1"
+                  - text: In particular, during the COVID‐19 pandemic, nurses have experienced increasing pressure, anxiety, exhaustion, isolation, and ongoing emotional trauma.
+                  - link "2" [ref=e110] [cursor=pointer]:
+                    - /url: "#hsr2477-bib-0002"
+                    - superscript [ref=e111]: "2"
+                  - text: ","
+                  - link "3" [ref=e112] [cursor=pointer]:
+                    - /url: "#hsr2477-bib-0003"
+                    - superscript [ref=e113]: "3"
+                  - text: The high level of workplace stress is becoming a major and serious problem for nurses, hospitals, and related institutions, and it significantly affects their quality of life, and the quality of care service they provide.
+                  - link "4" [ref=e114] [cursor=pointer]:
+                    - /url: "#hsr2477-bib-0004"
+                    - superscript [ref=e115]: "4"
+                  - text: Investigations have been conducted on workplace stress of nurses to identify their stressors, stress management intervention, and outcomes.
+                  - link "1" [ref=e116] [cursor=pointer]:
+                    - /url: "#hsr2477-bib-0001"
+                    - superscript [ref=e117]: "1"
+                  - text: ","
+                  - link "5" [ref=e118] [cursor=pointer]:
+                    - /url: "#hsr2477-bib-0005"
+                    - superscript [ref=e119]: "5"
+                  - text: ","
+                  - link "6" [ref=e120] [cursor=pointer]:
+                    - /url: "#hsr2477-bib-0006"
+                    - superscript [ref=e121]: "6"
+                  - text: Nevertheless, those studies mainly assessed the stress level of the subjects by questionnaires, and the examined activities were strongly tied to their perceived stress.
+                  - link "7" [ref=e122] [cursor=pointer]:
+                    - /url: "#hsr2477-bib-0007"
+                    - superscript [ref=e123]: "7"
+                  - text: ","
+                  - link "8" [ref=e124] [cursor=pointer]:
+                    - /url: "#hsr2477-bib-0008"
+                    - superscript [ref=e125]: "8"
+                  - text: ","
+                  - link "9" [ref=e126] [cursor=pointer]:
+                    - /url: "#hsr2477-bib-0009"
+                    - superscript [ref=e127]: "9"
+                  - text: If the activities could be tied to quantitative measures, it would provide a better grasp of the stress level of the nurses. Monitoring workplace stress for nurses objectively and efficiently, and providing proper intervention when necessary should be the main focus in making healthcare policy for nurses.
+                - paragraph [ref=e128]:
+                  - text: Heart rate (HR), blood pressure, and heart rate variability (HRV) are often regarded as physiological monitoring markers in stress assessment.
+                  - link "10" [ref=e129] [cursor=pointer]:
+                    - /url: "#hsr2477-bib-0010"
+                    - superscript [ref=e130]: "10"
+                  - text: In recent years, the quantitative analysis of HRV has been proposed as a possible way to study the effects of work‐related stresses on cardiovascular autonomic regulation in high stress conditions.
+                  - link "11" [ref=e131] [cursor=pointer]:
+                    - /url: "#hsr2477-bib-0011"
+                    - superscript [ref=e132]: "11"
+                  - text: ","
+                  - link "12" [ref=e133] [cursor=pointer]:
+                    - /url: "#hsr2477-bib-0012"
+                    - superscript [ref=e134]: "12"
+                  - text: ","
+                  - link "13" [ref=e135] [cursor=pointer]:
+                    - /url: "#hsr2477-bib-0013"
+                    - superscript [ref=e136]: "13"
+                  - text: HRV analysis was suggested to provide an objective measurement of stress in nurses group in theory.
+                  - link "11" [ref=e137] [cursor=pointer]:
+                    - /url: "#hsr2477-bib-0011"
+                    - superscript [ref=e138]: "11"
+                - paragraph [ref=e139]:
+                  - text: Although electrocardiography (ECG) device can reliably measure HR and HRV signals,
+                  - link "8" [ref=e140] [cursor=pointer]:
+                    - /url: "#hsr2477-bib-0008"
+                    - superscript [ref=e141]: "8"
+                  - text: ECG electrode pad and chest strap often lead to skin irritation and discomfort at contact areas, especially on female subjects.
+                  - link "9" [ref=e142] [cursor=pointer]:
+                    - /url: "#hsr2477-bib-0009"
+                    - superscript [ref=e143]: "9"
+                  - text: ","
+                  - link "14" [ref=e144] [cursor=pointer]:
+                    - /url: "#hsr2477-bib-0014"
+                    - superscript [ref=e145]: "14"
+                  - text: Thus, it has been difficult to measure stress for a long period of time in real working conditions. As an emerging technology in recent years, photoplethysmography (PPG) wearable device is becoming a popular technology for continuous HR monitoring. Evidence showed that HR can be estimated reliably from the PPG method.
+                  - link "15" [ref=e146] [cursor=pointer]:
+                    - /url: "#hsr2477-bib-0015"
+                    - superscript [ref=e147]: "15"
+                  - text: ","
+                  - link "16" [ref=e148] [cursor=pointer]:
+                    - /url: "#hsr2477-bib-0016"
+                    - superscript [ref=e149]: "16"
+                  - text: Compared to an ECG device with an electrode pad and chest strap, PPG wrist‐worn device is a more convenient and less intrusive measurement technique.
+                  - link "15" [ref=e150] [cursor=pointer]:
+                    - /url: "#hsr2477-bib-0015"
+                    - superscript [ref=e151]: "15"
+                  - text: Many smartwatches and wristbands contain PPG sensors, and their designs are getting more compact and user‐friendly.
+                  - link "9" [ref=e152] [cursor=pointer]:
+                    - /url: "#hsr2477-bib-0009"
+                    - superscript [ref=e153]: "9"
+                  - text: However, these devices mainly provide HR measurement but not detailed HRV analysis. Most importantly, the performance of PPG sensors remains questionable with respect to data collection in actual working conditions due to motion artifacts.
+                  - link "17" [ref=e154] [cursor=pointer]:
+                    - /url: "#hsr2477-bib-0017"
+                    - superscript [ref=e155]: "17"
+                - paragraph [ref=e156]: Getting accurate and detailed HRV measurements from PPG wearable devices remains a challenging problem. Even with the popularity and merit of PPG wearable devices, research work on the validation of PPG in HRV monitoring has not been thoroughly conducted.
+                - paragraph [ref=e157]: "Therefore, the present study aimed to investigate the data collected by a PPG device and an ECG device and to evaluate the PPG device's ability against the ECG device to accurately collect HR and HRV measurements for nurses under normal working conditions. In particular, the objectives of this pilot study are to analyze and compare: (a) the HR estimates; (b) LF/HF ratio estimates; and (c) percent LF estimates between the collected PPG and ECG signals."
+              - generic [ref=e158]:
+                - heading "2. MATERIALS AND METHODS" [level=2] [ref=e159]: 2. MATERIALS AND METHODS
+                - generic [ref=e160]:
+                  - heading "2.1. Participants" [level=3] [ref=e161]
+                  - paragraph [ref=e162]: "A convenience sampling method was used to recruit the participants. Inclusion criteria were as follows: registered nurse, on active duty, has no significant medical condition that may potentially influence HRV measurements, and is willing to volunteer to take part in this study. Twenty‐two healthy nurses working at intensive care unit (ICU) and neurosurgery intensive care unit (neuro‐ICU) at a public hospital in Inner Mongolia Autonomous Region of China were finally selected in this study. The experiments were explained to each participant, and consent forms were signed beforehand. This study was approved by the ethics committee of the Affiliated Hospital of Inner Mongolia Medical University (No. KY [2019002])."
+                - generic [ref=e163]:
+                  - heading "2.2. Devices" [level=3] [ref=e164]
+                  - generic [ref=e165]:
+                    - heading "2.2.1. PPG device" [level=4] [ref=e166]
+                    - paragraph [ref=e167]:
+                      - text: The PPG device used in this study (SMARTEAP Stress tracker WSS‐2, YiCheng Business Management & Consulting Co. Ltd, China) can be worn either on the wrist, lower, or upper arm. The device records data at 1‐second interval using two LED sensors with a sampling rate at 25 Hz to achieve low‐power consumption for long‐time monitoring.
+                      - link "18" [ref=e168] [cursor=pointer]:
+                        - /url: "#hsr2477-bib-0018"
+                        - superscript [ref=e169]: "18"
+                      - text: "In this study, the device was worn on the upper left arm, proximal part of the biceps brachii to minimize discomfort. Biological information, HR, low‐frequency component (LF: 0.04‐0.15 Hz), and high‐frequency component (HF: 0.15‐0.4 Hz) of HRV signal, were recorded during the experiment. LF is usually regarded as a marker of fluctuations in either sympathetic of sympathetic plus vagal activity, while HF is a marker of vagal activity."
+                      - link "19" [ref=e170] [cursor=pointer]:
+                        - /url: "#hsr2477-bib-0019"
+                        - superscript [ref=e171]: "19"
+                      - text: "In this experiment, the following frequency domain parameters were analyzed: LF/HF ratio, and percent LF distribution in total spectral power (ie, LF/[LF + HF]*100). The spectral components were calculated as absolutes units (ms"
+                      - superscript [ref=e172]: "2"
+                      - text: ).
+                  - generic [ref=e173]:
+                    - heading "2.2.2. ECG device" [level=4] [ref=e174]
+                    - paragraph [ref=e175]:
+                      - text: The ECG device (myBeat‐WHS‐1, Union Tool Co. Ltd., Japan) was used to provide criterion measures of HR and HRV. The device was fixed to the chest around the epigastrium by a dedicated chest strap with electrodes. The ECG data were recorded at 1000 Hz. The HR, LF (0.04‐0.15 Hz), HF (0.15‐0.4 Hz), body surface temperature, and triaxial acceleration were recorded during the experiment. LF and HF components were calculated as normalized units (nu) with this ECG device. The HRV‐based stress indices, LF/HF ratio, and percent LF, were also calculated. The detailed ECG processing and HRV analysis used in this device is explained in Ota et al.
+                      - link "20" [ref=e176] [cursor=pointer]:
+                        - /url: "#hsr2477-bib-0020"
+                        - superscript [ref=e177]: "20"
+                - generic [ref=e178]:
+                  - heading "2.3. Procedure" [level=3] [ref=e179]
+                  - paragraph [ref=e180]: The experiments were performed at a public hospital in the Inner Mongolia Autonomous Region of China. Information about the study was presented to the hospital management and the head nurses. Approval was obtained to conduct the experiment. The head nurses explained the main goals and relevant information of the experiment to the participating nurses. All participants signed the consent form and had the right to withdraw at any time. All personal information is protected according to the protocol approved by the ethics committee.
+                  - paragraph [ref=e181]: To compare the HR and HRV indices between PPG and ECG signals, all participants underwent a 60‐minute work protocol during normal working conditions while wearing a PPG device and an ECG device. In particular, the PPG device was worn on the upper arm, while the ECG device was fixed to the chest at the same time during the experiment. HR and HRV data were recorded concurrently and continuously throughout the experiment. One of the authors provided training on how to use the device to the nurses, retrieved the devices, and transferred the data to a computer after the experiment.
+                - generic [ref=e182]:
+                  - heading "2.4. Data collection and statistical analysis" [level=3] [ref=e183]
+                  - paragraph [ref=e184]:
+                    - text: The recorded PPG and ECG signals were retrieved using software provided by the manufacturers respectively. HR data were checked for integrity and then averaged at 1‐minute intervals for analysis.
+                    - link "21" [ref=e185] [cursor=pointer]:
+                      - /url: "#hsr2477-bib-0021"
+                      - superscript [ref=e186]: "21"
+                    - text: The HRV parameters were analyzed in the frequency domain. Although the two devices use different units for LF and HF measurements, the HRV parameters being examined, LF/HF ratio, and percent LF are both ratios, so the difference in the unit does not influence the result. LF and HF were averaged at 5‐minute intervals for further analysis.
+                    - link "22" [ref=e187] [cursor=pointer]:
+                      - /url: "#hsr2477-bib-0022"
+                      - superscript [ref=e188]: "22"
+                  - paragraph [ref=e189]:
+                    - text: "Pearson correlation analysis was performed to determine the strength of the relationship between the two devices. Bland‐Altman method was used on aggregate data of HR and stress values to assess the agreement between the two devices for HR and HRV measurements Moreover, the PPG and ECG signals of the day and night shifts were further analyzed using Bland‐Altman to assess the agreement more specifically due to the following considerations: (a) previous studies showed that shift schedule significantly affects the overall physical and mental health of nurses. Shift time is also often regarded as an influence factor of nurses' workplace stress."
+                    - link "23" [ref=e190] [cursor=pointer]:
+                      - /url: "#hsr2477-bib-0023"
+                      - superscript [ref=e191]: "23"
+                    - text: ","
+                    - link "24" [ref=e192] [cursor=pointer]:
+                      - /url: "#hsr2477-bib-0024"
+                      - superscript [ref=e193]: "24"
+                    - text: ","
+                    - link "25" [ref=e194] [cursor=pointer]:
+                      - /url: "#hsr2477-bib-0025"
+                      - superscript [ref=e195]: "25"
+                    - text: (b) The workloads in the day and night shifts were different in this experiment. It is possible that frequent arm movement may create motion artifacts in the PPG signals.
+                    - link "26" [ref=e196] [cursor=pointer]:
+                      - /url: "#hsr2477-bib-0026"
+                      - superscript [ref=e197]: "26"
+                    - text: The Statistical Package for the Social Science was used for all statistical analysis.
+                - generic [ref=e198]:
+                  - heading "2.5. Tasks list during the experiment" [level=3] [ref=e199]
+                  - paragraph [ref=e200]: The tasks and shifts of each participant can be found in the supplemental material.
+              - generic [ref=e201]:
+                - heading "3. RESULTS" [level=2] [ref=e202]: 3. RESULTS
+                - generic [ref=e203]:
+                  - heading "3.1. The characteristic of subjects" [level=3] [ref=e204]
+                  - paragraph [ref=e205]:
+                    - text: In this pilot study, we enrolled 1 male and 21 females with an average age of 33.59 ± 4.93 years (body mass index [BMI] = 22.74 ± 3.25 kg/m
+                    - superscript [ref=e206]: "2"
+                    - text: ). Of them, 15 nurses (all females, mean age = 34.33 ± 4.10 years, BMI = 22.75 ± 2.61 kg/m
+                    - superscript [ref=e207]: "2"
+                    - text: ", step/hour = 645.33 ± 190.27) worked in day shift, while 7 nurses (1 male and 6 females, mean age = 32.00 ± 6.45 years, BMI = 22.72 ± 4.59 kg/m"
+                    - superscript [ref=e208]: "2"
+                    - text: ", step/hour = 525.14 ± 217.33) worked in night shift. There was no significant difference in age, BMI, and steps between the two shifts. Analyzed PPG and ECG data were simultaneously collected from these 22 subjects. There were no missing data."
+                - generic [ref=e209]:
+                  - heading "3.2. HR estimates from PPG compared to ECG" [level=3] [ref=e210]
+                  - paragraph [ref=e211]:
+                    - text: The correlation coefficient, mean HR, and mean difference (bias) are presented in Table
+                    - link "1" [ref=e212] [cursor=pointer]:
+                      - /url: "#hsr2477-tbl-0001"
+                    - text: and Figure
+                    - link "1" [ref=e213] [cursor=pointer]:
+                      - /url: "#hsr2477-fig-0001"
+                    - text: . In the HR aggregate data (n = 1283),
+                    - emphasis [ref=e214]: t
+                    - text: a strong positive correlation was found between the HR estimates obtained from both devices (
+                    - emphasis [ref=e215]: r
+                    - text: = 0.974,
+                    - emphasis [ref=e216]: P
+                    - text: < .0001). The degree of agreement between PPG and ECG methods was assessed using Bland‐Altman analysis. The mean difference (bias) of HR aggregate data was found to be 0.493 ± 2.209 bpm (95% limit of agreement [LoA] 3.838, −4.823). A strong positive correlation was found in both day shift (
+                    - emphasis [ref=e217]: r
+                    - text: = 0.975,
+                    - emphasis [ref=e218]: P
+                    - text: < .0001) and night shift (
+                    - emphasis [ref=e219]: r
+                    - text: = 0.970,
+                    - emphasis [ref=e220]: P
+                    - text: < .0001). The PPG device demonstrated a mean bias of 0.398 ± 2.168 bpm (95% LoA 3.851, −4.648) for the day shift and 0.692 ± 2.284 bpm (95% LoA 3.785, −5.169) for the night shift (see Table
+                    - link "1" [ref=e221] [cursor=pointer]:
+                      - /url: "#hsr2477-tbl-0001"
+                    - text: ).
+                  - generic [ref=e222]:
+                    - heading "TABLE 1." [level=4] [ref=e223]
+                    - paragraph [ref=e225]: Results for HR data
+                    - table [ref=e227]:
+                      - rowgroup [ref=e233]:
+                        - row "Aggregate data (n = 1283) Day shift AM 7:00 to PM 17:59 (n = 871) Night shift PM 18:00 to AM 6:59 (n = 412)" [ref=e234]:
+                          - columnheader [ref=e235]
+                          - columnheader "Aggregate data (n = 1283)" [ref=e236]
+                          - columnheader "Day shift AM 7:00 to PM 17:59 (n = 871)" [ref=e237]
+                          - columnheader "Night shift PM 18:00 to AM 6:59 (n = 412)" [ref=e238]
+                      - rowgroup [ref=e239]:
+                        - row "PPG mean HR, bpm (±SD) 84.738 (9.675) 83.745 (9.711) 86.837 (9.265)" [ref=e240]:
+                          - cell "PPG mean HR, bpm (±SD)" [ref=e241]
+                          - cell "84.738 (9.675)" [ref=e242]
+                          - cell "83.745 (9.711)" [ref=e243]
+                          - cell "86.837 (9.265)" [ref=e244]
+                        - row "ECG mean HR, bpm (±SD) 85.230 (9.532) 84.144 (9.422) 87.528 (9.365)" [ref=e245]:
+                          - cell "ECG mean HR, bpm (±SD)" [ref=e246]
+                          - cell "85.230 (9.532)" [ref=e247]
+                          - cell "84.144 (9.422)" [ref=e248]
+                          - cell "87.528 (9.365)" [ref=e249]
+                        - row "Correlation (r) 95%CI 0.974***, 0.971‐0.976 0.975***, 0.971‐0.978 0.970***, 0.964‐0.975" [ref=e250]:
+                          - cell "Correlation (r) 95%CI" [ref=e251]:
+                            - text: Correlation (
+                            - emphasis [ref=e252]: r
+                            - text: ) 95%CI
+                          - cell "0.974***, 0.971‐0.976" [ref=e253]:
+                            - text: "0.974"
+                            - link "***" [ref=e254] [cursor=pointer]:
+                              - /url: "#hsr2477-note-0002"
+                              - superscript [ref=e255]: "***"
+                            - text: ", 0.971‐0.976"
+                          - cell "0.975***, 0.971‐0.978" [ref=e256]:
+                            - text: "0.975"
+                            - link "***" [ref=e257] [cursor=pointer]:
+                              - /url: "#hsr2477-note-0002"
+                              - superscript [ref=e258]: "***"
+                            - text: ", 0.971‐0.978"
+                          - cell "0.970***, 0.964‐0.975" [ref=e259]:
+                            - text: "0.970"
+                            - link "***" [ref=e260] [cursor=pointer]:
+                              - /url: "#hsr2477-note-0002"
+                              - superscript [ref=e261]: "***"
+                            - text: ", 0.964‐0.975"
+                        - row "Mean bias, bpm (±SD) 0.493 (2.209) 0.398 (2.168) 0.692(2.284)" [ref=e262]:
+                          - cell "Mean bias, bpm (±SD)" [ref=e263]
+                          - cell "0.493 (2.209)" [ref=e264]
+                          - cell "0.398 (2.168)" [ref=e265]
+                          - cell "0.692(2.284)" [ref=e266]
+                        - row "95% LoA (upper, lower) 3.838, −4.823 3.8508, −4.6475 3.785, −5.169" [ref=e267]:
+                          - cell "95% LoA (upper, lower)" [ref=e268]
+                          - cell "3.838, −4.823" [ref=e269]
+                          - cell "3.8508, −4.6475" [ref=e270]
+                          - cell "3.785, −5.169" [ref=e271]
+                        - row "SD error of mean differences 0.062 0.073 0.113" [ref=e272]:
+                          - cell "SD error of mean differences" [ref=e273]
+                          - cell "0.062" [ref=e274]
+                          - cell "0.073" [ref=e275]
+                          - cell "0.113" [ref=e276]
+                    - link "Open in a new tab" [ref=e278] [cursor=pointer]:
+                      - /url: table/hsr2477-tbl-0001/
+                    - generic [ref=e279]:
+                      - paragraph [ref=e281]: "Abbreviations: CI, confidence interval; ECG, electrocardiography; HR, heart rate; LoA, limits of agreement; n, per minute ECG and PPG data pairs; PPG, photoplethysmography; SD, standard deviation."
+                      - generic [ref=e282]:
+                        - superscript [ref=e283]: "***"
+                        - paragraph [ref=e284]:
+                          - emphasis [ref=e285]: P
+                          - text: < .001.
+                  - figure "Results of HR estimates obtained using PPG and ECG. (A) The Pearson's correlation. Bland‐Altman plots with bias and 95% limits of agreement for (B) aggregated, (C) day, and (D) night shifts HR estimates" [ref=e286]:
+                    - heading "FIGURE 1." [level=4] [ref=e287]
+                    - paragraph [ref=e288]:
+                      - img "FIGURE 1" [ref=e289]
+                    - link "Open in a new tab" [ref=e291] [cursor=pointer]:
+                      - /url: figure/hsr2477-fig-0001/
+                    - paragraph [ref=e293]: Results of HR estimates obtained using PPG and ECG. (A) The Pearson's correlation. Bland‐Altman plots with bias and 95% limits of agreement for (B) aggregated, (C) day, and (D) night shifts HR estimates
+                - generic [ref=e294]:
+                  - heading "3.3. LF/HF estimates from PPG compared to ECG" [level=3] [ref=e295]
+                  - paragraph [ref=e296]:
+                    - text: Results of LF/HF data pair analyses were presented in Table
+                    - link "2" [ref=e297] [cursor=pointer]:
+                      - /url: "#hsr2477-tbl-0002"
+                    - text: and Figure
+                    - link "2" [ref=e298] [cursor=pointer]:
+                      - /url: "#hsr2477-fig-0002"
+                    - text: . The results showed that there was a moderate positive correlation for aggregate data, day and night shift data respectively (
+                    - emphasis [ref=e299]: r
+                    - text: = 0.577,
+                    - emphasis [ref=e300]: P
+                    - text: < .0001;
+                    - emphasis [ref=e301]: r
+                    - text: = 0.617,
+                    - emphasis [ref=e302]: P
+                    - text: < .0001, and
+                    - emphasis [ref=e303]: r
+                    - text: = 0.464,
+                    - emphasis [ref=e304]: P
+                    - text: < .0001). Compared to the ECG data, PPG data showed that mean scores were 0.153 ± 1.573 for aggregate data, 0.132 ± 1.532 for day shift and 0.198 ± 1.667 for night shift, respectively, and their corresponding 95% LoA were −2.930 to 3.235, −2.870 to 3.134, and −3.071 to 3.466, respectively.
+                  - generic [ref=e305]:
+                    - heading "TABLE 2." [level=4] [ref=e306]
+                    - paragraph [ref=e308]: Results for LF/HF
+                    - table [ref=e310]:
+                      - rowgroup [ref=e316]:
+                        - row "Aggregate data (n = 264) Day shift AM 7:00 to PM 17:59 (n = 180) Night shift PM 18:00 to AM 6:59 (n = 84)" [ref=e317]:
+                          - columnheader [ref=e318]
+                          - columnheader "Aggregate data (n = 264)" [ref=e319]
+                          - columnheader "Day shift AM 7:00 to PM 17:59 (n = 180)" [ref=e320]
+                          - columnheader "Night shift PM 18:00 to AM 6:59 (n = 84)" [ref=e321]
+                      - rowgroup [ref=e322]:
+                        - row "PPG mean LF/HF (±SD) 3.557 (1.328) 3.374 (1.266) 3.954 (1.380)" [ref=e323]:
+                          - cell "PPG mean LF/HF (±SD)" [ref=e324]
+                          - cell "3.557 (1.328)" [ref=e325]
+                          - cell "3.374 (1.266)" [ref=e326]
+                          - cell "3.954 (1.380)" [ref=e327]
+                        - row "ECG mean LF/HF (±SD) 3.404 (1.905) 3.242 (1.945) 3.756 (1.775)" [ref=e328]:
+                          - cell "ECG mean LF/HF (±SD)" [ref=e329]
+                          - cell "3.404 (1.905)" [ref=e330]
+                          - cell "3.242 (1.945)" [ref=e331]
+                          - cell "3.756 (1.775)" [ref=e332]
+                        - row "Correlation (r) 95% CI 0.577***, 0.489‐0.653 0.617***, 0.517–0.701 0.464***, 0.275–0.619" [ref=e333]:
+                          - cell "Correlation (r) 95% CI" [ref=e334]:
+                            - text: Correlation (
+                            - emphasis [ref=e335]: r
+                            - text: ) 95% CI
+                          - cell "0.577***, 0.489‐0.653" [ref=e336]:
+                            - text: "0.577"
+                            - link "***" [ref=e337] [cursor=pointer]:
+                              - /url: "#hsr2477-note-1003"
+                              - superscript [ref=e338]: "***"
+                            - text: ", 0.489‐0.653"
+                          - cell "0.617***, 0.517–0.701" [ref=e339]:
+                            - text: "0.617"
+                            - link "***" [ref=e340] [cursor=pointer]:
+                              - /url: "#hsr2477-note-1003"
+                              - superscript [ref=e341]: "***"
+                            - text: ", 0.517–0.701"
+                          - cell "0.464***, 0.275–0.619" [ref=e342]:
+                            - text: "0.464"
+                            - link "***" [ref=e343] [cursor=pointer]:
+                              - /url: "#hsr2477-note-1003"
+                              - superscript [ref=e344]: "***"
+                            - text: ", 0.275–0.619"
+                        - row "Mean bias, (±SD) 0.153 (1.573) 0.132 (1.532) 0.198 (1.668)" [ref=e345]:
+                          - cell "Mean bias, (±SD)" [ref=e346]
+                          - cell "0.153 (1.573)" [ref=e347]
+                          - cell "0.132 (1.532)" [ref=e348]
+                          - cell "0.198 (1.668)" [ref=e349]
+                        - row "95% LoA (upper, lower) 3.235, −2.930 3.134, −2.870 3.466, −3.071" [ref=e350]:
+                          - cell "95% LoA (upper, lower)" [ref=e351]
+                          - cell "3.235, −2.930" [ref=e352]
+                          - cell "3.134, −2.870" [ref=e353]
+                          - cell "3.466, −3.071" [ref=e354]
+                        - row "SE of mean differences 0.098 0.115 0.184" [ref=e355]:
+                          - cell "SE of mean differences" [ref=e356]
+                          - cell "0.098" [ref=e357]
+                          - cell "0.115" [ref=e358]
+                          - cell "0.184" [ref=e359]
+                    - link "Open in a new tab" [ref=e361] [cursor=pointer]:
+                      - /url: table/hsr2477-tbl-0002/
+                    - generic [ref=e362]:
+                      - paragraph [ref=e364]: "Abbreviations: CI, confidence interval; ECG, electrocardiography; HF, high frequency; LF, low frequency; LoA, limits of agreement; n, per 5‐minute data pairs; PPG, photoplethysmography; SD, standard deviation."
+                      - generic [ref=e365]:
+                        - superscript [ref=e366]: "***"
+                        - paragraph [ref=e367]:
+                          - emphasis [ref=e368]: P
+                          - text: < .001.
+                  - figure "Results of LF/HF data pairs of PPG and ECG. (A) The Pearson's correlation. Bland‐Altman plots with bias and 95% limits of agreement for (B) aggregated, (C) day, and (D) night shifts LF/HF estimates" [ref=e369]:
+                    - heading "FIGURE 2." [level=4] [ref=e370]
+                    - paragraph [ref=e371]:
+                      - img "FIGURE 2" [ref=e372]
+                    - link "Open in a new tab" [ref=e374] [cursor=pointer]:
+                      - /url: figure/hsr2477-fig-0002/
+                    - paragraph [ref=e376]: Results of LF/HF data pairs of PPG and ECG. (A) The Pearson's correlation. Bland‐Altman plots with bias and 95% limits of agreement for (B) aggregated, (C) day, and (D) night shifts LF/HF estimates
+                - generic [ref=e377]:
+                  - heading "3.4. Percent LF estimates from PPG compared to ECG" [level=3] [ref=e378]
+                  - paragraph [ref=e379]:
+                    - text: Table
+                    - link "3" [ref=e380] [cursor=pointer]:
+                      - /url: "#hsr2477-tbl-0003"
+                    - text: depicts the mean, correlations coefficient, and mean bias in percent LF estimates obtained from the two devices. The Bland‐Altman plots for all data sets are shown in Figure
+                    - link "3" [ref=e381] [cursor=pointer]:
+                      - /url: "#hsr2477-fig-0003"
+                    - text: . Similar to the result of the LF/HF estimates, moderate positive correlations were found between percent LF aggregate data (
+                    - emphasis [ref=e382]: r
+                    - text: = 0.668,
+                    - emphasis [ref=e383]: P
+                    - text: < .0001), dayshift data (
+                    - emphasis [ref=e384]: r
+                    - text: = 0.685,
+                    - emphasis [ref=e385]: P
+                    - text: < .0001), and night shift data (
+                    - emphasis [ref=e386]: r
+                    - text: = 0.622,
+                    - emphasis [ref=e387]: P
+                    - text: < .0001) obtained from the PPG and ECG devices. Moreover, the results of Bland‐Altman analysis showed a mean bias of percent LF as 0.001 ± 0.069 (95% LoA 0.139, −0.137) for aggregate data, 0.005 ± 0.068 (95% LoA 0.139, −0.130) for day shift, and 0.014 ± 20.069 (95% LoA 0.122, −0.150) for night shift. The high degree of agreement between the two methods was found for HRV parameters.
+                  - generic [ref=e388]:
+                    - heading "TABLE 3." [level=4] [ref=e389]
+                    - paragraph [ref=e391]: Results for percent LF
+                    - table [ref=e393]:
+                      - rowgroup [ref=e399]:
+                        - row "Aggregate data (n = 264) Day shift AM 7:00 to PM 17:59 (n = 180) Night shift PM 18:00 to AM 6:59 (n = 84)" [ref=e400]:
+                          - columnheader [ref=e401]
+                          - columnheader "Aggregate data (n = 264)" [ref=e402]
+                          - columnheader "Day shift AM 7:00 to PM 17:59 (n = 180)" [ref=e403]
+                          - columnheader "Night shift PM 18:00 to AM 6:59 (n = 84)" [ref=e404]
+                      - rowgroup [ref=e405]:
+                        - row "PPG mean LF/(LF + HF) (±SD) 0.709 (0.0701) 0.702 (0.067) 0.724 (0.075)" [ref=e406]:
+                          - cell "PPG mean LF/(LF + HF) (±SD)" [ref=e407]
+                          - cell "0.709 (0.0701)" [ref=e408]
+                          - cell "0.702 (0.067)" [ref=e409]
+                          - cell "0.724 (0.075)" [ref=e410]
+                        - row "ECG mean LF/(LF + HF) (±SD) 0.711 (0.092) 0.698(0.094) 0.738 (0.084)" [ref=e411]:
+                          - cell "ECG mean LF/(LF + HF) (±SD)" [ref=e412]
+                          - cell "0.711 (0.092)" [ref=e413]
+                          - cell "0.698(0.094)" [ref=e414]
+                          - cell "0.738 (0.084)" [ref=e415]
+                        - row "Correlation (r) 95% CI 0.668***, 0.595‐0.730 0.685***, 0.596‐0.754 0.622***, 0.471‐0.738" [ref=e416]:
+                          - cell "Correlation (r) 95% CI" [ref=e417]:
+                            - text: Correlation (
+                            - emphasis [ref=e418]: r
+                            - text: ) 95% CI
+                          - cell "0.668***, 0.595‐0.730" [ref=e419]:
+                            - text: "0.668"
+                            - link "***" [ref=e420] [cursor=pointer]:
+                              - /url: "#hsr2477-note-1004"
+                              - superscript [ref=e421]: "***"
+                            - text: ", 0.595‐0.730"
+                          - cell "0.685***, 0.596‐0.754" [ref=e422]:
+                            - text: "0.685"
+                            - link "***" [ref=e423] [cursor=pointer]:
+                              - /url: "#hsr2477-note-1004"
+                              - superscript [ref=e424]: "***"
+                            - text: ", 0.596‐0.754"
+                          - cell "0.622***, 0.471‐0.738" [ref=e425]:
+                            - text: "0.622"
+                            - link "***" [ref=e426] [cursor=pointer]:
+                              - /url: "#hsr2477-note-1004"
+                              - superscript [ref=e427]: "***"
+                            - text: ", 0.471‐0.738"
+                        - row "Mean bias, (±SD) 0.001 (0.070) 0.005 (0.068) 0.014 (0.069)" [ref=e428]:
+                          - cell "Mean bias, (±SD)" [ref=e429]
+                          - cell "0.001 (0.070)" [ref=e430]
+                          - cell "0.005 (0.068)" [ref=e431]
+                          - cell "0.014 (0.069)" [ref=e432]
+                        - row "95% LoA (upper, lower) 0.134, −0.137 0.139, −0.130 0.122, −0.150" [ref=e433]:
+                          - cell "95% LoA (upper, lower)" [ref=e434]
+                          - cell "0.134, −0.137" [ref=e435]
+                          - cell "0.139, −0.130" [ref=e436]
+                          - cell "0.122, −0.150" [ref=e437]
+                        - row "SE of mean differences 0.004 0.005 0.008" [ref=e438]:
+                          - cell "SE of mean differences" [ref=e439]
+                          - cell "0.004" [ref=e440]
+                          - cell "0.005" [ref=e441]
+                          - cell "0.008" [ref=e442]
+                    - link "Open in a new tab" [ref=e444] [cursor=pointer]:
+                      - /url: table/hsr2477-tbl-0003/
+                    - generic [ref=e445]:
+                      - paragraph [ref=e447]: "Abbreviations: CI, confidence interval; ECG, electrocardiography; HF, high frequency; LF, low frequency; LoA, limits of agreement; n, per 5‐minute data pairs; PPG, photoplethysmography; SD, standard deviation."
+                      - generic [ref=e448]:
+                        - superscript [ref=e449]: "***"
+                        - paragraph [ref=e450]:
+                          - emphasis [ref=e451]: P
+                          - text: < .001.
+                  - figure "Results of percent LF data pairs of PPG and ECG. (A) The Pearson's correlation. Bland‐Altman plots with bias and 95% limits of agreement for (B) aggregated, (C) day, and (D) night shifts percent LF estimates" [ref=e452]:
+                    - heading "FIGURE 3." [level=4] [ref=e453]
+                    - paragraph [ref=e454]:
+                      - img "FIGURE 3" [ref=e455]
+                    - link "Open in a new tab" [ref=e457] [cursor=pointer]:
+                      - /url: figure/hsr2477-fig-0003/
+                    - paragraph [ref=e459]: Results of percent LF data pairs of PPG and ECG. (A) The Pearson's correlation. Bland‐Altman plots with bias and 95% limits of agreement for (B) aggregated, (C) day, and (D) night shifts percent LF estimates
+              - generic [ref=e460]:
+                - heading "4. DISCUSSION" [level=2] [ref=e461]: 4. DISCUSSION
+                - paragraph [ref=e462]:
+                  - text: This study examined the HR, LF/HF ratio, and percent LF measurements collected by PPG and ECG devices. The HR aggregate dataset indicated a strong positive correlation and a very small mean bias between the captured data of the two types of devices. These findings agreed with previous laboratory studies,
+                  - link "9" [ref=e463] [cursor=pointer]:
+                    - /url: "#hsr2477-bib-0009"
+                    - superscript [ref=e464]: "9"
+                  - text: ","
+                  - link "16" [ref=e465] [cursor=pointer]:
+                    - /url: "#hsr2477-bib-0016"
+                    - superscript [ref=e466]: "16"
+                  - text: which reported similar correlations and a high degree of agreement of HR derived from PPG and ECG devices. The present study showed that HR measurements from the two devices used in this experiment are in a high degree of agreement for nurses under real working conditions. Considering the differences in workloads between shifts, we further analyzed the HR for day and night shifts respectively to examine the degree of agreement between PPG and ECG signal by the two devices more specifically. Similarly, in both shifts, the HR measurements obtained from the PPG device were strongly correlated to ECG measurements with a very small mean bias.
+                - paragraph [ref=e467]:
+                  - text: Both devices used power spectral density analysis to identify and remove the motion artifacts from the raw data to calculate the HRV parameters.
+                  - link "9" [ref=e468] [cursor=pointer]:
+                    - /url: "#hsr2477-bib-0009"
+                    - superscript [ref=e469]: "9"
+                  - text: ","
+                  - link "27" [ref=e470] [cursor=pointer]:
+                    - /url: "#hsr2477-bib-0027"
+                    - superscript [ref=e471]: "27"
+                  - text: The stress values are calculated based on HRV parameters from both devices. The LF/HF ratio and percent LF were used to assess the accuracy and reliability of the two devices. The result of the present study showed a moderate positive correlation between the two devices, and most of the mean bias pairs were within the LoA width. Overall, the results demonstrated that the PPG device achieved acceptable and comparable reliability as the ECG device in acquiring HRV parameters of nurses in real working conditions.
+                - paragraph [ref=e472]: Since the PPG device was worn on the upper arm, feedbacks from the participants indicated that it did not cause any discomfort or interference in their movement. All participants preferred the PPG device over the ECG one. With the high level of agreement between the two devices shown in the results, this pilot study suggested that the PPG device is a feasible tool for collecting accurate HR and HRV parameters for nurses under real work condition.
+                - paragraph [ref=e473]:
+                  - text: There are several limitations to this pilot study. Firstly, the sample size is small which may affect the statistical power. Secondly, since some volunteers reported discomfort when wearing the ECG device after a long period of time in another previous study of ours, we decided to collect only 1 hour of data in this experiment. Moreover, only one model of PPG device and ECG device was used in the present study. More devices from different manufacturers should be used to examine the reliability of these devices in general in real working conditions in the future. Finally, HRV parameters can be affected by physiological factors (age, gender, day and night rhythm, and acute and chronic diseases)
+                  - link "28" [ref=e474] [cursor=pointer]:
+                    - /url: "#hsr2477-bib-0028"
+                    - superscript [ref=e475]: "28"
+                  - text: and mechanical factors such as motion artifacts
+                  - link "17" [ref=e476] [cursor=pointer]:
+                    - /url: "#hsr2477-bib-0017"
+                    - superscript [ref=e477]: "17"
+                  - text: and sampling devices.
+                  - link "18" [ref=e478] [cursor=pointer]:
+                    - /url: "#hsr2477-bib-0018"
+                    - superscript [ref=e479]: "18"
+                  - text: ","
+                  - link "22" [ref=e480] [cursor=pointer]:
+                    - /url: "#hsr2477-bib-0022"
+                    - superscript [ref=e481]: "22"
+                - paragraph [ref=e482]: Overall, in conjunction with existing self‐evaluation mechanisms, PPG wearable devices that are capable of collecting HRV parameters in real working conditions will contribute to the stress management of nurses to reliably assess their conditions, and to evaluate the effectiveness of interventions.
+              - generic [ref=e483]:
+                - heading "5. CONCLUSIONS" [level=2] [ref=e484]: 5. CONCLUSIONS
+                - paragraph [ref=e485]: In this study, we examined the validity of the HR and HRV parameters measurements captured by a PPG device and an ECG device from nurses during normal work conditions. Our results showed that the PPG device was able to show reliable HR and HRV parameters at a level comparable to the ECG device. Since nurses are faced with excessive levels of workplace stress, in addition to subjective self‐evaluation questionnaires, it is beneficial to regularly collect objective data such as HR and HRV parameters to rapidly detect fluctuations in the stress levels in nurses and to provide early interventions accordingly. Our pilot study demonstrated the feasibility of using wearable PPG and ECG devices to perform short‐term monitoring. In the future, large‐scale long‐term studies with larger study populations should be conducted to further evaluate the reliability of PPG and ECG devices in monitoring the work conditions of nurses.
+              - generic [ref=e486]:
+                - heading "FUNDING" [level=2] [ref=e487]: FUNDING
+                - paragraph [ref=e488]: This research was supported by a project grant from National Health Commission for Health Professional Development Program of China (grant no. 2019‐HLYJ‐015).
+              - generic [ref=e489]:
+                - heading "CONFLICT OF INTEREST" [level=2] [ref=e490]: CONFLICT OF INTEREST
+                - paragraph [ref=e491]: The authors declare no conflicts of interest.
+              - generic [ref=e492]:
+                - heading "AUTHOR CONTRIBUTIONS" [level=2] [ref=e493]: AUTHOR CONTRIBUTIONS
+                - paragraph [ref=e494]: "Conceptualization: Xinxia Li."
+                - paragraph [ref=e495]: "Data Curation: Chenghong Hu."
+                - paragraph [ref=e496]: "Formal Analysis: Chenghong Hu."
+                - paragraph [ref=e497]: Funding Acquisition, Xinxia Li.
+                - paragraph [ref=e498]: "Investigation: Yang Chen, Rongqing Dang."
+                - paragraph [ref=e499]: "Project Administration: Xinxia Li."
+                - paragraph [ref=e500]: "Resources: Airong Meng, Yanmei Guo."
+                - paragraph [ref=e501]: "Supervision: Xinxia Li."
+                - paragraph [ref=e502]: "Writing—Original Draft Preparation: Chenghong Hu."
+                - paragraph [ref=e503]: "Writing—Review and Editing: Xinxia Li, Chenghong Hu."
+                - paragraph [ref=e504]: All authors have read and agreed to the published version of the manuscript.
+                - paragraph [ref=e505]: Chenghong Hu had full access to all of the data in the study and takes complete responsibility for the integrity of the data and the accuracy of the data analysis.
+              - generic [ref=e506]:
+                - heading "TRANSPARENCY STATEMENT" [level=2] [ref=e507]: TRANSPARENCY STATEMENT
+                - paragraph [ref=e508]: Xinxia Li affirms that this manuscript is an honest, accurate, and transparent account of the study being reported; that no important aspects of the study have been omitted; and that any discrepancies from the study as planned (and, if relevant registered) have been explained.
+              - generic [ref=e509]:
+                - heading "Supporting information" [level=2] [ref=e510]: Supporting information
+                - generic [ref=e511]:
+                  - paragraph [ref=e513]:
+                    - strong [ref=e514]: Appendix S1.
+                    - text: Supporting information.
+                  - generic [ref=e516]:
+                    - link "Click here for additional data file." [ref=e517] [cursor=pointer]:
+                      - /url: /articles/instance/8865060/bin/HSR2-5-e477-s001.docx
+                    - superscript [ref=e518]: (115.7KB, docx)
+              - generic [ref=e519]:
+                - heading "ACKNOWLEDGMENTS" [level=2] [ref=e520]: ACKNOWLEDGMENTS
+                - paragraph [ref=e521]: The authors would like to thank all hospital leaders for their helpful support and all volunteers for their participation.
+              - paragraph [ref=e523]: "Li X, Hu C, Meng A, Guo Y, Chen Y, Dang R. Heart rate variability and heart rate monitoring of nurses using PPG and ECG signals during working condition: A pilot study. Health Sci Rep. 2022;5:e477. doi: 10.1002/hsr2.477"
+              - generic [ref=e524]:
+                - heading "DATA AVAILABILITY STATEMENT" [level=2] [ref=e525]: DATA AVAILABILITY STATEMENT
+                - paragraph [ref=e526]: The data supporting the findings of the present study will be available on request to the corresponding author.
+              - generic [ref=e527]:
+                - heading "REFERENCES" [level=2] [ref=e528]: REFERENCES
+                - list [ref=e530]:
+                  - listitem [ref=e531]:
+                    - generic [ref=e532]: "1."
+                    - text: "Edwards D, Burnard P. A systematic review of stress and stress management interventions for mental health nurses. J Adv Nurs. 2003;42(2):169‐200. doi: 10.1046/j.1365-2648.2003.02600.x ["
+                    - link "External, opens in a new tab. DOI" [ref=e533] [cursor=pointer]:
+                      - /url: https://doi.org/10.1046/j.1365-2648.2003.02600.x
+                    - text: "] ["
+                    - link "PubMed" [ref=e534] [cursor=pointer]:
+                      - /url: https://pubmed.ncbi.nlm.nih.gov/12670386/
+                    - text: "] ["
+                    - link "External, opens in a new tab. Google Scholar" [ref=e535] [cursor=pointer]:
+                      - /url: https://scholar.google.com/scholar_lookup?journal=J%20Adv%20Nurs&title=A%20systematic%20review%20of%20stress%20and%20stress%20management%20interventions%20for%20mental%20health%20nurses&author=D%20Edwards&author=P%20Burnard&volume=42&issue=2&publication_year=2003&pages=169-200&pmid=12670386&doi=10.1046/j.1365-2648.2003.02600.x&
+                    - text: "]"
+                  - listitem [ref=e536]:
+                    - generic [ref=e537]: "2."
+                    - text: "Hu D, Kong Y, Li WG, et al. Frontline nurses' burnout, anxiety, depression, and fear statuses and their associated factors during the COVID‐19 outbreak in Wuhan, China: a large‐scale cross‐sectional study. EClinicalMedicine. 2020;24:100424. doi: 10.1016/j.eclinm.2020.100424 ["
+                    - link "External, opens in a new tab. DOI" [ref=e538] [cursor=pointer]:
+                      - /url: https://doi.org/10.1016/j.eclinm.2020.100424
+                    - text: "] ["
+                    - link "PMC free article" [ref=e539] [cursor=pointer]:
+                      - /url: /articles/PMC7320259/
+                    - text: "] ["
+                    - link "PubMed" [ref=e540] [cursor=pointer]:
+                      - /url: https://pubmed.ncbi.nlm.nih.gov/32766539/
+                    - text: "] ["
+                    - link "External, opens in a new tab. Google Scholar" [ref=e541] [cursor=pointer]:
+                      - /url: https://scholar.google.com/scholar_lookup?journal=EClinicalMedicine&title=Frontline%20nurses'%20burnout,%20anxiety,%20depression,%20and%20fear%20statuses%20and%20their%20associated%20factors%20during%20the%20COVID%E2%80%9019%20outbreak%20in%20Wuhan,%20China:%20a%20large%E2%80%90scale%20cross%E2%80%90sectional%20study&author=D%20Hu&author=Y%20Kong&author=WG%20Li&volume=24&publication_year=2020&pages=100424&pmid=32766539&doi=10.1016/j.eclinm.2020.100424&
+                    - text: "]"
+                  - listitem [ref=e542]:
+                    - generic [ref=e543]: "3."
+                    - text: "Stelnicki AM, Carleton RN, Reichert C. Nurses' mental health and well‐being: COVID‐19 impacts. Can J Nurs Res. 2020;52(3):237‐239. doi: 10.1177/0844562120931623 ["
+                    - link "External, opens in a new tab. DOI" [ref=e544] [cursor=pointer]:
+                      - /url: https://doi.org/10.1177/0844562120931623
+                    - text: "] ["
+                    - link "PubMed" [ref=e545] [cursor=pointer]:
+                      - /url: https://pubmed.ncbi.nlm.nih.gov/32515209/
+                    - text: "] ["
+                    - link "External, opens in a new tab. Google Scholar" [ref=e546] [cursor=pointer]:
+                      - /url: https://scholar.google.com/scholar_lookup?journal=Can%20J%20Nurs%20Res&title=Nurses'%20mental%20health%20and%20well%E2%80%90being:%20COVID%E2%80%9019%20impacts&author=AM%20Stelnicki&author=RN%20Carleton&author=C%20Reichert&volume=52&issue=3&publication_year=2020&pages=237-239&pmid=32515209&doi=10.1177/0844562120931623&
+                    - text: "]"
+                  - listitem [ref=e547]:
+                    - generic [ref=e548]: "4."
+                    - text: "Sarafis P, Rousaki E, Tsounis A, et al. The impact of occupa‐tional stress on nurses' caring behaviors and their health related quality of life. BMC Nurs. 2016;15:56. doi: 10.1186/s12912-016-0178-y ["
+                    - link "External, opens in a new tab. DOI" [ref=e549] [cursor=pointer]:
+                      - /url: https://doi.org/10.1186/s12912-016-0178-y
+                    - text: "] ["
+                    - link "PMC free article" [ref=e550] [cursor=pointer]:
+                      - /url: /articles/PMC5039891/
+                    - text: "] ["
+                    - link "PubMed" [ref=e551] [cursor=pointer]:
+                      - /url: https://pubmed.ncbi.nlm.nih.gov/27708546/
+                    - text: "] ["
+                    - link "External, opens in a new tab. Google Scholar" [ref=e552] [cursor=pointer]:
+                      - /url: https://scholar.google.com/scholar_lookup?journal=BMC%20Nurs&title=The%20impact%20of%20occupa%E2%80%90tional%20stress%20on%20nurses'%20caring%20behaviors%20and%20their%20health%20related%20quality%20of%20life&author=P%20Sarafis&author=E%20Rousaki&author=A%20Tsounis&volume=15&publication_year=2016&pages=56&pmid=27708546&doi=10.1186/s12912-016-0178-y&
+                    - text: "]"
+                  - listitem [ref=e553]:
+                    - generic [ref=e554]: "5."
+                    - text: "Frogeli E, Rudman A, Gustavsson P. The relationship between task mastery, role clarity, social acceptance, and stress: an intensive longitudinal study with a sample of newly registered nurses. Int J Nurs Stud. 2019;91:60‐69. doi: 10.1016/j.ijnurstu.2018.10.007 ["
+                    - link "External, opens in a new tab. DOI" [ref=e555] [cursor=pointer]:
+                      - /url: https://doi.org/10.1016/j.ijnurstu.2018.10.007
+                    - text: "] ["
+                    - link "PubMed" [ref=e556] [cursor=pointer]:
+                      - /url: https://pubmed.ncbi.nlm.nih.gov/30677589/
+                    - text: "] ["
+                    - link "External, opens in a new tab. Google Scholar" [ref=e557] [cursor=pointer]:
+                      - /url: https://scholar.google.com/scholar_lookup?journal=Int%20J%20Nurs%20Stud&title=The%20relationship%20between%20task%20mastery,%20role%20clarity,%20social%20acceptance,%20and%20stress:%20an%20intensive%20longitudinal%20study%20with%20a%20sample%20of%20newly%20registered%20nurses&author=E%20Frogeli&author=A%20Rudman&author=P%20Gustavsson&volume=91&publication_year=2019&pages=60-69&pmid=30677589&doi=10.1016/j.ijnurstu.2018.10.007&
+                    - text: "]"
+                  - listitem [ref=e558]:
+                    - generic [ref=e559]: "6."
+                    - text: "Liu Y, Aungsuroch Y. Work stress, perceived social support, self‐efficacy and burnout among Chinese registered nurses. J Nurs Manag. 2019;27(7):1445‐1453. doi: 10.1111/jonm.12828 ["
+                    - link "External, opens in a new tab. DOI" [ref=e560] [cursor=pointer]:
+                      - /url: https://doi.org/10.1111/jonm.12828
+                    - text: "] ["
+                    - link "PubMed" [ref=e561] [cursor=pointer]:
+                      - /url: https://pubmed.ncbi.nlm.nih.gov/31306524/
+                    - text: "] ["
+                    - link "External, opens in a new tab. Google Scholar" [ref=e562] [cursor=pointer]:
+                      - /url: https://scholar.google.com/scholar_lookup?journal=J%20Nurs%20Manag&title=Work%20stress,%20perceived%20social%20support,%20self%E2%80%90efficacy%20and%20burnout%20among%20Chinese%20registered%20nurses&author=Y%20Liu&author=Y%20Aungsuroch&volume=27&issue=7&publication_year=2019&pages=1445-1453&pmid=31306524&doi=10.1111/jonm.12828&
+                    - text: "]"
+                  - listitem [ref=e563]:
+                    - generic [ref=e564]: "7."
+                    - text: "Chang IC, Cheng WC, Kung WC. A stress relief app intervention for newly employed nursing staff: qua‐si‐experimental design. JMIR Mhealth Uhealth. 2019;7(12):e15785. doi: 10.2196/15785 ["
+                    - link "External, opens in a new tab. DOI" [ref=e565] [cursor=pointer]:
+                      - /url: https://doi.org/10.2196/15785
+                    - text: "] ["
+                    - link "PMC free article" [ref=e566] [cursor=pointer]:
+                      - /url: /articles/PMC6939249/
+                    - text: "] ["
+                    - link "PubMed" [ref=e567] [cursor=pointer]:
+                      - /url: https://pubmed.ncbi.nlm.nih.gov/31850848/
+                    - text: "] ["
+                    - link "External, opens in a new tab. Google Scholar" [ref=e568] [cursor=pointer]:
+                      - /url: https://scholar.google.com/scholar_lookup?journal=JMIR%20Mhealth%20Uhealth&title=A%20stress%20relief%20app%20intervention%20for%20newly%20employed%20nursing%20staff:%20qua%E2%80%90si%E2%80%90experimental%20design&author=IC%20Chang&author=WC%20Cheng&author=WC%20Kung&volume=7&issue=12&publication_year=2019&pages=e15785&pmid=31850848&doi=10.2196/15785&
+                    - text: "]"
+                  - listitem [ref=e569]:
+                    - generic [ref=e570]: "8."
+                    - text: Bogdány T, Boros S, Szemerszky R, et al. Validation of the firstbeat teambelt and BodyGuard2 systems. Magyar Sporttudományi Szemle. 2016;17:5‐12. [
+                    - link "External, opens in a new tab. Google Scholar" [ref=e571] [cursor=pointer]:
+                      - /url: https://scholar.google.com/scholar_lookup?journal=Magyar%20Sporttudom%C3%A1nyi%20Szemle&title=Validation%20of%20the%20firstbeat%20teambelt%20and%20BodyGuard2%20systems&author=T%20Bogd%C3%A1ny&author=S%20Boros&author=R%20Szemerszky&volume=17&publication_year=2016&pages=5-12&
+                    - text: "]"
+                  - listitem [ref=e572]:
+                    - generic [ref=e573]: "9."
+                    - text: "Schubert M, Clark A, Rosa A. The polar® OH1 optical heart rate sensor is valid during moderate‐vigorous exercise. Sports Med Int Open. 2018;02:67‐70. doi: 10.1055/a-0631-0920 ["
+                    - link "External, opens in a new tab. DOI" [ref=e574] [cursor=pointer]:
+                      - /url: https://doi.org/10.1055/a-0631-0920
+                    - text: "] ["
+                    - link "PMC free article" [ref=e575] [cursor=pointer]:
+                      - /url: /articles/PMC6225963/
+                    - text: "] ["
+                    - link "PubMed" [ref=e576] [cursor=pointer]:
+                      - /url: https://pubmed.ncbi.nlm.nih.gov/30539120/
+                    - text: "] ["
+                    - link "External, opens in a new tab. Google Scholar" [ref=e577] [cursor=pointer]:
+                      - /url: https://scholar.google.com/scholar_lookup?journal=Sports%20Med%20Int%20Open&title=The%20polar%C2%AE%20OH1%20optical%20heart%20rate%20sensor%20is%20valid%20during%20moderate%E2%80%90vigorous%20exercise&author=M%20Schubert&author=A%20Clark&author=A%20Rosa&volume=02&publication_year=2018&pages=67-70&pmid=30539120&doi=10.1055/a-0631-0920&
+                    - text: "]"
+                  - listitem [ref=e578]:
+                    - generic [ref=e579]: "10."
+                    - text: "Jarczok MN, Jarczok M, Mauss D, et al. Autonomic nervous system activity and workplace stressors‐‐a systematic review. Neurosci Biobehav Rev. 2013;37(8):1810‐1823. doi: 10.1016/j.neubiorev.2013.07.004 ["
+                    - link "External, opens in a new tab. DOI" [ref=e580] [cursor=pointer]:
+                      - /url: https://doi.org/10.1016/j.neubiorev.2013.07.004
+                    - text: "] ["
+                    - link "PubMed" [ref=e581] [cursor=pointer]:
+                      - /url: https://pubmed.ncbi.nlm.nih.gov/23891906/
+                    - text: "] ["
+                    - link "External, opens in a new tab. Google Scholar" [ref=e582] [cursor=pointer]:
+                      - /url: https://scholar.google.com/scholar_lookup?journal=Neurosci%20Biobehav%20Rev&title=Autonomic%20nervous%20system%20activity%20and%20workplace%20stressors%E2%80%90%E2%80%90a%20systematic%20review&author=MN%20Jarczok&author=M%20Jarczok&author=D%20Mauss&volume=37&issue=8&publication_year=2013&pages=1810-1823&pmid=23891906&doi=10.1016/j.neubiorev.2013.07.004&
+                    - text: "]"
+                  - listitem [ref=e583]:
+                    - generic [ref=e584]: "11."
+                    - text: "Kim HG, Cheon EJ, Bai DS, Lee YH, Koo BH. Stress and heart rate variability: a meta‐analysis and review of the literature. Psychiatry Investig. 2018;15(3):235‐245. doi: 10.30773/pi.2017.08.17 ["
+                    - link "External, opens in a new tab. DOI" [ref=e585] [cursor=pointer]:
+                      - /url: https://doi.org/10.30773/pi.2017.08.17
+                    - text: "] ["
+                    - link "PMC free article" [ref=e586] [cursor=pointer]:
+                      - /url: /articles/PMC5900369/
+                    - text: "] ["
+                    - link "PubMed" [ref=e587] [cursor=pointer]:
+                      - /url: https://pubmed.ncbi.nlm.nih.gov/29486547/
+                    - text: "] ["
+                    - link "External, opens in a new tab. Google Scholar" [ref=e588] [cursor=pointer]:
+                      - /url: https://scholar.google.com/scholar_lookup?journal=Psychiatry%20Investig&title=Stress%20and%20heart%20rate%20variability:%20a%20meta%E2%80%90analysis%20and%20review%20of%20the%20literature&author=HG%20Kim&author=EJ%20Cheon&author=DS%20Bai&author=YH%20Lee&author=BH%20Koo&volume=15&issue=3&publication_year=2018&pages=235-245&pmid=29486547&doi=10.30773/pi.2017.08.17&
+                    - text: "]"
+                  - listitem [ref=e589]:
+                    - generic [ref=e590]: "12."
+                    - text: "van Amelsvoort LG, Schouten EG, Maan AC, et al. Occupational determinants of heart rate variability. Int Arch Occup Environ Health. 2000;73(4):255‐262. doi: 10.1007/s004200050425 ["
+                    - link "External, opens in a new tab. DOI" [ref=e591] [cursor=pointer]:
+                      - /url: https://doi.org/10.1007/s004200050425
+                    - text: "] ["
+                    - link "PubMed" [ref=e592] [cursor=pointer]:
+                      - /url: https://pubmed.ncbi.nlm.nih.gov/10877031/
+                    - text: "] ["
+                    - link "External, opens in a new tab. Google Scholar" [ref=e593] [cursor=pointer]:
+                      - /url: https://scholar.google.com/scholar_lookup?journal=Int%20Arch%20Occup%20Environ%20Health&title=Occupational%20determinants%20of%20heart%20rate%20variability&author=LG%20van%20Amelsvoort&author=EG%20Schouten&author=AC%20Maan&volume=73&issue=4&publication_year=2000&pages=255-262&pmid=10877031&doi=10.1007/s004200050425&
+                    - text: "]"
+                  - listitem [ref=e594]:
+                    - generic [ref=e595]: "13."
+                    - text: "Williamon A, Aufegger L, Wasley D, Looney D, Mandic DP. Complexity of physiological responses decreases in high‐stress musical performance. J R Soc Interface. 2013;10(89):20130719. doi: 10.1098/rsif.2013.0719 ["
+                    - link "External, opens in a new tab. DOI" [ref=e596] [cursor=pointer]:
+                      - /url: https://doi.org/10.1098/rsif.2013.0719
+                    - text: "] ["
+                    - link "PMC free article" [ref=e597] [cursor=pointer]:
+                      - /url: /articles/PMC3808549/
+                    - text: "] ["
+                    - link "PubMed" [ref=e598] [cursor=pointer]:
+                      - /url: https://pubmed.ncbi.nlm.nih.gov/24068177/
+                    - text: "] ["
+                    - link "External, opens in a new tab. Google Scholar" [ref=e599] [cursor=pointer]:
+                      - /url: https://scholar.google.com/scholar_lookup?journal=J%20R%20Soc%20Interface&title=Complexity%20of%20physiological%20responses%20decreases%20in%20high%E2%80%90stress%20musical%20performance&author=A%20Williamon&author=L%20Aufegger&author=D%20Wasley&author=D%20Looney&author=DP%20Mandic&volume=10&issue=89&publication_year=2013&pages=20130719&pmid=24068177&doi=10.1098/rsif.2013.0719&
+                    - text: "]"
+                  - listitem [ref=e600]:
+                    - generic [ref=e601]: "14."
+                    - text: "Achten J, Jeukendrup AE. Heart rate monitoring: applications and limitations. Sports Med. 2003;33:517‐538. ["
+                    - link "External, opens in a new tab. DOI" [ref=e602] [cursor=pointer]:
+                      - /url: https://doi.org/10.2165/00007256-200333070-00004
+                    - text: "] ["
+                    - link "PubMed" [ref=e603] [cursor=pointer]:
+                      - /url: https://pubmed.ncbi.nlm.nih.gov/12762827/
+                    - text: "] ["
+                    - link "External, opens in a new tab. Google Scholar" [ref=e604] [cursor=pointer]:
+                      - /url: https://scholar.google.com/scholar_lookup?journal=Sports%20Med&title=Heart%20rate%20monitoring:%20applications%20and%20limitations&author=J%20Achten&author=AE%20Jeukendrup&volume=33&publication_year=2003&pages=517-538&pmid=12762827&doi=10.2165/00007256-200333070-00004&
+                    - text: "]"
+                  - listitem [ref=e605]:
+                    - generic [ref=e606]: "15."
+                    - text: "Pinheiro N, Couceiro R, Henriques J, et al. Can PPG be used for HRV analysis? Paper presented at: Annu Int Conf IEEE Eng Med Biol Soc. 2016, 2016, 2945–2949. DOI: 10.1109/EMBC.2016.7591347 ["
+                    - link "External, opens in a new tab. DOI" [ref=e607] [cursor=pointer]:
+                      - /url: https://doi.org/10.1109/EMBC.2016.7591347
+                    - text: "] ["
+                    - link "PubMed" [ref=e608] [cursor=pointer]:
+                      - /url: https://pubmed.ncbi.nlm.nih.gov/28268930/
+                    - text: "] ["
+                    - link "External, opens in a new tab. Google Scholar" [ref=e609] [cursor=pointer]:
+                      - /url: https://scholar.google.com/scholar_lookup?Pinheiro%20N,%20Couceiro%20R,%20Henriques%20J,%20et%20al.%20Can%20PPG%20be%20used%20for%20HRV%20analysis?%20Paper%20presented%20at:%20Annu%20Int%20Conf%20IEEE%20Eng%20Med%20Biol%20Soc.%202016,%202016,%202945%E2%80%932949.%20DOI:%2010.1109/EMBC.2016.7591347
+                    - text: "]"
+                  - listitem [ref=e610]:
+                    - generic [ref=e611]: "16."
+                    - text: "Selvaraj N, Jaryal A, Santhosh J, Deepak KK, Anand S. Assessment of heart rate variability derived from finger‐tip photoplethysmography as compared to electrocardiography. J Med Eng Technol. 2008;2(6):479‐484. doi: 10.1080/03091900701781317 ["
+                    - link "External, opens in a new tab. DOI" [ref=e612] [cursor=pointer]:
+                      - /url: https://doi.org/10.1080/03091900701781317
+                    - text: "] ["
+                    - link "PubMed" [ref=e613] [cursor=pointer]:
+                      - /url: https://pubmed.ncbi.nlm.nih.gov/18663635/
+                    - text: "] ["
+                    - link "External, opens in a new tab. Google Scholar" [ref=e614] [cursor=pointer]:
+                      - /url: https://scholar.google.com/scholar_lookup?journal=J%20Med%20Eng%20Technol&title=Assessment%20of%20heart%20rate%20variability%20derived%20from%20finger%E2%80%90tip%20photoplethysmography%20as%20compared%20to%20electrocardiography&author=N%20Selvaraj&author=A%20Jaryal&author=J%20Santhosh&author=KK%20Deepak&author=S%20Anand&volume=2&issue=6&publication_year=2008&pages=479-484&pmid=18663635&doi=10.1080/03091900701781317&
+                    - text: "]"
+                  - listitem [ref=e615]:
+                    - generic [ref=e616]: "17."
+                    - text: "Dubey H, Kumaresan R, Mankodiya K. Harmonic sum‐based method for heart rate estimation using PPG signals affected with motion artifacts. J Ambient Intell Humaniz Comput. 2018;9(1):137‐150. doi: 10.1007/s12652-016-0422-z ["
+                    - link "External, opens in a new tab. DOI" [ref=e617] [cursor=pointer]:
+                      - /url: https://doi.org/10.1007/s12652-016-0422-z
+                    - text: "] ["
+                    - link "External, opens in a new tab. Google Scholar" [ref=e618] [cursor=pointer]:
+                      - /url: https://scholar.google.com/scholar_lookup?journal=J%20Ambient%20Intell%20Humaniz%20Comput&title=Harmonic%20sum%E2%80%90based%20method%20for%20heart%20rate%20estimation%20using%20PPG%20signals%20affected%20with%20motion%20artifacts&author=H%20Dubey&author=R%20Kumaresan&author=K%20Mankodiya&volume=9&issue=1&publication_year=2018&pages=137-150&doi=10.1007/s12652-016-0422-z&
+                    - text: "]"
+                  - listitem [ref=e619]:
+                    - generic [ref=e620]: "18."
+                    - text: "Choi A, Shin H. Photoplethysmography sampling frequency: pilot assessment of how low can we go to analyze pulse rate variability with reliability? Physiol Meas. 2017;38(3):586‐600. doi: 10.1088/1361-6579/aa5efa ["
+                    - link "External, opens in a new tab. DOI" [ref=e621] [cursor=pointer]:
+                      - /url: https://doi.org/10.1088/1361-6579/aa5efa
+                    - text: "] ["
+                    - link "PubMed" [ref=e622] [cursor=pointer]:
+                      - /url: https://pubmed.ncbi.nlm.nih.gov/28169836/
+                    - text: "] ["
+                    - link "External, opens in a new tab. Google Scholar" [ref=e623] [cursor=pointer]:
+                      - /url: https://scholar.google.com/scholar_lookup?journal=Physiol%20Meas&title=Photoplethysmography%20sampling%20frequency:%20pilot%20assessment%20of%20how%20low%20can%20we%20go%20to%20analyze%20pulse%20rate%20variability%20with%20reliability?&author=A%20Choi&author=H%20Shin&volume=38&issue=3&publication_year=2017&pages=586-600&pmid=28169836&doi=10.1088/1361-6579/aa5efa&
+                    - text: "]"
+                  - listitem [ref=e624]:
+                    - generic [ref=e625]: "19."
+                    - text: "Malliani A, Pagani M, Lombardi F, Cerutti S. Cardiovascular neural regulation explored in the frequency domain. Circulation. 1991;84(2):482‐492. doi: 10.1161/01.CIR.84.2.48 ["
+                    - link "External, opens in a new tab. DOI" [ref=e626] [cursor=pointer]:
+                      - /url: https://doi.org/10.1161/01.CIR.84.2.48
+                    - text: "] ["
+                    - link "PubMed" [ref=e627] [cursor=pointer]:
+                      - /url: https://pubmed.ncbi.nlm.nih.gov/1860193/
+                    - text: "] ["
+                    - link "External, opens in a new tab. Google Scholar" [ref=e628] [cursor=pointer]:
+                      - /url: https://scholar.google.com/scholar_lookup?journal=Circulation&title=Cardiovascular%20neural%20regulation%20explored%20in%20the%20frequency%20domain&author=A%20Malliani&author=M%20Pagani&author=F%20Lombardi&author=S%20Cerutti&volume=84&issue=2&publication_year=1991&pages=482-492&pmid=1860193&doi=10.1161/01.CIR.84.2.48&
+                    - text: "]"
+                  - listitem [ref=e629]:
+                    - generic [ref=e630]: "20."
+                    - text: "Ota K, Hiraguri T, Yoshino H. A Study on QoE Estimation from Heart Rate Variability Using Machine Learning. Paper presented at: 2018 IEEE International Conference on Consumer Electronics‐Taiwan (ICCE‐TW). 2018. May. 10.1109/ICCE-China.2018.8448445 ["
+                    - link "External, opens in a new tab. DOI" [ref=e631] [cursor=pointer]:
+                      - /url: https://doi.org/10.1109/ICCE-China.2018.8448445
+                    - text: "]"
+                  - listitem [ref=e632]:
+                    - generic [ref=e633]: "21."
+                    - text: "Dolezal BA, Boland DM, Carney J, Abrazado M, Smith DL, Cooper CB. Validation of heart rate derived from a physiological status monitor‐embedded compression shirt against criterion ECG. J Occup Environ Hyg. 2014;11(12):833‐839. doi: 10.1080/15459624.2014.925114 ["
+                    - link "External, opens in a new tab. DOI" [ref=e634] [cursor=pointer]:
+                      - /url: https://doi.org/10.1080/15459624.2014.925114
+                    - text: "] ["
+                    - link "PubMed" [ref=e635] [cursor=pointer]:
+                      - /url: https://pubmed.ncbi.nlm.nih.gov/24896644/
+                    - text: "] ["
+                    - link "External, opens in a new tab. Google Scholar" [ref=e636] [cursor=pointer]:
+                      - /url: https://scholar.google.com/scholar_lookup?journal=J%20Occup%20Environ%20Hyg&title=Validation%20of%20heart%20rate%20derived%20from%20a%20physiological%20status%20monitor%E2%80%90embedded%20compression%20shirt%20against%20criterion%20ECG&author=BA%20Dolezal&author=DM%20Boland&author=J%20Carney&author=M%20Abrazado&author=DL%20Smith&volume=11&issue=12&publication_year=2014&pages=833-839&pmid=24896644&doi=10.1080/15459624.2014.925114&
+                    - text: "]"
+                  - listitem [ref=e637]:
+                    - generic [ref=e638]: "22."
+                    - text: "Task Force of the European Society of Cardiology and the North American Society of Pacing and Electrophysiology . Heart rate variability: standards of measurement, physiological interpretation and clinical use. Circulation. 1996;93:1043‐1065. (Page 7, line 133‐Page 9, line 168). doi: 10.1161/01.CIR.93.5.1043 ["
+                    - link "External, opens in a new tab. DOI" [ref=e639] [cursor=pointer]:
+                      - /url: https://doi.org/10.1161/01.CIR.93.5.1043
+                    - text: "] ["
+                    - link "PubMed" [ref=e640] [cursor=pointer]:
+                      - /url: https://pubmed.ncbi.nlm.nih.gov/8598068/
+                    - text: "] ["
+                    - link "External, opens in a new tab. Google Scholar" [ref=e641] [cursor=pointer]:
+                      - /url: https://scholar.google.com/scholar_lookup?journal=Circulation&title=Heart%20rate%20variability:%20standards%20of%20measurement,%20physiological%20interpretation%20and%20clinical%20use&volume=93&publication_year=1996&pages=1043-1065&pmid=8598068&doi=10.1161/01.CIR.93.5.1043&
+                    - text: "]"
+                  - listitem [ref=e642]:
+                    - generic [ref=e643]: "23."
+                    - text: "Dagget T, Molla A, Belachew T. Job related stress among nurses working in Jimma zone public hospitals, South West Ethiopia: a cross sectional study. BMC Nurs. 2016;15:39. doi: 10.1186/s12912-016-0158-2 ["
+                    - link "External, opens in a new tab. DOI" [ref=e644] [cursor=pointer]:
+                      - /url: https://doi.org/10.1186/s12912-016-0158-2
+                    - text: "] ["
+                    - link "PMC free article" [ref=e645] [cursor=pointer]:
+                      - /url: /articles/PMC4910212/
+                    - text: "] ["
+                    - link "PubMed" [ref=e646] [cursor=pointer]:
+                      - /url: https://pubmed.ncbi.nlm.nih.gov/27313502/
+                    - text: "] ["
+                    - link "External, opens in a new tab. Google Scholar" [ref=e647] [cursor=pointer]:
+                      - /url: https://scholar.google.com/scholar_lookup?journal=BMC%20Nurs&title=Job%20related%20stress%20among%20nurses%20working%20in%20Jimma%20zone%20public%20hospitals,%20South%20West%20Ethiopia:%20a%20cross%20sectional%20study&author=T%20Dagget&author=A%20Molla&author=T%20Belachew&volume=15&publication_year=2016&pages=39&pmid=27313502&doi=10.1186/s12912-016-0158-2&
+                    - text: "]"
+                  - listitem [ref=e648]:
+                    - generic [ref=e649]: "24."
+                    - text: "Oriyama S, Miyakoshi Y, Kobayashi T. Effects of two 15‐min naps on the subjective sleepless, fatigue and heart rate variability of night shift nurse. Ind Health. 2014;52:25‐35. doi: 10.2486/indhealth.2013-0043 ["
+                    - link "External, opens in a new tab. DOI" [ref=e650] [cursor=pointer]:
+                      - /url: https://doi.org/10.2486/indhealth.2013-0043
+                    - text: "] ["
+                    - link "PMC free article" [ref=e651] [cursor=pointer]:
+                      - /url: /articles/PMC4202767/
+                    - text: "] ["
+                    - link "PubMed" [ref=e652] [cursor=pointer]:
+                      - /url: https://pubmed.ncbi.nlm.nih.gov/24292879/
+                    - text: "] ["
+                    - link "External, opens in a new tab. Google Scholar" [ref=e653] [cursor=pointer]:
+                      - /url: https://scholar.google.com/scholar_lookup?journal=Ind%20Health&title=Effects%20of%20two%2015%E2%80%90min%20naps%20on%20the%20subjective%20sleepless,%20fatigue%20and%20heart%20rate%20variability%20of%20night%20shift%20nurse&author=S%20Oriyama&author=Y%20Miyakoshi&author=T%20Kobayashi&volume=52&publication_year=2014&pages=25-35&pmid=24292879&doi=10.2486/indhealth.2013-0043&
+                    - text: "]"
+                  - listitem [ref=e654]:
+                    - generic [ref=e655]: "25."
+                    - text: "Rosa RR. Extended work shifts and excessive fatigue. J Sleep Res. 1995;4:51‐56. doi: 10.1111/j.1365-2869.1995.tb00227.x ["
+                    - link "External, opens in a new tab. DOI" [ref=e656] [cursor=pointer]:
+                      - /url: https://doi.org/10.1111/j.1365-2869.1995.tb00227.x
+                    - text: "] ["
+                    - link "PubMed" [ref=e657] [cursor=pointer]:
+                      - /url: https://pubmed.ncbi.nlm.nih.gov/10607212/
+                    - text: "] ["
+                    - link "External, opens in a new tab. Google Scholar" [ref=e658] [cursor=pointer]:
+                      - /url: https://scholar.google.com/scholar_lookup?journal=J%20Sleep%20Res&title=Extended%20work%20shifts%20and%20excessive%20fatigue&author=RR%20Rosa&volume=4&publication_year=1995&pages=51-56&pmid=10607212&doi=10.1111/j.1365-2869.1995.tb00227.x&
+                    - text: "]"
+                  - listitem [ref=e659]:
+                    - generic [ref=e660]: "26."
+                    - text: "Spierer DK, Rosen Z, Litman LL, Fujii K. Validation of photoplethysmography as a method to detect heart rate during rest and exercise. J Med Eng Technol. 2015;39(5):264‐271. doi: 10.3109/03091902.2015.1047536 ["
+                    - link "External, opens in a new tab. DOI" [ref=e661] [cursor=pointer]:
+                      - /url: https://doi.org/10.3109/03091902.2015.1047536
+                    - text: "] ["
+                    - link "PubMed" [ref=e662] [cursor=pointer]:
+                      - /url: https://pubmed.ncbi.nlm.nih.gov/26112379/
+                    - text: "] ["
+                    - link "External, opens in a new tab. Google Scholar" [ref=e663] [cursor=pointer]:
+                      - /url: https://scholar.google.com/scholar_lookup?journal=J%20Med%20Eng%20Technol&title=Validation%20of%20photoplethysmography%20as%20a%20method%20to%20detect%20heart%20rate%20during%20rest%20and%20exercise&author=DK%20Spierer&author=Z%20Rosen&author=LL%20Litman&author=K%20Fujii&volume=39&issue=5&publication_year=2015&pages=264-271&pmid=26112379&doi=10.3109/03091902.2015.1047536&
+                    - text: "]"
+                  - listitem [ref=e664]:
+                    - generic [ref=e665]: "27."
+                    - text: "Farhadi M, Mashhadi MB, Essalat M, et al., Real time heart rate monitoring using Photoplethysmographic (PPG) signals during intensive physical exercises. bioRxiv 2016; 092627. DOI: 10.1101/092627 ["
+                    - link "External, opens in a new tab. DOI" [ref=e666] [cursor=pointer]:
+                      - /url: https://doi.org/10.1101/092627
+                    - text: "]"
+                  - listitem [ref=e667]:
+                    - generic [ref=e668]: "28."
+                    - text: "Sammito S, Böckelmann I. Factors influencing heart rate variability. ICFJ. 2016;6:18–22. doi: 10.17987/icfj.v6i0.242 ["
+                    - link "External, opens in a new tab. DOI" [ref=e669] [cursor=pointer]:
+                      - /url: https://doi.org/10.17987/icfj.v6i0.242
+                    - text: "] ["
+                    - link "External, opens in a new tab. Google Scholar" [ref=e670] [cursor=pointer]:
+                      - /url: https://scholar.google.com/scholar_lookup?journal=ICFJ&title=Factors%20influencing%20heart%20rate%20variability&author=S%20Sammito&author=I%20B%C3%B6ckelmann&volume=6&publication_year=2016&pages=18-22&doi=10.17987/icfj.v6i0.242&
+                    - text: "]"
+              - generic [ref=e671]:
+                - heading "Associated Data" [level=2] [ref=e672]: Associated Data
+                - paragraph [ref=e673]:
+                  - emphasis [ref=e674]: This section collects any data citations, data availability statements, or supplementary materials included in this article.
+                - generic [ref=e675]:
+                  - heading "Supplementary Materials" [level=3] [ref=e676]
+                  - generic [ref=e677]:
+                    - paragraph [ref=e679]:
+                      - strong [ref=e680]: Appendix S1.
+                      - text: Supporting information.
+                    - generic [ref=e682]:
+                      - link "Click here for additional data file." [ref=e683] [cursor=pointer]:
+                        - /url: /articles/instance/8865060/bin/HSR2-5-e477-s001.docx
+                      - superscript [ref=e684]: (115.7KB, docx)
+                - generic [ref=e685]:
+                  - heading "Data Availability Statement" [level=3] [ref=e686]
+                  - paragraph [ref=e687]: The data supporting the findings of the present study will be available on request to the corresponding author.
+            - generic [ref=e688]:
+              - separator [ref=e689]
+              - paragraph [ref=e690]:
+                - text: Articles from Health Science Reports are provided here courtesy of
+                - strong [ref=e691]: Wiley
+  - contentinfo [ref=e692]:
+    - generic [ref=e693]:
+      - generic [ref=e694]: Follow NCBI
+      - generic [ref=e695]:
+        - link "NCBI on X (formerly known as Twitter)" [ref=e696] [cursor=pointer]:
+          - /url: https://twitter.com/ncbi
+          - img [ref=e697]
+          - generic [ref=e698]: NCBI on X (formerly known as Twitter)
+        - link "NCBI on Facebook" [ref=e699] [cursor=pointer]:
+          - /url: https://www.facebook.com/ncbi.nlm
+          - img [ref=e700]
+          - generic [ref=e701]: NCBI on Facebook
+        - link "NCBI on LinkedIn" [ref=e702] [cursor=pointer]:
+          - /url: https://www.linkedin.com/company/ncbinlm
+          - img [ref=e703]
+          - generic [ref=e704]: NCBI on LinkedIn
+        - link "NCBI on GitHub" [ref=e705] [cursor=pointer]:
+          - /url: https://github.com/ncbi
+          - img [ref=e706]
+          - generic [ref=e707]: NCBI on GitHub
+        - link "NCBI RSS feed" [ref=e708] [cursor=pointer]:
+          - /url: https://ncbiinsights.ncbi.nlm.nih.gov/
+          - img [ref=e709]
+          - generic [ref=e710]: NCBI RSS feed
+    - generic [ref=e711]:
+      - generic [ref=e712]:
+        - generic [ref=e713]:
+          - paragraph [ref=e714]: Connect with NLM
+          - generic [ref=e715]:
+            - link "NLM on X (formerly known as Twitter)" [ref=e716] [cursor=pointer]:
+              - /url: https://twitter.com/nlm_nih
+              - img [ref=e717]
+              - generic [ref=e718]: NLM on X (formerly known as Twitter)
+            - link "NLM on Facebook" [ref=e719] [cursor=pointer]:
+              - /url: https://www.facebook.com/nationallibraryofmedicine
+              - img [ref=e720]
+              - generic [ref=e721]: NLM on Facebook
+            - link "NLM on YouTube" [ref=e722] [cursor=pointer]:
+              - /url: https://www.youtube.com/user/NLMNIH
+              - img [ref=e723]
+              - generic [ref=e725]: NLM on YouTube
+        - paragraph [ref=e727]:
+          - link "External, opens in a new tab. National Library of Medicine 8600 Rockville Pike Bethesda, MD 20894" [ref=e728] [cursor=pointer]:
+            - /url: "https://www.google.com/maps/place/8600+Rockville+Pike,+Bethesda,+MD+20894/%4038.9959508,\n            -77.101021,17z/data%3D!3m1!4b1!4m5!3m4!1s0x89b7c95e25765ddb%3A0x19156f88b27635b8!8m2!3d38.9959508!\n            4d-77.0988323"
+            - text: External, opens in a new tab. National Library of Medicine
+            - text: 8600 Rockville Pike
+            - text: Bethesda, MD 20894
+        - list [ref=e729]:
+          - listitem [ref=e730]:
+            - link "Web Policies" [ref=e731] [cursor=pointer]:
+              - /url: https://www.nlm.nih.gov/web_policies.html
+          - listitem [ref=e732]:
+            - link "FOIA" [ref=e733] [cursor=pointer]:
+              - /url: https://www.nih.gov/institutes-nih/nih-office-director/office-communications-public-liaison/freedom-information-act-office
+          - listitem [ref=e734]:
+            - link "External, opens in a new tab. HHS Vulnerability Disclosure" [ref=e735] [cursor=pointer]:
+              - /url: https://www.hhs.gov/vulnerability-disclosure-policy/index.html
+        - list [ref=e736]:
+          - listitem [ref=e737]:
+            - link "Help" [ref=e738] [cursor=pointer]:
+              - /url: https://support.nlm.nih.gov/?pagename=cloudpmc-viewer%3Apmc%3Aarticle%3Ajournal
+          - listitem [ref=e739]:
+            - link "Accessibility" [ref=e740] [cursor=pointer]:
+              - /url: https://www.nlm.nih.gov/accessibility.html
+          - listitem [ref=e741]:
+            - link "Careers" [ref=e742] [cursor=pointer]:
+              - /url: https://www.nlm.nih.gov/careers/careers.html
+      - list [ref=e744]:
+        - listitem [ref=e745]:
+          - link "NLM" [ref=e746] [cursor=pointer]:
+            - /url: https://www.nlm.nih.gov/
+        - listitem [ref=e747]:
+          - link "NIH" [ref=e748] [cursor=pointer]:
+            - /url: https://www.nih.gov/
+        - listitem [ref=e749]:
+          - link "External, opens in a new tab. HHS" [ref=e750] [cursor=pointer]:
+            - /url: https://www.hhs.gov/
+        - listitem [ref=e751]:
+          - link "External, opens in a new tab. USA.gov" [ref=e752] [cursor=pointer]:
+            - /url: https://www.usa.gov/
+  - button "Back to Top back to top icon" [ref=e755] [cursor=pointer]:
+    - generic [ref=e756]: Back to Top
+    - img "back to top icon"
+  - button "Tell us what you think!" [ref=e753] [cursor=pointer]:
+    - img "Tell us what you think!" [ref=e754]
