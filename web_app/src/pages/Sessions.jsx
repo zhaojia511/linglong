@@ -5,6 +5,7 @@ import { sessionService } from '../services/api'
 function Sessions() {
   const [sessions, setSessions] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [filter, setFilter] = useState({
     startDate: '',
     endDate: '',
@@ -20,6 +21,7 @@ function Sessions() {
       setSessions(data.data)
     } catch (error) {
       console.error('Error loading sessions:', error)
+      setError('Failed to load sessions. Is the backend running?')
     } finally {
       setLoading(false)
     }
@@ -80,6 +82,13 @@ function Sessions() {
             </div>
           </div>
         </div>
+
+        {error && (
+          <div className="card" style={{background:'#fff3cd', border:'1px solid #ffc107', padding:'15px', marginBottom:'20px'}}>
+            <strong>Error:</strong> {error}
+            <button onClick={loadSessions} className="btn btn-primary" style={{marginLeft:'15px'}}>Retry</button>
+          </div>
+        )}
 
         <div className="card">
           <h2>All Training Sessions ({sessions.length})</h2>
