@@ -17,7 +17,8 @@
       "Bash(npm show jest-axe versions --json)",
       "Bash(npm show prettier versions --json)",
       "Bash(python3 -c \"import sys,json; v=json.load\\(sys.stdin\\); print\\([x for x in v if x.startswith\\(''2.''\\)][-3:]\\)\")",
-      "Bash(npm install)"
+      "Bash(npm install)",
+      "Bash(npm run build)"
     ],
     "additionalDirectories": [
       "d:\\github\\linglong\\docs\\superpowers"
