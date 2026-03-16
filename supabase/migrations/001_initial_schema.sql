@@ -95,27 +95,51 @@ ALTER TABLE public.training_sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.force_plate_sessions ENABLE ROW LEVEL SECURITY;
 
 -- RLS: profiles
+DROP POLICY IF EXISTS "profiles_select_own" ON public.profiles;
 CREATE POLICY "profiles_select_own" ON public.profiles FOR SELECT USING (id = auth.uid());
+DROP POLICY IF EXISTS "profiles_insert_own" ON public.profiles;
 CREATE POLICY "profiles_insert_own" ON public.profiles FOR INSERT WITH CHECK (id = auth.uid());
+DROP POLICY IF EXISTS "profiles_update_own" ON public.profiles;
 CREATE POLICY "profiles_update_own" ON public.profiles FOR UPDATE USING (id = auth.uid());
+DROP POLICY IF EXISTS "profiles_delete_own" ON public.profiles;
 CREATE POLICY "profiles_delete_own" ON public.profiles FOR DELETE USING (id = auth.uid());
 
 -- RLS: persons
+DROP POLICY IF EXISTS "persons_select_own" ON public.persons;
 CREATE POLICY "persons_select_own" ON public.persons FOR SELECT USING (user_id = auth.uid());
+DROP POLICY IF EXISTS "persons_insert_own" ON public.persons;
 CREATE POLICY "persons_insert_own" ON public.persons FOR INSERT WITH CHECK (user_id = auth.uid());
+DROP POLICY IF EXISTS "persons_update_own" ON public.persons;
 CREATE POLICY "persons_update_own" ON public.persons FOR UPDATE USING (user_id = auth.uid());
+DROP POLICY IF EXISTS "persons_delete_own" ON public.persons;
 CREATE POLICY "persons_delete_own" ON public.persons FOR DELETE USING (user_id = auth.uid());
 
 -- RLS: training_sessions
+DROP POLICY IF EXISTS "training_sessions_select_own" ON public.training_sessions;
 CREATE POLICY "training_sessions_select_own" ON public.training_sessions FOR SELECT USING (user_id = auth.uid());
-CREATE POLICY "training_sessions_insert_own" ON public.training_sessions FOR INSERT WITH CHECK (user_id = auth.uid());
+DROP POLICY IF EXISTS "training_sessions_insert_own" ON public.training_sessions;
+CREATE POLICY "training_sessions_insert_own" ON public.training_sessions
+  FOR INSERT WITH CHECK (
+    user_id = auth.uid() AND
+    EXISTS (SELECT 1 FROM public.persons WHERE id = person_id AND user_id = auth.uid())
+  );
+DROP POLICY IF EXISTS "training_sessions_update_own" ON public.training_sessions;
 CREATE POLICY "training_sessions_update_own" ON public.training_sessions FOR UPDATE USING (user_id = auth.uid());
+DROP POLICY IF EXISTS "training_sessions_delete_own" ON public.training_sessions;
 CREATE POLICY "training_sessions_delete_own" ON public.training_sessions FOR DELETE USING (user_id = auth.uid());
 
 -- RLS: force_plate_sessions
+DROP POLICY IF EXISTS "force_plate_sessions_select_own" ON public.force_plate_sessions;
 CREATE POLICY "force_plate_sessions_select_own" ON public.force_plate_sessions FOR SELECT USING (user_id = auth.uid());
-CREATE POLICY "force_plate_sessions_insert_own" ON public.force_plate_sessions FOR INSERT WITH CHECK (user_id = auth.uid());
+DROP POLICY IF EXISTS "force_plate_sessions_insert_own" ON public.force_plate_sessions;
+CREATE POLICY "force_plate_sessions_insert_own" ON public.force_plate_sessions
+  FOR INSERT WITH CHECK (
+    user_id = auth.uid() AND
+    EXISTS (SELECT 1 FROM public.persons WHERE id = person_id AND user_id = auth.uid())
+  );
+DROP POLICY IF EXISTS "force_plate_sessions_update_own" ON public.force_plate_sessions;
 CREATE POLICY "force_plate_sessions_update_own" ON public.force_plate_sessions FOR UPDATE USING (user_id = auth.uid());
+DROP POLICY IF EXISTS "force_plate_sessions_delete_own" ON public.force_plate_sessions;
 CREATE POLICY "force_plate_sessions_delete_own" ON public.force_plate_sessions FOR DELETE USING (user_id = auth.uid());
 
 -- auto-create profile row when a user signs up
