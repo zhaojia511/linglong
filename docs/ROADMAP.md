@@ -1,6 +1,6 @@
 # Linglong HR Monitor - Project Roadmap
 
-## Current Status: Initial Release (v1.0.0)
+## Current Status: Active Development (v1.1.0 in progress)
 
 ### Completed Features ✅
 
@@ -48,10 +48,10 @@
 - [x] API documentation
 - [x] BLE sensor compatibility list
 
-## Phase 2: Enhanced Features (v1.1.0) - Q2 2024
+## Phase 2: Enhanced Features (v1.1.0) - Q2 2026 (in progress)
 
 ### Training Analytics
-- [ ] Training zones calculation (Zone 1-5 based on HR)
+- [x] Training zones calculation (Zone 1-5 based on HR) — in progress
 - [ ] Training load metrics (TRIMP)
 - [ ] Recovery time estimation
 - [ ] Fitness trends over time
@@ -81,7 +81,7 @@
 - [ ] Export functionality
 - [ ] Print-friendly views
 
-## Phase 3: Team Features (v2.0.0) - Q3 2024
+## Phase 3: Team Features (v2.0.0) - Q3 2026
 
 ### Coach/Team Management
 - [ ] Coach account type
@@ -108,7 +108,7 @@
 - [ ] Achievement badges
 - [ ] Friend connections
 
-## Phase 4: Integration & Advanced Features (v2.5.0) - Q4 2024
+## Phase 4: Integration & Advanced Features (v2.5.0) - Q4 2026
 
 ### Third-Party Integrations
 - [ ] Strava integration
@@ -133,7 +133,7 @@
 - [ ] Optimal training time suggestions
 - [ ] Personalized training zones
 
-## Phase 5: Enterprise & Professional (v3.0.0) - 2025
+## Phase 5: Enterprise & Professional (v3.0.0) - 2027
 
 ### Professional Features
 - [ ] White-label solution
@@ -283,6 +283,6 @@ Have ideas for features or improvements? Please:
 
 ---
 
-**Last Updated**: 2024-01-01
-**Version**: 1.0.0
-**Status**: Initial Release
+**Last Updated**: 2026-03-16
+**Version**: 1.1.0-dev
+**Status**: Active Development
