@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../models/person.dart';
 import '../services/database_service.dart';
-import '../services/sync_service.dart';
+import '../services/supabase_repository.dart';
+import '../services/settings_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -11,32 +13,174 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Team Members'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.sync),
+            onPressed: () => _showSyncDialog(context),
+          ),
+        ],
+      ),
+      body: Consumer<DatabaseService>(
+        builder: (context, dbService, child) {
+          final persons = dbService.getAllPersons();
+
+          if (persons.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.people, size: 64, color: Colors.grey[400]),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'No team members yet',
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const PersonDetailScreen(person: null),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.add),
+                    label: const Text('Add Team Member'),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return ListView.builder(
+            padding: const EdgeInsets.all(8),
+            itemCount: persons.length,
+            itemBuilder: (context, index) {
+              final person = persons[index];
+              final isCurrent = dbService.currentPerson?.id == person.id;
+
+              return Card(
+                margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: _getColorForPerson(index),
+                    child: Text(
+                      person.name.isNotEmpty ? person.name[0].toUpperCase() : '?',
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  title: Text(person.name),
+                  subtitle: Text(_buildSubtitle(person)),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => PersonDetailScreen(person: person),
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'profile_fab',
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const PersonDetailScreen(person: null),
+            ),
+          );
+        },
+        icon: const Icon(Icons.add),
+        label: const Text('Add Member'),
+      ),
+    );
+  }
+
+  Color _getColorForPerson(int index) {
+    final colors = [
+      Colors.blue,
+      Colors.red,
+      Colors.green,
+      Colors.orange,
+      Colors.purple,
+      Colors.teal,
+    ];
+    return colors[index % colors.length];
+  }
+
+  void _showSyncDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => const SyncDialog(),
+    );
+  }
+
+  String _buildSubtitle(person) {
+    final parts = <String>[];
+    parts.add('${person.age} years');
+    final gender = person.gender;
+    parts.add(gender.isNotEmpty ? '${gender[0].toUpperCase()}${gender.substring(1)}' : gender);
+    if (person.category != null && person.category!.isNotEmpty) parts.add(person.category!);
+    if (person.group != null && person.group!.isNotEmpty) parts.add(person.group!);
+    return parts.join(' • ');
+  }
+}
+
+class PersonDetailScreen extends StatefulWidget {
+  final Person? person;
+
+  const PersonDetailScreen({super.key, this.person});
+
+  @override
+  State<PersonDetailScreen> createState() => _PersonDetailScreenState();
+}
+
+class _PersonDetailScreenState extends State<PersonDetailScreen> {
+  late final TextEditingController _nameController;
+  late final TextEditingController _ageController;
+  late final TextEditingController _weightController;
+  late final TextEditingController _heightController;
+  late final TextEditingController _maxHRController;
+  late final TextEditingController _restingHRController;
+  late final TextEditingController _categoryController;
+  late final TextEditingController _groupController;
+  late String _gender;
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _ageController = TextEditingController();
-  final _weightController = TextEditingController();
-  final _heightController = TextEditingController();
-  final _maxHRController = TextEditingController();
-  final _restingHRController = TextEditingController();
-  String _gender = 'male';
 
   @override
   void initState() {
     super.initState();
-    _loadProfile();
-  }
+    _nameController = TextEditingController();
+    _ageController = TextEditingController();
+    _weightController = TextEditingController();
+    _heightController = TextEditingController();
+    _maxHRController = TextEditingController();
+    _restingHRController = TextEditingController();
+    _categoryController = TextEditingController();
+    _groupController = TextEditingController();
+    _gender = 'male';
 
-  void _loadProfile() {
-    final person =
-        Provider.of<DatabaseService>(context, listen: false).currentPerson;
-    if (person != null) {
-      _nameController.text = person.name;
-      _ageController.text = person.age.toString();
-      _weightController.text = person.weight.toString();
-      _heightController.text = person.height.toString();
-      _maxHRController.text = person.maxHeartRate?.toString() ?? '';
-      _restingHRController.text = person.restingHeartRate?.toString() ?? '';
-      _gender = person.gender;
+    if (widget.person != null) {
+      _nameController.text = widget.person!.name;
+      _ageController.text = widget.person!.age.toString();
+      _weightController.text = widget.person!.weight.toString();
+      _heightController.text = widget.person!.height.toString();
+      _maxHRController.text = widget.person!.maxHeartRate?.toString() ?? '';
+      _restingHRController.text = widget.person!.restingHeartRate?.toString() ?? '';
+      _categoryController.text = widget.person!.category ?? '';
+      _groupController.text = widget.person!.group ?? '';
+      _gender = widget.person!.gender;
     }
   }
 
@@ -48,74 +192,142 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _heightController.dispose();
     _maxHRController.dispose();
     _restingHRController.dispose();
+    _categoryController.dispose();
+    _groupController.dispose();
     super.dispose();
   }
 
-  void _saveProfile() async {
+  void _savePerson() async {
     if (_formKey.currentState!.validate()) {
       final dbService = Provider.of<DatabaseService>(context, listen: false);
-      final syncService = Provider.of<SyncService>(context, listen: false);
+      final supabaseRepo = SupabaseRepository();
 
-      final person = dbService.currentPerson;
+      try {
+        if (widget.person == null) {
+          // Create new person
+          final newPerson = await dbService.createPerson(
+            name: _nameController.text,
+            age: int.parse(_ageController.text),
+            gender: _gender,
+            weight: double.parse(_weightController.text),
+            height: double.parse(_heightController.text),
+            maxHeartRate: _maxHRController.text.isNotEmpty
+                ? int.parse(_maxHRController.text)
+                : null,
+            restingHeartRate: _restingHRController.text.isNotEmpty
+                ? int.parse(_restingHRController.text)
+                : null,
+            category: _categoryController.text.isEmpty ? null : _categoryController.text,
+            group: _groupController.text.isEmpty ? null : _groupController.text,
+          );
 
-      if (person == null) {
-        // Create new person
-        final newPerson = await dbService.createPerson(
-          name: _nameController.text,
-          age: int.parse(_ageController.text),
-          gender: _gender,
-          weight: double.parse(_weightController.text),
-          height: double.parse(_heightController.text),
-          maxHeartRate: _maxHRController.text.isNotEmpty
+          // Always upsert to Supabase
+          await supabaseRepo.upsertPerson(
+            name: newPerson.name,
+            age: newPerson.age,
+            gender: newPerson.gender,
+            weight: newPerson.weight,
+            height: newPerson.height,
+            maxHeartRate: newPerson.maxHeartRate,
+            restingHeartRate: newPerson.restingHeartRate,
+            id: newPerson.id,
+          );
+        } else {
+          // Update existing person
+          widget.person!.name = _nameController.text;
+          widget.person!.age = int.parse(_ageController.text);
+          widget.person!.gender = _gender;
+          widget.person!.weight = double.parse(_weightController.text);
+          widget.person!.height = double.parse(_heightController.text);
+          widget.person!.maxHeartRate = _maxHRController.text.isNotEmpty
               ? int.parse(_maxHRController.text)
-              : null,
-          restingHeartRate: _restingHRController.text.isNotEmpty
+              : null;
+          widget.person!.restingHeartRate = _restingHRController.text.isNotEmpty
               ? int.parse(_restingHRController.text)
-              : null,
-        );
+              : null;
+          widget.person!.category = _categoryController.text.isEmpty ? null : _categoryController.text;
+          widget.person!.group = _groupController.text.isEmpty ? null : _groupController.text;
 
-        if (syncService.isAuthenticated) {
-          await syncService.syncPerson(newPerson);
+          await dbService.updatePerson(widget.person!);
+
+          // Always upsert to Supabase
+          await supabaseRepo.upsertPerson(
+            name: widget.person!.name,
+            age: widget.person!.age,
+            gender: widget.person!.gender,
+            weight: widget.person!.weight,
+            height: widget.person!.height,
+            maxHeartRate: widget.person!.maxHeartRate,
+            restingHeartRate: widget.person!.restingHeartRate,
+            id: widget.person!.id,
+          );
         }
-      } else {
-        // Update existing person
-        person.name = _nameController.text;
-        person.age = int.parse(_ageController.text);
-        person.gender = _gender;
-        person.weight = double.parse(_weightController.text);
-        person.height = double.parse(_heightController.text);
-        person.maxHeartRate = _maxHRController.text.isNotEmpty
-            ? int.parse(_maxHRController.text)
-            : null;
-        person.restingHeartRate = _restingHRController.text.isNotEmpty
-            ? int.parse(_restingHRController.text)
-            : null;
 
-        await dbService.updatePerson(person);
-
-        if (syncService.isAuthenticated) {
-          await syncService.syncPerson(person);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Team member saved')),
+          );
+          Navigator.pop(context);
         }
-      }
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile saved')),
-        );
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: $e')),
+          );
+        }
       }
     }
+  }
+
+  void _deletePerson() {
+    if (widget.person == null) return;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Team Member'),
+        content: Text(
+          'Are you sure you want to delete "${widget.person!.name}"?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              final dbService =
+                  Provider.of<DatabaseService>(context, listen: false);
+              
+              await dbService.deletePerson(widget.person!.id);
+
+              if (mounted) {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Team member deleted')),
+                );
+                Navigator.pop(context);
+              }
+            },
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: Text(widget.person == null ? 'Add Team Member' : 'Edit ${widget.person!.name}'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.sync),
-            onPressed: () => _showSyncDialog(context),
-          ),
+          if (widget.person != null)
+            IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: _deletePerson,
+              tooltip: 'Delete',
+            ),
         ],
       ),
       body: SingleChildScrollView(
@@ -125,9 +337,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const CircleAvatar(
+              CircleAvatar(
                 radius: 50,
-                child: Icon(Icons.person, size: 50),
+                backgroundColor: Colors.blue.shade100,
+                child: Text(
+                  _nameController.text.isNotEmpty
+                      ? _nameController.text[0].toUpperCase()
+                      : '?',
+                  style: const TextStyle(fontSize: 32, color: Colors.blue),
+                ),
               ),
               const SizedBox(height: 24),
               TextFormField(
@@ -137,11 +355,70 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.person),
                 ),
+                onChanged: (_) => setState(() {}),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter your name';
+                    return 'Please enter a name';
                   }
                   return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              Consumer<SettingsService>(
+                builder: (context, settings, child) {
+                  final categories = settings.getCategories();
+                  return DropdownButtonFormField<String>(
+                    value: _categoryController.text.isEmpty ? null : _categoryController.text,
+                    decoration: const InputDecoration(
+                      labelText: 'Category',
+                      border: OutlineInputBorder(),
+                      hintText: 'Select category',
+                    ),
+                    items: [
+                      const DropdownMenuItem<String>(
+                        value: null,
+                        child: Text('None'),
+                      ),
+                      ...categories.map((cat) => DropdownMenuItem<String>(
+                        value: cat,
+                        child: Text(cat),
+                      )),
+                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        _categoryController.text = value ?? '';
+                      });
+                    },
+                  );
+                },
+              ),
+              const SizedBox(height: 12),
+              Consumer<SettingsService>(
+                builder: (context, settings, child) {
+                  final groups = settings.getGroups();
+                  return DropdownButtonFormField<String>(
+                    value: _groupController.text.isEmpty ? null : _groupController.text,
+                    decoration: const InputDecoration(
+                      labelText: 'Group',
+                      border: OutlineInputBorder(),
+                      hintText: 'Select group',
+                    ),
+                    items: [
+                      const DropdownMenuItem<String>(
+                        value: null,
+                        child: Text('None'),
+                      ),
+                      ...groups.map((grp) => DropdownMenuItem<String>(
+                        value: grp,
+                        child: Text(grp),
+                      )),
+                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        _groupController.text = value ?? '';
+                      });
+                    },
+                  );
                 },
               ),
               const SizedBox(height: 16),
@@ -178,8 +455,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       items: const [
                         DropdownMenuItem(value: 'male', child: Text('Male')),
-                        DropdownMenuItem(
-                            value: 'female', child: Text('Female')),
+                        DropdownMenuItem(value: 'female', child: Text('Female')),
                         DropdownMenuItem(value: 'other', child: Text('Other')),
                       ],
                       onChanged: (value) {
@@ -242,9 +518,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 16),
               const Divider(),
               const Text(
-                'Optional Heart Rate Information',
+                'Heart Rate Information (Optional)',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -278,23 +554,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: _saveProfile,
+                onPressed: _savePerson,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.all(16),
                 ),
-                child: const Text('Save Profile'),
+                child: Text(widget.person == null ? 'Add Member' : 'Save Changes'),
               ),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  void _showSyncDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => const SyncDialog(),
     );
   }
 }
@@ -353,5 +622,12 @@ class SyncDialog extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+extension StringCapitalize on String {
+  String capitalize() {
+    if (isEmpty) return this;
+    return this[0].toUpperCase() + substring(1);
   }
 }

@@ -3,6 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uuid/uuid.dart';
 import '../models/person.dart';
 import '../models/training_session.dart';
+import 'supabase_repository.dart';
 
 class DatabaseService extends ChangeNotifier {
   static final DatabaseService instance = DatabaseService._internal();
@@ -15,18 +16,29 @@ class DatabaseService extends ChangeNotifier {
   DatabaseService._internal();
 
   Future<void> init() async {
-    // Register adapters
-    // Hive.registerAdapter(PersonAdapter());
-    // Hive.registerAdapter(TrainingSessionAdapter());
-    // Hive.registerAdapter(HeartRateDataAdapter());
-    
-    // Open boxes
-    _personBox = await Hive.openBox<Person>('persons');
-    _sessionBox = await Hive.openBox<TrainingSession>('training_sessions');
-    
-    // Load current person if exists
-    if (_personBox!.isNotEmpty) {
-      _currentPerson = _personBox!.values.first;
+    try {
+      // Register adapters before opening boxes
+      if (!Hive.isAdapterRegistered(PersonAdapter().typeId)) {
+        Hive.registerAdapter(PersonAdapter());
+      }
+      if (!Hive.isAdapterRegistered(TrainingSessionAdapter().typeId)) {
+        Hive.registerAdapter(TrainingSessionAdapter());
+      }
+      if (!Hive.isAdapterRegistered(HeartRateDataAdapter().typeId)) {
+        Hive.registerAdapter(HeartRateDataAdapter());
+      }
+      
+      // Open boxes
+      _personBox = await Hive.openBox<Person>('persons');
+      _sessionBox = await Hive.openBox<TrainingSession>('training_sessions');
+      
+      // Load current person if exists
+      if (_personBox!.isNotEmpty) {
+        _currentPerson = _personBox!.values.first;
+      }
+    } catch (e) {
+      debugPrint('Error initializing DatabaseService: $e');
+      rethrow;
     }
   }
 
@@ -41,6 +53,8 @@ class DatabaseService extends ChangeNotifier {
     required double height,
     int? maxHeartRate,
     int? restingHeartRate,
+    String? category,
+    String? group,
   }) async {
     final person = Person(
       id: const Uuid().v4(),
@@ -51,12 +65,14 @@ class DatabaseService extends ChangeNotifier {
       height: height,
       maxHeartRate: maxHeartRate,
       restingHeartRate: restingHeartRate,
+      category: category,
+      group: group,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );
     
     await _personBox!.put(person.id, person);
-    _currentPerson = person;
+    // Do not auto-select newly created person to avoid unexpected "selected" state
     notifyListeners();
     return person;
   }
@@ -74,14 +90,75 @@ class DatabaseService extends ChangeNotifier {
     return _personBox!.values.toList();
   }
 
+  Future<void> deletePerson(String personId) async {
+    await _personBox!.delete(personId);
+    if (_currentPerson?.id == personId) {
+      _currentPerson = null;
+    }
+    notifyListeners();
+  }
+
+  // Sensor Assignment Management
+  Future<void> assignSensorToAthlete(String sensorId, String athleteId) async {
+    // First, remove this sensor from any other athlete
+    for (var person in _personBox!.values) {
+      if (person.hasSensorAssigned(sensorId) && person.id != athleteId) {
+        person.assignedSensorIds.remove(sensorId);
+        await _personBox!.put(person.id, person);
+      }
+    }
+    
+    // Then assign to the target athlete
+    final athlete = _personBox!.get(athleteId);
+    if (athlete != null) {
+      athlete.assignSensor(sensorId);
+      await _personBox!.put(athleteId, athlete);
+      notifyListeners();
+    }
+  }
+
+  Future<void> unassignSensor(String sensorId) async {
+    for (var person in _personBox!.values) {
+      if (person.hasSensorAssigned(sensorId)) {
+        person.assignedSensorIds.remove(sensorId);
+        await _personBox!.put(person.id, person);
+        notifyListeners();
+        break;
+      }
+    }
+  }
+
+  Person? getAthleteForSensor(String sensorId) {
+    for (var person in _personBox!.values) {
+      if (person.hasSensorAssigned(sensorId)) {
+        return person;
+      }
+    }
+    return null;
+  }
+
+  List<Person> getAthletes() {
+    return _personBox!.values.where((p) => p.role == 'athlete').toList();
+  }
+
+  Person? getPersonById(String personId) {
+    return _personBox!.get(personId);
+  }
+
   // Training Session Management
   Future<TrainingSession> createSession({
     required String title,
     required String trainingType,
     String? notes,
   }) async {
+    // Ensure a person is selected - auto-select first one if none selected
     if (_currentPerson == null) {
-      throw Exception('No person profile found');
+      final persons = getAllPersons();
+      if (persons.isEmpty) {
+        throw Exception('Please create a person profile first');
+      }
+      _currentPerson = persons.first;
+      debugPrint('Auto-selected person: ${_currentPerson!.name}');
     }
 
     final session = TrainingSession(
@@ -141,7 +218,10 @@ class DatabaseService extends ChangeNotifier {
   }
 
   List<TrainingSession> getUnsyncedSessions() {
-    return _sessionBox!.values.where((s) => !s.synced).toList();
+    // Only return complete sessions that can be synced (have endTime)
+    return _sessionBox!.values
+        .where((s) => !s.synced && s.endTime != null)
+        .toList();
   }
 
   Future<void> deleteSession(String sessionId) async {
@@ -169,5 +249,99 @@ class DatabaseService extends ChangeNotifier {
                      durationMinutes / 4.184;
     
     return calories.clamp(0, double.infinity);
+  }
+
+  /// Sync a training session to Supabase
+  Future<bool> syncSessionToCloud(
+    TrainingSession session,
+    SupabaseRepository supabaseRepository,
+  ) async {
+    try {
+      if (session.endTime == null) {
+        debugPrint('Cannot sync incomplete session ${session.id}');
+        return false;
+      }
+
+      debugPrint('Starting sync for session ${session.id}');
+      
+      // Prepare heart rate data
+      final heartRateData = session.heartRateData
+          .map((d) => {
+                'timestamp': d.timestamp.toIso8601String(),
+                'heartRate': d.heartRate,
+                'deviceId': d.deviceId,
+              })
+          .toList();
+
+      // Sync to Supabase
+      await supabaseRepository.upsertTrainingSession(
+        id: session.id,
+        personId: session.personId,
+        title: session.title,
+        trainingType: session.trainingType,
+        startTime: session.startTime,
+        endTime: session.endTime!,
+        duration: session.duration,
+        avgHeartRate: session.avgHeartRate ?? 0,
+        maxHeartRate: session.maxHeartRate ?? 0,
+        minHeartRate: session.minHeartRate ?? 0,
+        calories: session.calories ?? 0,
+        heartRateData: heartRateData,
+        notes: session.notes,
+        rrIntervals: null, // Add if you capture RR intervals
+      );
+
+      debugPrint('Supabase upload successful for session ${session.id}');
+      
+      // Mark session as synced in local database
+      session.synced = true;
+      await _sessionBox!.put(session.id, session);
+      
+      debugPrint('Session ${session.id} marked as synced in local database');
+      debugPrint('Session synced flag is now: ${session.synced}');
+      
+      return true;
+    } catch (e) {
+      debugPrint('Error syncing session to cloud: $e');
+      return false;
+    }
+  }
+
+  /// Sync all unsynced sessions to Supabase
+  Future<int> syncAllUnsyncedSessions(
+    SupabaseRepository supabaseRepository,
+  ) async {
+    try {
+      final unsyncedSessions = getUnsyncedSessions();
+      debugPrint('Found ${unsyncedSessions.length} unsynced sessions to upload');
+      
+      int syncedCount = 0;
+
+      for (var session in unsyncedSessions) {
+        debugPrint('Syncing session ${session.id}: synced=${session.synced}, endTime=${session.endTime}');
+        final success = await syncSessionToCloud(session, supabaseRepository);
+        if (success) {
+          syncedCount++;
+          debugPrint('Successfully synced session ${session.id}');
+        } else {
+          debugPrint('Failed to sync session ${session.id}');
+        }
+      }
+
+      // Force notify listeners after all syncs complete
+      if (syncedCount > 0) {
+        debugPrint('Notifying listeners after syncing $syncedCount sessions');
+        notifyListeners();
+      }
+      
+      // Verify badge count after sync
+      final remainingUnsynced = getUnsyncedSessions().length;
+      debugPrint('After sync: $remainingUnsynced unsynced sessions remaining');
+      
+      return syncedCount;
+    } catch (e) {
+      debugPrint('Error syncing all unsynced sessions: $e');
+      return 0;
+    }
   }
 }

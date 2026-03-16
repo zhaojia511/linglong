@@ -1,152 +1,76 @@
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/person.dart';
 import '../models/training_session.dart';
-import 'database_service.dart';
+import '../supabase/supabase_client.dart';
 
 class SyncService extends ChangeNotifier {
-  static const String defaultBaseUrl = 'http://localhost:3000/api';
-  String _baseUrl = defaultBaseUrl;
-  String? _authToken;
   bool _isSyncing = false;
 
   bool get isSyncing => _isSyncing;
-  String get baseUrl => _baseUrl;
+  bool get isAuthenticated => SupabaseClientProvider.client.auth.currentSession != null;
 
-  Future<void> init() async {
-    final prefs = await SharedPreferences.getInstance();
-    _baseUrl = prefs.getString('api_base_url') ?? defaultBaseUrl;
-    _authToken = prefs.getString('auth_token');
-  }
+  SupabaseClient get _client => SupabaseClientProvider.client;
 
-  Future<void> setBaseUrl(String url) async {
-    _baseUrl = url;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('api_base_url', url);
+  Future<void> login(String email, String password) async {
+    await _client.auth.signInWithPassword(email: email, password: password);
     notifyListeners();
-  }
-
-  Future<bool> login(String email, String password) async {
-    try {
-      final response = await http.post(
-        Uri.parse('$_baseUrl/auth/login'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email, 'password': password}),
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        _authToken = data['token'];
-        
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('auth_token', _authToken!);
-        
-        notifyListeners();
-        return true;
-      }
-      return false;
-    } catch (e) {
-      debugPrint('Login error: $e');
-      return false;
-    }
   }
 
   Future<void> logout() async {
-    _authToken = null;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('auth_token');
+    await _client.auth.signOut();
     notifyListeners();
   }
 
-  Map<String, String> _getHeaders() {
-    return {
-      'Content-Type': 'application/json',
-      if (_authToken != null) 'Authorization': 'Bearer $_authToken',
-    };
+  Future<void> syncPerson(Person person) async {
+    if (!isAuthenticated) return;
+    final user = _client.auth.currentUser!;
+    await _client.from('persons').upsert({
+      'id': person.id,
+      'user_id': user.id,
+      'name': person.name,
+      'age': person.age,
+      'gender': person.gender,
+      'weight': person.weight,
+      'height': person.height,
+      'max_heart_rate': person.maxHeartRate,
+      'resting_heart_rate': person.restingHeartRate,
+    }, onConflict: 'id');
   }
 
-  Future<bool> syncPerson(Person person) async {
-    try {
-      final response = await http.post(
-        Uri.parse('$_baseUrl/persons'),
-        headers: _getHeaders(),
-        body: jsonEncode(person.toJson()),
-      );
-
-      return response.statusCode == 200 || response.statusCode == 201;
-    } catch (e) {
-      debugPrint('Error syncing person: $e');
-      return false;
-    }
-  }
-
-  Future<bool> syncSession(TrainingSession session) async {
-    try {
-      final response = await http.post(
-        Uri.parse('$_baseUrl/sessions'),
-        headers: _getHeaders(),
-        body: jsonEncode(session.toJson()),
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        session.synced = true;
-        await DatabaseService.instance.updateSession(session);
-        return true;
-      }
-      return false;
-    } catch (e) {
-      debugPrint('Error syncing session: $e');
-      return false;
-    }
+  Future<void> syncSession(TrainingSession session) async {
+    if (!isAuthenticated) return;
+    final user = _client.auth.currentUser!;
+    await _client.from('training_sessions').upsert({
+      'id': session.id,
+      'user_id': user.id,
+      'person_id': session.personId,
+      'title': session.title,
+      'start_time': session.startTime.toIso8601String(),
+      'end_time': session.endTime?.toIso8601String(),
+      'duration': session.duration,
+      'avg_heart_rate': session.avgHeartRate,
+      'max_heart_rate': session.maxHeartRate,
+      'min_heart_rate': session.minHeartRate,
+      'calories': session.calories,
+      'training_type': session.trainingType,
+      'heart_rate_data': session.heartRateData.map((e) => e.toJson()).toList(),
+      'notes': session.notes,
+    }, onConflict: 'id');
   }
 
   Future<void> syncAll() async {
-    if (_isSyncing || _authToken == null) return;
-
+    if (!isAuthenticated || _isSyncing) return;
     _isSyncing = true;
     notifyListeners();
-
     try {
-      // Sync current person
-      final person = DatabaseService.instance.currentPerson;
-      if (person != null) {
-        await syncPerson(person);
-      }
-
-      // Sync unsynced sessions
-      final unsyncedSessions = DatabaseService.instance.getUnsyncedSessions();
-      for (var session in unsyncedSessions) {
-        await syncSession(session);
-      }
+      // Sessions are synced individually via syncSession()
+      // This method is kept for UI compatibility
     } finally {
       _isSyncing = false;
       notifyListeners();
     }
   }
 
-  Future<List<TrainingSession>> fetchSessions({int? limit, int? offset}) async {
-    try {
-      final uri = Uri.parse('$_baseUrl/sessions').replace(
-        queryParameters: {
-          if (limit != null) 'limit': limit.toString(),
-          if (offset != null) 'offset': offset.toString(),
-        },
-      );
-
-      final response = await http.get(uri, headers: _getHeaders());
-
-      if (response.statusCode == 200) {
-        final List<dynamic> data = jsonDecode(response.body);
-        return data.map((json) => TrainingSession.fromJson(json)).toList();
-      }
-      return [];
-    } catch (e) {
-      debugPrint('Error fetching sessions: $e');
-      return [];
-    }
-  }
-
-  bool get isAuthenticated => _authToken != null;
+  Stream<AuthState> get authStateChanges => _client.auth.onAuthStateChange;
 }
