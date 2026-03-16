@@ -5,7 +5,7 @@ Heart rate monitor platform for team sports coaching. Coaches monitor multiple a
 
 **Stack:**
 - Mobile: Flutter (iOS primary, Android supported)
-- Backend: Node.js/Express + Supabase (PostgreSQL + Auth)
+- Backend: Supabase (PostgreSQL + Auth + RPC) — no Node.js server
 - Web: React/Vite → deployed to Cloudflare Pages
 
 ## Branches
@@ -45,7 +45,7 @@ mobile_app/lib/
     ble_service.dart               # BLE device discovery/connection
     database_service.dart          # Local Hive DB + sensor assignment methods
     supabase_repository.dart       # Cloud sync
-    sync_service.dart              # REST backend sync (legacy)
+    sync_service.dart              # Supabase direct sync
     settings_service.dart
     app_initializer.dart
     emg_service.dart
@@ -61,8 +61,8 @@ mobile_app/lib/
 
 ## Sync Architecture
 - Mobile → Supabase direct (via `supabase_repository.dart`)
-- Web app → Supabase direct (migrated away from Node.js backend)
-- Backend (`backend/`) still exists but web app no longer uses it
+- Web app → Supabase direct (via `web_app/src/services/api.js`)
+- No Node.js backend — fully removed
 
 ## iOS Status
 - iOS project files exist (`mobile_app/ios/`)

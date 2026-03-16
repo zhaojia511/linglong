@@ -34,6 +34,18 @@ class Person extends HiveObject {
   @HiveField(9)
   DateTime updatedAt;
 
+  @HiveField(10)
+  String role; // 'athlete' or 'coach'
+  
+  @HiveField(11)
+  List<String> assignedSensorIds; // BLE device IDs assigned to this athlete
+  
+  @HiveField(12)
+  String? category;
+
+  @HiveField(13)
+  String? group;
+
   Person({
     required this.id,
     required this.name,
@@ -45,7 +57,11 @@ class Person extends HiveObject {
     this.restingHeartRate,
     required this.createdAt,
     required this.updatedAt,
-  });
+    this.role = 'athlete',
+    List<String>? assignedSensorIds,
+    this.category,
+    this.group,
+  }) : assignedSensorIds = assignedSensorIds ?? [];
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -58,6 +74,10 @@ class Person extends HiveObject {
     'restingHeartRate': restingHeartRate,
     'createdAt': createdAt.toIso8601String(),
     'updatedAt': updatedAt.toIso8601String(),
+    'role': role,
+    'assignedSensorIds': assignedSensorIds,
+    'category': category,
+    'group': group,
   };
 
   factory Person.fromJson(Map<String, dynamic> json) => Person(
@@ -71,5 +91,26 @@ class Person extends HiveObject {
     restingHeartRate: json['restingHeartRate'],
     createdAt: DateTime.parse(json['createdAt']),
     updatedAt: DateTime.parse(json['updatedAt']),
+    role: json['role'] ?? 'athlete',
+    assignedSensorIds: json['assignedSensorIds'] != null
+        ? List<String>.from(json['assignedSensorIds'])
+        : [],
+    category: json['category'],
+    group: json['group'],
   );
+
+  /// Check if a sensor is assigned to this athlete
+  bool hasSensorAssigned(String sensorId) => assignedSensorIds.contains(sensorId);
+
+  /// Assign a sensor to this athlete
+  void assignSensor(String sensorId) {
+    if (!assignedSensorIds.contains(sensorId)) {
+      assignedSensorIds.add(sensorId);
+    }
+  }
+
+  /// Remove a sensor assignment
+  void removeSensor(String sensorId) {
+    assignedSensorIds.remove(sensorId);
+  }
 }
