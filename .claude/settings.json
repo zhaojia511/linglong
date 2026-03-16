@@ -6,7 +6,8 @@
       "Bash(xargs grep:*)",
       "WebFetch(domain:github.com)",
       "Read(//d/github/hootuo/**)",
-      "Read(//c/Users/zhaoj/.claude/**)"
+      "Read(//c/Users/zhaoj/.claude/**)",
+      "Bash(grep -rn \"signUp\\\\|sign_up\\\\|register\\\\|createUser\" d:/github/linglong/web_app/src/ --include=*.js --include=*.jsx)"
     ]
   }
 }
