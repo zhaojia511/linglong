@@ -59,14 +59,37 @@ class HrvAnalysis {
   /// Compute all HRV metrics at once.
   static HrvResult analyze(List<int> rrIntervals) {
     final filtered = _filterArtifacts(rrIntervals);
+    final rmssdVal = rmssd(filtered);
+    final sdnnVal = sdnn(filtered);
+    // SD1 = short-term variability (parasympathetic). SD2 = long-term.
+    final sd1 = rmssdVal / sqrt(2);
+    final sd2Val = sdnnVal * sdnnVal * 2 - sd1 * sd1;
+    final sd2 = sd2Val > 0 ? sqrt(sd2Val) : 0.0;
     return HrvResult(
-      sdnn: sdnn(filtered),
-      rmssd: rmssd(filtered),
+      sdnn: sdnnVal,
+      rmssd: rmssdVal,
       pnn50: pnn50(filtered),
       meanRR: meanRR(filtered),
+      sd1: sd1,
+      sd2: sd2,
       validIntervals: filtered.length,
       totalIntervals: rrIntervals.length,
+      filteredRR: filtered,
     );
+  }
+
+  /// Rolling RMSSD over time using a sliding window of [windowSize] intervals.
+  /// Returns a list of (intervalIndex, rmssd) pairs.
+  static List<({int index, double rmssd})> rollingRmssd(
+      List<int> rrIntervals, {int windowSize = 30}) {
+    final filtered = _filterArtifacts(rrIntervals);
+    if (filtered.length < windowSize) return [];
+    final result = <({int index, double rmssd})>[];
+    for (int i = windowSize; i <= filtered.length; i++) {
+      final window = filtered.sublist(i - windowSize, i);
+      result.add((index: i, rmssd: rmssd(window)));
+    }
+    return result;
   }
 
   /// Filter out physiologically impossible RR intervals.
@@ -99,16 +122,22 @@ class HrvResult {
   final double rmssd;
   final double pnn50;
   final double meanRR;
+  final double sd1;  // Poincaré short-term variability (parasympathetic)
+  final double sd2;  // Poincaré long-term variability
   final int validIntervals;
   final int totalIntervals;
+  final List<int> filteredRR; // cleaned RR intervals for plotting
 
   const HrvResult({
     required this.sdnn,
     required this.rmssd,
     required this.pnn50,
     required this.meanRR,
+    required this.sd1,
+    required this.sd2,
     required this.validIntervals,
     required this.totalIntervals,
+    required this.filteredRR,
   });
 
   /// Estimated stress level based on RMSSD.
@@ -125,6 +154,8 @@ class HrvResult {
         'rmssd': rmssd.toStringAsFixed(1),
         'pnn50': pnn50.toStringAsFixed(1),
         'meanRR': meanRR.toStringAsFixed(1),
+        'sd1': sd1.toStringAsFixed(1),
+        'sd2': sd2.toStringAsFixed(1),
         'stressLevel': stressLevel,
         'validIntervals': validIntervals,
         'totalIntervals': totalIntervals,
