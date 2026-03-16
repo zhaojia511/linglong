@@ -21,6 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/persons', require('./routes/persons'));
 app.use('/api/sessions', require('./routes/sessions'));
+app.use('/api/force-sessions', require('./routes/force_sessions'));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
