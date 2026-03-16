@@ -5,7 +5,6 @@ import '../services/supabase_repository.dart';
 import '../models/training_session.dart';
 import '../screens/session_visualization_screen.dart';
 import 'dashboard_screen.dart';
-import 'emg_screen.dart';
 import 'profile_screen.dart';
 import 'settings_screen.dart';
 
@@ -23,7 +22,6 @@ class _HomeScreenState extends State<HomeScreen> {
   late final List<Widget> _screens = [
     const DashboardScreen(),
     const TrainingHistoryWidget(),
-    const EmgScreen(),
     const ProfileScreen(),
     const SettingsScreen(),
   ];
@@ -54,10 +52,6 @@ class _HomeScreenState extends State<HomeScreen> {
           NavigationDestination(
             icon: Icon(Icons.history),
             label: 'History',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.sensors),
-            label: 'EMG',
           ),
           NavigationDestination(
             icon: Icon(Icons.person),

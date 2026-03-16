@@ -5,6 +5,7 @@ import 'screens/home_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/training_history_screen.dart';
 import 'screens/profile_screen.dart';
+import 'screens/settings_screen.dart';
 import 'services/ble_service.dart';
 import 'services/database_service.dart';
 import 'services/settings_service.dart';
@@ -102,6 +103,7 @@ class MyApp extends StatelessWidget {
           '/dashboard': (context) => const DashboardScreen(),
           '/history': (context) => const TrainingHistoryScreen(),
           '/profile': (context) => const ProfileScreen(),
+          '/settings': (context) => const SettingsScreen(),
         },
       ),
     );

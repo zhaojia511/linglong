@@ -266,15 +266,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'HR Monitor',
-          style: TextStyle(fontSize: 16),
-        ),
+        title: null,
         toolbarHeight: 48,
+        leading: IconButton(
+          icon: const Icon(Icons.bluetooth, size: 20),
+          onPressed: () => _showDeviceDialog(context),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.bluetooth, size: 20),
-            onPressed: () => _showDeviceDialog(context),
+            icon: const Icon(Icons.settings, size: 20),
+            onPressed: () => Navigator.pushNamed(context, '/settings'),
           ),
         ],
       ),
@@ -448,19 +449,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       childAspectRatio:
                           0.95, // Original sizing for smaller cards
                     ),
-                    itemCount: connectedDevices.where((d) => d.isConnected).length + 3,
+                    itemCount: connectedDevices.where((d) => d.isConnected).length,
                     itemBuilder: (context, index) {
                       final connectedOnly = connectedDevices.where((d) => d.isConnected).toList();
-                      
-                      if (index < connectedOnly.length) {
-                        final device = connectedOnly[index];
-                        final athlete = DatabaseService.instance.getAthleteForSensor(device.id);
-                        return _buildSquareDeviceCard(device, index + 1, athlete);
-                      } else {
-                        // Show mock BPM data cards
-                        final mockIndex = index - connectedOnly.length;
-                        return _buildMockBPMCard(mockIndex + 1, connectedOnly.length + mockIndex + 1);
-                      }
+                      final device = connectedOnly[index];
+                      final athlete = DatabaseService.instance.getAthleteForSensor(device.id);
+                      return _buildSquareDeviceCard(device, index + 1, athlete);
                     },
                   ),
 
@@ -700,121 +694,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   /// Build a mock BPM card for demonstration/testing purposes
   /// Displays simulated heart rate data with training zone colors
-  Widget _buildMockBPMCard(int mockDataIndex, int memberNumber) {
-    // Mock data with different BPM values for different training zones
-    final mockDataList = [
-      {'name': 'Mock 1', 'bpm': 85, 'athlete': 'Demo Athlete 1'},
-      {'name': 'Mock 2', 'bpm': 135, 'athlete': 'Demo Athlete 2'},
-      {'name': 'Mock 3', 'bpm': 175, 'athlete': 'Demo Athlete 3'},
-    ];
-    
-    final mockData = mockDataList[(mockDataIndex - 1) % mockDataList.length];
-    final bpm = mockData['bpm'] as int;
-    final name = mockData['athlete'] as String;
-
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              _getColorForMember(memberNumber).withOpacity(0.12),
-              _getColorForMember(memberNumber).withOpacity(0.04),
-            ],
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Top: Athlete name
-              Text(
-                name,
-                style: TextStyle(
-                  fontSize: 10,
-                  color: Colors.blue[700],
-                  fontWeight: FontWeight.w600,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-              ),
-
-              // Main: Large Heart Rate Display
-              Expanded(
-                child: Container(
-                  width: double.infinity,
-                  margin: const EdgeInsets.symmetric(vertical: 6),
-                  decoration: BoxDecoration(
-                    color: _getHeartRateColorByTrainingZone(bpm)
-                        .withOpacity(0.95),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.favorite,
-                        color: Colors.white,
-                        size: 24,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        bpm.toString(),
-                        style: const TextStyle(
-                          fontSize: 40,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          height: 1.0,
-                        ),
-                      ),
-                      const Text(
-                        'bpm',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.white70,
-                          height: 1.0,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        _getTrainingZoneName(bpm),
-                        style: const TextStyle(
-                          fontSize: 9,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                          height: 1.0,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Bottom: Mock indicator
-              Text(
-                '📊 Demo',
-                style: TextStyle(
-                  fontSize: 8,
-                  color: Colors.grey[600],
-                  fontWeight: FontWeight.w500,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildAthleteList(HRDevice device) {
     final athletes = DatabaseService.instance.getAthletes();
     
