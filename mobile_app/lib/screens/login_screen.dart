@@ -38,10 +38,24 @@ class _LoginScreenState extends State<LoginScreen> {
         : await auth.signIn(_emailCtrl.text, _passwordCtrl.text);
 
     if (mounted) {
-      setState(() {
-        _submitting = false;
-        _errorMessage = err;
-      });
+      if (err == 'CHECK_EMAIL') {
+        setState(() {
+          _submitting = false;
+          _errorMessage = null;
+          _isSignUp = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Account created! Check your email to confirm, then sign in.'),
+            duration: Duration(seconds: 5),
+          ),
+        );
+      } else {
+        setState(() {
+          _submitting = false;
+          _errorMessage = err;
+        });
+      }
     }
   }
 

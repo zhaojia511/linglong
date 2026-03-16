@@ -65,12 +65,18 @@ class AuthService extends ChangeNotifier {
         email: email.trim(),
         password: password,
       );
+      _loading = false;
       if (res.user == null) {
-        _loading = false;
         _error = 'Sign up failed';
         notifyListeners();
         return 'Sign up failed';
       }
+      if (res.session == null) {
+        // Email confirmation required
+        notifyListeners();
+        return 'CHECK_EMAIL';
+      }
+      notifyListeners();
       return null;
     } on AuthException catch (e) {
       _loading = false;
