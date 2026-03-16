@@ -11,6 +11,7 @@ import RecordingManagement from './pages/RecordingManagement'
 import HistoryAnalysis from './pages/HistoryAnalysis'
 import Settings from './pages/Settings'
 import { authService } from './services/api'
+import { supabase } from './services/supabaseClient'
 import { queryClient } from './lib/queryClient'
 import Header from './components/Header'
 import TabSidebar from './components/TabSidebar'
@@ -20,20 +21,23 @@ function App() {
   const [authChecked, setAuthChecked] = useState(false)
 
   useEffect(() => {
-    let mounted = true
+    // Check current session
     authService.isAuthenticated().then((authed) => {
-      if (mounted) {
-        setIsAuthenticated(authed)
-        setAuthChecked(true)
-      }
+      setIsAuthenticated(authed)
+      setAuthChecked(true)
     })
-    return () => {
-      mounted = false
-    }
+
+    // Subscribe to future auth changes (token refresh, logout from another tab)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session)
+      setAuthChecked(true)
+    })
+
+    return () => subscription.unsubscribe()
   }, [])
 
   const PrivateRoute = ({ children }) => {
-    if (!authChecked) return null
+    if (!authChecked) return <div className="container">Loading...</div>
     return isAuthenticated ? children : <Navigate to="/login" />
   }
 
