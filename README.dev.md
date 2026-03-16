@@ -1,6 +1,18 @@
 Developer quick start
 =====================
 
+Sync this repo/branch on another machine:
+
+```bash
+# make executable first time: chmod +x scripts/sync_branch.sh
+./scripts/sync_branch.sh copilot/build-heartrate-sensor-app 5d45926
+```
+
+Notes:
+- The script updates `origin` to `https://github.com/zhaojia511/linglong.git`
+- It fetches, checks out the target branch, fast-forwards only, and verifies the expected commit if provided
+- It stops on a dirty working tree unless you set `ALLOW_DIRTY=1`
+
 Start backend and frontend dev servers (creates logs in `logs/`):
 
 ```bash
