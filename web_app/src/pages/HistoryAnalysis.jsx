@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { supabase } from '../services/supabaseClient'
 import api from '../services/api'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts'
+import { getZoneForHR, ZONE_DEFINITIONS } from '../lib/trainingZones'
 
 const HistoryAnalysis = () => {
   const [stats, setStats] = useState(null)
@@ -108,6 +109,19 @@ const HistoryAnalysis = () => {
     })
 
     return Object.values(monthlyStats).sort((a, b) => a.month.localeCompare(b.month))
+  }
+
+  const prepareZoneSummary = () => {
+    const counts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
+    let total = 0
+    sessions.forEach(s => {
+      const person = persons.find(p => p.id === s.personId)
+      if (!person?.maxHeartRate || !s.avgHeartRate) return
+      const zone = getZoneForHR(s.avgHeartRate, person.maxHeartRate)
+      if (zone) { counts[zone.zone]++; total++ }
+    })
+    if (total === 0) return null
+    return { counts, total }
   }
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8']
@@ -267,6 +281,40 @@ const HistoryAnalysis = () => {
             </BarChart>
           </ResponsiveContainer>
         </div>
+
+        {/* Zone Distribution Summary */}
+        {(() => {
+          const zoneSummary = prepareZoneSummary()
+          if (!zoneSummary) return null
+          return (
+            <div className="bg-white shadow-md rounded-lg p-6 mb-8">
+              <h3 className="text-xl font-semibold mb-4">Zone Distribution (All Sessions)</h3>
+              <div style={{ display: 'flex', gap: 4, height: 32, borderRadius: 4, overflow: 'hidden' }}>
+                {ZONE_DEFINITIONS.map(z => {
+                  const pct = Math.round((zoneSummary.counts[z.zone] / zoneSummary.total) * 100)
+                  if (pct === 0) return null
+                  return (
+                    <div
+                      key={z.zone}
+                      title={`Zone ${z.zone}: ${z.name} — ${pct}%`}
+                      style={{ background: z.color, flex: pct, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 11, fontWeight: 'bold' }}
+                    >
+                      {pct >= 8 ? `Z${z.zone} ${pct}%` : ''}
+                    </div>
+                  )
+                })}
+              </div>
+              <div style={{ display: 'flex', gap: 16, marginTop: 8, flexWrap: 'wrap' }}>
+                {ZONE_DEFINITIONS.map(z => (
+                  <span key={z.zone} style={{ fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <span style={{ width: 10, height: 10, background: z.color, display: 'inline-block', borderRadius: 2 }} />
+                    Z{z.zone} {z.name}: {Math.round((zoneSummary.counts[z.zone] / zoneSummary.total) * 100)}%
+                  </span>
+                ))}
+              </div>
+            </div>
+          )
+        })()}
 
         {/* Recent Sessions Table */}
         <div className="bg-white shadow-md rounded-lg overflow-hidden">
