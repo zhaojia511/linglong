@@ -16,9 +16,11 @@ function Sessions() {
   }, [filter])
 
   const loadSessions = async () => {
+    setLoading(true)
+    setError('')
     try {
       const data = await sessionService.getSessions(filter)
-      setSessions(data.data)
+      setSessions(data.data ?? [])
     } catch (error) {
       console.error('Error loading sessions:', error)
       setError('Failed to load sessions. Is the backend running?')
