@@ -84,41 +84,13 @@ router.get('/', protect, async (req, res) => {
   }
 });
 
-// @route   GET /api/sessions/:id
-// @desc    Get single training session by ID
-// @access  Private
-router.get('/:id', protect, async (req, res) => {
-  try {
-    const session = await TrainingSession.findOne({ 
-      id: req.params.id, 
-      userId: req.user._id 
-    });
-
-    if (!session) {
-      return res.status(404).json({
-        error: { message: 'Training session not found' }
-      });
-    }
-
-    res.json({
-      success: true,
-      data: session
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      error: { message: 'Server error' }
-    });
-  }
-});
-
 // @route   GET /api/sessions/stats/summary
 // @desc    Get training statistics summary
 // @access  Private
 router.get('/stats/summary', protect, async (req, res) => {
   try {
     const { startDate, endDate, personId } = req.query;
-    
+
     const query = { userId: req.user._id };
     if (personId) query.personId = personId;
     if (startDate || endDate) {
@@ -153,6 +125,34 @@ router.get('/stats/summary', protect, async (req, res) => {
     res.json({
       success: true,
       data: stats
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: { message: 'Server error' }
+    });
+  }
+});
+
+// @route   GET /api/sessions/:id
+// @desc    Get single training session by ID
+// @access  Private
+router.get('/:id', protect, async (req, res) => {
+  try {
+    const session = await TrainingSession.findOne({
+      id: req.params.id,
+      userId: req.user._id
+    });
+
+    if (!session) {
+      return res.status(404).json({
+        error: { message: 'Training session not found' }
+      });
+    }
+
+    res.json({
+      success: true,
+      data: session
     });
   } catch (error) {
     console.error(error);
