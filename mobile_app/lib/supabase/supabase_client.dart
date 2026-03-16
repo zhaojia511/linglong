@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseConfig {
@@ -8,24 +9,31 @@ class SupabaseConfig {
 
 class SupabaseClientProvider {
   static late SupabaseClient _client;
-  
+
   static SupabaseClient get client => _client;
 
   static Future<void> init() async {
+    debugPrint('[Supabase] Initializing with URL: ${SupabaseConfig.supabaseUrl}');
     try {
       if (Supabase.instance.client.auth.currentUser != null) {
-        // already initialized
+        debugPrint('[Supabase] Already initialized, reusing client');
         _client = Supabase.instance.client;
         return;
       }
     } catch (_) {
       // Not initialized yet, proceed with initialization
     }
-    
-    await Supabase.initialize(
-      url: SupabaseConfig.supabaseUrl,
-      anonKey: SupabaseConfig.supabaseAnonKey,
-    );
-    _client = Supabase.instance.client;
+
+    try {
+      await Supabase.initialize(
+        url: SupabaseConfig.supabaseUrl,
+        anonKey: SupabaseConfig.supabaseAnonKey,
+      );
+      _client = Supabase.instance.client;
+      debugPrint('[Supabase] Initialized successfully');
+    } catch (e) {
+      debugPrint('[Supabase] Init FAILED: $e');
+      rethrow;
+    }
   }
 }
