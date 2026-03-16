@@ -10,6 +10,14 @@ function Dashboard() {
   const navigate = useNavigate()
   const { statsQuery, sessionsQuery } = useDashboardData()
 
+  // Backend wraps all responses as { success: true, data: ... }
+  // statsQuery.data is the full response object; .data is the actual stats
+  const stats = statsQuery.data?.data ?? statsQuery.data
+
+  // sessionsQuery.data is { success, count, total, data: [...] }
+  // so the array is at .data.data
+  const recentSessions = sessionsQuery.data?.data ?? []
+
   const handleLogout = () => {
     authService.logout()
     navigate('/login')
@@ -111,11 +119,11 @@ function Dashboard() {
 
         <div className="card">
           <h2>Recent Training Sessions</h2>
-          {sessionsQuery.data?.length === 0 ? (
+          {recentSessions.length === 0 ? (
             <p>No training sessions yet.</p>
           ) : (
             <ul className="session-list">
-              {sessionsQuery.data?.map((session) => (
+              {recentSessions.map((session) => (
                 <li key={session.id} className="session-item">
                   <div>
                     <strong>{session.title}</strong>
