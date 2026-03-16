@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /d/github/linglong log --oneline -10)",
+      "Bash(git -C /d/github/linglong log --pretty=fuller --all -20)",
+      "mcp__plugin_playwright_playwright__browser_navigate",
+      "mcp__plugin_playwright_playwright__browser_wait_for",
+      "mcp__plugin_playwright_playwright__browser_snapshot",
+      "WebSearch",
+      "WebFetch(domain:www.analog.com)",
+      "WebFetch(domain:www.ti.com)",
+      "Bash(git commit:*)",
+      "Bash(npm install uuid)",
+      "Bash(npm install uuid --legacy-peer-deps)",
+      "Bash(npm install uuid --legacy-peer-deps --force)",
+      "Bash(npm install --legacy-peer-deps)",
+      "Bash(npm show jest-axe versions --json)",
+      "Bash(npm show prettier versions --json)",
+      "Bash(python3 -c \"import sys,json; v=json.load\\(sys.stdin\\); print\\([x for x in v if x.startswith\\(''2.''\\)][-3:]\\)\")",
+      "Bash(npm install)",
+      "Bash(npm run build)"
+    ],
+    "additionalDirectories": [
+      "d:\\github\\linglong\\docs\\superpowers"
+    ]
+  }
+}

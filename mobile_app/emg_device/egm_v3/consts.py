@@ -1,0 +1,11 @@
+
+class ConstValues: 
+    SERVICE_UUID = "464A3100-5350-6E6F-6974-6F4D74736146"
+    COMMAND_CHAR_UUID = "464A3101-5350-6E6F-6974-6F4D74736146"
+    NOTIFY_CHAR_UUID = "464A3102-5350-6E6F-6974-6F4D74736146"
+    DATA_CHAR_UUID = "464A3103-5350-6E6F-6974-6F4D74736146"
+    
+    sampling_frequency = 800  # change this to the actual sampling frequency of your device HARDWARE
+
+    COMMAND_HEX = bytes.fromhex("F8F20A")
+    FILTER_LIST = ["bandpass 20-350", "lowpass 350", "highpass 20", "notch 60"]
