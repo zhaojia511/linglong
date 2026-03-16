@@ -14,13 +14,17 @@ const UserSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, 'Please provide a password'],
-    minlength: 6,
-    select: false
+    required: false,
+    select: false,
   },
   name: {
     type: String,
     required: [true, 'Please provide a name']
+  },
+  supabaseId: {
+    type: String,
+    unique: true,
+    sparse: true,   // sparse index: allows multiple null values
   },
   role: {
     type: String,
@@ -35,10 +39,9 @@ const UserSchema = new mongoose.Schema({
 
 // Encrypt password before saving
 UserSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) {
-    next();
+  if (!this.password || !this.isModified('password')) {
+    return next();
   }
-  
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
