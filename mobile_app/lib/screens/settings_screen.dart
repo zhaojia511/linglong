@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/settings_service.dart';
 import '../services/supabase_repository.dart';
+import '../services/auth_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -114,8 +115,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _signOut() async {
     try {
-      final repo = SupabaseRepository();
-      await repo.signOut();
+      await context.read<AuthService>().signOut();
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
