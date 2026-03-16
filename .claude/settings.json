@@ -7,7 +7,9 @@
       "WebFetch(domain:github.com)",
       "Read(//d/github/hootuo/**)",
       "Read(//c/Users/zhaoj/.claude/**)",
-      "Bash(grep -rn \"signUp\\\\|sign_up\\\\|register\\\\|createUser\" d:/github/linglong/web_app/src/ --include=*.js --include=*.jsx)"
+      "Bash(grep -rn \"signUp\\\\|sign_up\\\\|register\\\\|createUser\" d:/github/linglong/web_app/src/ --include=*.js --include=*.jsx)",
+      "Bash(grep -r \"emailConfirm\\\\|email.confirm\\\\|confirm.*email\\\\|onAuthStateChange\\\\|signUpEmailConfirm\" /d/github/linglong --include=*.js --include=*.jsx --include=*.ts --include=*.tsx --include=*.sql)",
+      "Bash(grep -r \"redirectUrl\\\\|redirect_url\\\\|REDIRECT\" /d/github/linglong --include=*.js --include=*.jsx --include=*.sql --include=*.json)"
     ]
   }
 }
