@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uuid/uuid.dart';
@@ -305,6 +306,78 @@ class DatabaseService extends ChangeNotifier {
       debugPrint('Error syncing session to cloud: $e');
       return false;
     }
+  }
+
+  /// Pull persons and sessions from Supabase into local Hive
+  Future<void> syncDownFromCloud(SupabaseRepository repo) async {
+    try {
+      // --- Persons ---
+      final remotePersons = await repo.fetchPersons();
+      debugPrint('[SyncDown] Fetched ${remotePersons.length} persons from cloud');
+      for (final json in remotePersons) {
+        final person = _personFromSupabase(json);
+        // Preserve local sensor assignments
+        final existing = _personBox!.get(person.id);
+        if (existing != null) {
+          person.assignedSensorIds = existing.assignedSensorIds;
+        }
+        await _personBox!.put(person.id, person);
+      }
+
+      // --- Sessions ---
+      final remoteSessions = await repo.fetchSessions();
+      debugPrint('[SyncDown] Fetched ${remoteSessions.length} sessions from cloud');
+      for (final json in remoteSessions) {
+        final session = _sessionFromSupabase(json);
+        await _sessionBox!.put(session.id, session);
+      }
+
+      notifyListeners();
+      debugPrint('[SyncDown] Sync down complete');
+    } catch (e) {
+      debugPrint('[SyncDown] Error: $e');
+    }
+  }
+
+  Person _personFromSupabase(Map<String, dynamic> json) => Person(
+    id: json['id'],
+    name: json['name'] ?? '',
+    age: json['age'] ?? 0,
+    gender: json['gender'] ?? 'male',
+    weight: (json['weight'] ?? 0.0).toDouble(),
+    height: (json['height'] ?? 0.0).toDouble(),
+    maxHeartRate: json['max_heart_rate'],
+    restingHeartRate: json['resting_heart_rate'],
+    createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : DateTime.now(),
+    updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at']) : DateTime.now(),
+    role: json['role'] ?? 'athlete',
+    category: json['category'],
+    group: json['group'],
+  );
+
+  TrainingSession _sessionFromSupabase(Map<String, dynamic> json) {
+    List<HeartRateData> hrData = [];
+    final raw = json['heart_rate_data'];
+    if (raw != null) {
+      final list = raw is String ? jsonDecode(raw) as List : raw as List;
+      hrData = list.map((e) => HeartRateData.fromJson(e as Map<String, dynamic>)).toList();
+    }
+    return TrainingSession(
+      id: json['id'],
+      personId: json['person_id'] ?? '',
+      title: json['title'] ?? '',
+      startTime: DateTime.parse(json['start_time']),
+      endTime: json['end_time'] != null ? DateTime.parse(json['end_time']) : null,
+      duration: json['duration'] ?? 0,
+      avgHeartRate: json['avg_heart_rate'],
+      maxHeartRate: json['max_heart_rate'],
+      minHeartRate: json['min_heart_rate'],
+      calories: json['calories']?.toDouble(),
+      trainingType: json['training_type'] ?? '',
+      heartRateData: hrData,
+      synced: json['synced'] ?? true,
+      notes: json['notes'],
+    );
   }
 
   /// Sync all unsynced sessions to Supabase

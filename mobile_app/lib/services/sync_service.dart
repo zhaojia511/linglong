@@ -3,14 +3,49 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/person.dart';
 import '../models/training_session.dart';
 import '../supabase/supabase_client.dart';
+import 'app_initializer.dart';
+import 'database_service.dart';
+import 'settings_service.dart';
+import 'supabase_repository.dart';
 
 class SyncService extends ChangeNotifier {
   bool _isSyncing = false;
+  final SupabaseRepository _repo = SupabaseRepository();
+
+  SyncService() {
+    _client.auth.onAuthStateChange.listen((data) {
+      if (data.event == AuthChangeEvent.signedIn) {
+        debugPrint('[SyncService] Signed in — triggering bidirectional sync');
+        _syncOnLogin();
+      }
+    });
+  }
 
   bool get isSyncing => _isSyncing;
   bool get isAuthenticated => SupabaseClientProvider.client.auth.currentSession != null;
 
   SupabaseClient get _client => SupabaseClientProvider.client;
+
+  Future<void> _syncOnLogin() async {
+    if (_isSyncing) return;
+    _isSyncing = true;
+    notifyListeners();
+    try {
+      // Wait for DB/settings to finish initializing (important for session-restore on startup)
+      await AppInitializer.instance.initFuture;
+      final db = DatabaseService.instance;
+      final settings = SettingsService.instance;
+      // Pull cloud data down first
+      await settings.syncDownFromCloud(_repo);
+      await db.syncDownFromCloud(_repo);
+      // Push local data up
+      await settings.syncUpToCloud(_repo);
+      await db.syncAllUnsyncedSessions(_repo);
+    } finally {
+      _isSyncing = false;
+      notifyListeners();
+    }
+  }
 
   Future<void> login(String email, String password) async {
     await _client.auth.signInWithPassword(email: email, password: password);
@@ -35,6 +70,9 @@ class SyncService extends ChangeNotifier {
       'height': person.height,
       'max_heart_rate': person.maxHeartRate,
       'resting_heart_rate': person.restingHeartRate,
+      'role': person.role,
+      'category': person.category,
+      'group': person.group,
     }, onConflict: 'id');
   }
 
@@ -61,15 +99,7 @@ class SyncService extends ChangeNotifier {
 
   Future<void> syncAll() async {
     if (!isAuthenticated || _isSyncing) return;
-    _isSyncing = true;
-    notifyListeners();
-    try {
-      // Sessions are synced individually via syncSession()
-      // This method is kept for UI compatibility
-    } finally {
-      _isSyncing = false;
-      notifyListeners();
-    }
+    await _syncOnLogin();
   }
 
   Stream<AuthState> get authStateChanges => _client.auth.onAuthStateChange;
