@@ -104,16 +104,18 @@ function Dashboard() {
               </div>
             </div>
 
-            <div className="card">
-              <h2>Training Types Distribution</h2>
-              <div style={{ marginTop: '20px' }}>
-                {Object.entries(stats.trainingTypes).map(([type, count]) => (
-                  <div key={type} style={{ marginBottom: '10px' }}>
-                    <strong>{type}:</strong> {count} sessions
-                  </div>
-                ))}
+            {stats.trainingTypes && Object.keys(stats.trainingTypes).length > 0 && (
+              <div className="card">
+                <h2>Training Types Distribution</h2>
+                <div style={{ marginTop: '20px' }}>
+                  {Object.entries(stats.trainingTypes).map(([type, count]) => (
+                    <div key={type} style={{ marginBottom: '10px' }}>
+                      <strong>{type}:</strong> {count} sessions
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </>
         )}
 
