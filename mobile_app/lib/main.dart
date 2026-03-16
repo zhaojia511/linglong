@@ -6,10 +6,12 @@ import 'screens/dashboard_screen.dart';
 import 'screens/training_history_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/settings_screen.dart';
+import 'screens/auth_gate.dart';
 import 'services/ble_service.dart';
 import 'services/database_service.dart';
 import 'services/settings_service.dart';
 import 'services/sync_service.dart';
+import 'services/auth_service.dart';
 import 'supabase/supabase_client.dart';
 import 'services/app_initializer.dart';
 
@@ -80,6 +82,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => AuthService()),
         ChangeNotifierProvider(create: (_) => BLEService()),
         ChangeNotifierProvider(create: (_) => DatabaseService.instance),
         ChangeNotifierProvider(create: (_) => SyncService()),
@@ -97,7 +100,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           brightness: Brightness.dark,
         ),
-        home: const _InitializerScreen(),
+        home: const AuthGate(child: _InitializerScreen()),
         routes: {
           '/home': (context) => const HomeScreen(),
           '/dashboard': (context) => const DashboardScreen(),
