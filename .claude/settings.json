@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -r \"iOS\\\\|ios\\\\|not available\\\\|unavailable\\\\|App Store\" /d/github/linglong --include=*.md --include=*.dart --include=*.yaml)"
+    ]
+  }
+}
