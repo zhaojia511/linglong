@@ -2,6 +2,28 @@ import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { sessionService } from '../services/api'
 
+function exportSessionsToCSV(sessions) {
+  const headers = ['Title', 'Type', 'Date', 'Duration (min)', 'Avg HR (bpm)', 'Max HR (bpm)', 'Calories (kcal)', 'Distance (m)']
+  const rows = sessions.map(s => [
+    `"${(s.title || '').replace(/"/g, '""')}"`,
+    s.trainingType || '',
+    s.startTime ? new Date(s.startTime).toLocaleDateString() : '',
+    s.duration ? Math.round(s.duration / 60) : '',
+    s.avgHeartRate || '',
+    s.maxHeartRate || '',
+    s.calories ? Math.round(s.calories) : '',
+    s.distance || '',
+  ])
+  const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n')
+  const blob = new Blob([csv], { type: 'text/csv' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `sessions-${new Date().toISOString().split('T')[0]}.csv`
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
 function Sessions() {
   const [sessions, setSessions] = useState([])
   const [loading, setLoading] = useState(true)
@@ -93,7 +115,18 @@ function Sessions() {
         )}
 
         <div className="card">
-          <h2>All Training Sessions ({sessions.length})</h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h2>All Training Sessions ({sessions.length})</h2>
+            {sessions.length > 0 && (
+              <button
+                onClick={() => exportSessionsToCSV(sessions)}
+                className="btn"
+                style={{ background: '#28a745', color: 'white' }}
+              >
+                Export CSV
+              </button>
+            )}
+          </div>
           {loading ? (
             <p>Loading...</p>
           ) : sessions.length === 0 ? (
