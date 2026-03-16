@@ -19,7 +19,7 @@ AS $$
       FROM (
         SELECT training_type, COUNT(*) as cnt
         FROM public.training_sessions
-        WHERE user_id = auth.uid()
+        WHERE user_id::text = auth.uid()::text
           AND (p_start_date IS NULL OR start_time >= p_start_date)
           AND (p_end_date IS NULL OR start_time <= p_end_date)
           AND (p_person_id IS NULL OR person_id = p_person_id)
@@ -28,7 +28,7 @@ AS $$
     )
   )
   FROM public.training_sessions
-  WHERE user_id = auth.uid()
+  WHERE user_id::text = auth.uid()::text
     AND (p_start_date IS NULL OR start_time >= p_start_date)
     AND (p_end_date IS NULL OR start_time <= p_end_date)
     AND (p_person_id IS NULL OR person_id = p_person_id);
