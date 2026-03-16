@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:provider/provider.dart';
-import '../services/database_service.dart';
 import '../models/training_session.dart';
 import '../utils/hr_data_processing.dart';
 import '../utils/hrv_analysis.dart';
