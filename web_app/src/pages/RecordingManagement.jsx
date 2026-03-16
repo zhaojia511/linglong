@@ -50,12 +50,12 @@ const RecordingManagement = () => {
     try {
       const data = {
         ...formData,
-        duration: parseInt(formData.duration),
-        distance: parseFloat(formData.distance),
-        calories: parseFloat(formData.calories),
-        avgHeartRate: parseInt(formData.avgHeartRate),
-        maxHeartRate: parseInt(formData.maxHeartRate),
-        minHeartRate: parseInt(formData.minHeartRate),
+        ...(formData.duration !== '' && formData.duration != null ? { duration: parseInt(formData.duration) } : {}),
+        ...(formData.distance !== '' && formData.distance != null ? { distance: parseFloat(formData.distance) } : {}),
+        ...(formData.calories !== '' && formData.calories != null ? { calories: parseFloat(formData.calories) } : {}),
+        ...(formData.avgHeartRate !== '' && formData.avgHeartRate != null ? { avgHeartRate: parseInt(formData.avgHeartRate) } : {}),
+        ...(formData.maxHeartRate !== '' && formData.maxHeartRate != null ? { maxHeartRate: parseInt(formData.maxHeartRate) } : {}),
+        ...(formData.minHeartRate !== '' && formData.minHeartRate != null ? { minHeartRate: parseInt(formData.minHeartRate) } : {}),
         startTime: new Date(formData.startTime).toISOString(),
         endTime: formData.endTime ? new Date(formData.endTime).toISOString() : null
       }

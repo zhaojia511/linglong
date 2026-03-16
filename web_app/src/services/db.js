@@ -113,7 +113,7 @@ export const sessionService = {
       p_person_id: personId || null,
     })
     if (error) throw error
-    return { data }
+    return { data: Array.isArray(data) ? data[0] ?? null : data }
   },
 
   async deleteSession(id) {
