@@ -64,15 +64,15 @@ const HistoryAnalysis = () => {
   // Prepare chart data
   const prepareHeartRateData = () => {
     const filteredSessions = sessions
-      .filter(s => s.avg_heart_rate)
-      .sort((a, b) => new Date(a.start_time) - new Date(b.start_time))
+      .filter(s => s.avgHeartRate)
+      .sort((a, b) => new Date(a.startTime) - new Date(b.startTime))
       .slice(-20) // Last 20 sessions
 
     return filteredSessions.map(session => ({
-      date: new Date(session.start_time).toLocaleDateString(),
-      avgHR: session.avg_heart_rate,
-      maxHR: session.max_heart_rate,
-      person: persons.find(p => p.id === session.person_id)?.name || 'Unknown'
+      date: new Date(session.startTime).toLocaleDateString(),
+      avgHR: session.avgHeartRate,
+      maxHR: session.maxHeartRate,
+      person: persons.find(p => p.id === session.personId)?.name || 'Unknown'
     }))
   }
 
@@ -90,7 +90,7 @@ const HistoryAnalysis = () => {
     const monthlyStats = {}
 
     sessions.forEach(session => {
-      const date = new Date(session.start_time)
+      const date = new Date(session.startTime)
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
 
       if (!monthlyStats[monthKey]) {
@@ -301,19 +301,19 @@ const HistoryAnalysis = () => {
                 {sessions.slice(0, 10).map((session) => (
                   <tr key={session.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {new Date(session.start_time).toLocaleDateString()}
+                      {new Date(session.startTime).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {persons.find(p => p.id === session.person_id)?.name || 'Unknown'}
+                      {persons.find(p => p.id === session.personId)?.name || 'Unknown'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">
-                      {session.training_type || '-'}
+                      {session.trainingType || '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {session.duration ? `${Math.floor(session.duration / 60)}m ${session.duration % 60}s` : '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {session.avg_heart_rate ? `${session.avg_heart_rate} bpm` : '-'}
+                      {session.avgHeartRate ? `${session.avgHeartRate} bpm` : '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {session.calories ? `${Math.round(session.calories)} kcal` : '-'}

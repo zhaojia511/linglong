@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../services/supabaseClient'
 import api from '../services/api'
+import { v4 as uuidv4 } from 'uuid'
 
 const RecordingManagement = () => {
   const [sessions, setSessions] = useState([])
@@ -10,17 +11,17 @@ const RecordingManagement = () => {
   const [showForm, setShowForm] = useState(false)
   const [editingSession, setEditingSession] = useState(null)
   const [formData, setFormData] = useState({
-    person_id: '',
+    personId: '',
     title: '',
-    training_type: '',
-    start_time: '',
-    end_time: '',
+    trainingType: '',
+    startTime: '',
+    endTime: '',
     duration: '',
     distance: '',
     calories: '',
-    avg_heart_rate: '',
-    max_heart_rate: '',
-    min_heart_rate: '',
+    avgHeartRate: '',
+    maxHeartRate: '',
+    minHeartRate: '',
     notes: ''
   })
 
@@ -53,17 +54,17 @@ const RecordingManagement = () => {
         duration: parseInt(formData.duration),
         distance: parseFloat(formData.distance),
         calories: parseFloat(formData.calories),
-        avg_heart_rate: parseInt(formData.avg_heart_rate),
-        max_heart_rate: parseInt(formData.max_heart_rate),
-        min_heart_rate: parseInt(formData.min_heart_rate),
-        start_time: new Date(formData.start_time).toISOString(),
-        end_time: formData.end_time ? new Date(formData.end_time).toISOString() : null
+        avgHeartRate: parseInt(formData.avgHeartRate),
+        maxHeartRate: parseInt(formData.maxHeartRate),
+        minHeartRate: parseInt(formData.minHeartRate),
+        startTime: new Date(formData.startTime).toISOString(),
+        endTime: formData.endTime ? new Date(formData.endTime).toISOString() : null
       }
 
       if (editingSession) {
         await api.post(`/sessions`, { ...data, id: editingSession.id })
       } else {
-        await api.post('/sessions', data)
+        await api.post('/sessions', { ...data, id: uuidv4() })
       }
 
       await loadData()
@@ -79,17 +80,17 @@ const RecordingManagement = () => {
   const handleEdit = (session) => {
     setEditingSession(session)
     setFormData({
-      person_id: session.person_id || '',
+      personId: session.personId || '',
       title: session.title || '',
-      training_type: session.training_type || '',
-      start_time: session.start_time ? new Date(session.start_time).toISOString().slice(0, 16) : '',
-      end_time: session.end_time ? new Date(session.end_time).toISOString().slice(0, 16) : '',
+      trainingType: session.trainingType || '',
+      startTime: session.startTime ? new Date(session.startTime).toISOString().slice(0, 16) : '',
+      endTime: session.endTime ? new Date(session.endTime).toISOString().slice(0, 16) : '',
       duration: session.duration?.toString() || '',
       distance: session.distance?.toString() || '',
       calories: session.calories?.toString() || '',
-      avg_heart_rate: session.avg_heart_rate?.toString() || '',
-      max_heart_rate: session.max_heart_rate?.toString() || '',
-      min_heart_rate: session.min_heart_rate?.toString() || '',
+      avgHeartRate: session.avgHeartRate?.toString() || '',
+      maxHeartRate: session.maxHeartRate?.toString() || '',
+      minHeartRate: session.minHeartRate?.toString() || '',
       notes: session.notes || ''
     })
     setShowForm(true)
@@ -109,17 +110,17 @@ const RecordingManagement = () => {
 
   const resetForm = () => {
     setFormData({
-      person_id: '',
+      personId: '',
       title: '',
-      training_type: '',
-      start_time: '',
-      end_time: '',
+      trainingType: '',
+      startTime: '',
+      endTime: '',
       duration: '',
       distance: '',
       calories: '',
-      avg_heart_rate: '',
-      max_heart_rate: '',
-      min_heart_rate: '',
+      avgHeartRate: '',
+      maxHeartRate: '',
+      minHeartRate: '',
       notes: ''
     })
   }
@@ -185,8 +186,8 @@ const RecordingManagement = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">Person *</label>
               <select
                 required
-                value={formData.person_id}
-                onChange={(e) => setFormData({...formData, person_id: e.target.value})}
+                value={formData.personId}
+                onChange={(e) => setFormData({...formData, personId: e.target.value})}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select Person</option>
@@ -212,16 +213,16 @@ const RecordingManagement = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">Training Type *</label>
               <select
                 required
-                value={formData.training_type}
-                onChange={(e) => setFormData({...formData, training_type: e.target.value})}
+                value={formData.trainingType}
+                onChange={(e) => setFormData({...formData, trainingType: e.target.value})}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select Type</option>
                 <option value="running">Running</option>
                 <option value="cycling">Cycling</option>
                 <option value="swimming">Swimming</option>
-                <option value="weightlifting">Weightlifting</option>
-                <option value="yoga">Yoga</option>
+                <option value="gym">Gym / Weights</option>
+                <option value="general">General / Yoga</option>
                 <option value="other">Other</option>
               </select>
             </div>
@@ -231,8 +232,8 @@ const RecordingManagement = () => {
               <input
                 type="datetime-local"
                 required
-                value={formData.start_time}
-                onChange={(e) => setFormData({...formData, start_time: e.target.value})}
+                value={formData.startTime}
+                onChange={(e) => setFormData({...formData, startTime: e.target.value})}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -241,8 +242,8 @@ const RecordingManagement = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">End Time</label>
               <input
                 type="datetime-local"
-                value={formData.end_time}
-                onChange={(e) => setFormData({...formData, end_time: e.target.value})}
+                value={formData.endTime}
+                onChange={(e) => setFormData({...formData, endTime: e.target.value})}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -285,8 +286,8 @@ const RecordingManagement = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">Avg Heart Rate (bpm)</label>
               <input
                 type="number"
-                value={formData.avg_heart_rate}
-                onChange={(e) => setFormData({...formData, avg_heart_rate: e.target.value})}
+                value={formData.avgHeartRate}
+                onChange={(e) => setFormData({...formData, avgHeartRate: e.target.value})}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -295,8 +296,8 @@ const RecordingManagement = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">Max Heart Rate (bpm)</label>
               <input
                 type="number"
-                value={formData.max_heart_rate}
-                onChange={(e) => setFormData({...formData, max_heart_rate: e.target.value})}
+                value={formData.maxHeartRate}
+                onChange={(e) => setFormData({...formData, maxHeartRate: e.target.value})}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -305,8 +306,8 @@ const RecordingManagement = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">Min Heart Rate (bpm)</label>
               <input
                 type="number"
-                value={formData.min_heart_rate}
-                onChange={(e) => setFormData({...formData, min_heart_rate: e.target.value})}
+                value={formData.minHeartRate}
+                onChange={(e) => setFormData({...formData, minHeartRate: e.target.value})}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -386,10 +387,10 @@ const RecordingManagement = () => {
                       {session.title || 'Untitled Session'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">
-                      {session.training_type || '-'}
+                      {session.trainingType || '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {formatDate(session.start_time)}
+                      {formatDate(session.startTime)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {formatDuration(session.duration)}
@@ -398,7 +399,7 @@ const RecordingManagement = () => {
                       {session.distance ? `${(session.distance / 1000).toFixed(2)} km` : '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {session.avg_heart_rate ? `${session.avg_heart_rate} bpm` : '-'}
+                      {session.avgHeartRate ? `${session.avgHeartRate} bpm` : '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button
