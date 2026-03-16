@@ -1,0 +1,1610 @@
+
+
+--- Page 1 ---
+
+USERMANUAL
+
+--- Page 2 ---
+
+2CONTENTS
+Contents 2
+Introduction 6
+PolarProTeamDock 6
+PolarProSensor 6
+PolarTeamProApp 6
+PolarTeamProWebService 7
+iPad(SoldSeparately) 7
+FactsandFeatures 7
+PolarProSensor 7
+PolarProTeamDock 8
+PolarTeamProWebserviceandApp 8
+GettoKnowPolarTeamPro 9
+What'sintheBox 9
+PolarProTeamDock 9
+PolarProSensor 10
+FirstTimeSetup 10
+Charge 10
+Activate Account 10
+TeamSetupThreeStepWizard 10
+1/3General 10
+2/3SportProfile 11
+3/3Players 11
+Download PolarTeamProappontoYouriPad 11
+Charging 12
+Charging PolarProTeamDock 12
+Charging PolarProSensors 12
+UpdateFirmware 12
+HowtoUpdateFirmware 12
+UpdateInformation 12
+Languages 12
+Navigation 12
+PolarTeamProWebService 12
+Activities 12
+Reports 13
+PolarTeamProApp 13
+Teamhome 13
+Players 13
+Sensors &dock 13
+StartSession 14
+UserManual 14
+Organization Settings 15
+EditOrganization settings 15
+Addcoachtoorganization 15
+Addexistingcoachtoteam 15
+TeamSettings 15
+Editteamsettings 16
+Addcoachtoteam 16
+Playerrosterview 16
+Playeroptions 16
+Addnewplayertoteam 16
+Addexistingplayertoteam 16
+EditPlayerSettings 17
+ProfileSettings 17
+
+--- Page 3 ---
+
+3EditProfileSettings 17
+WearPolarProSensor 18
+WearPolarProSensorwithastrap 18
+WearPolarProSensorwithTeamProShirt 18
+StartTraining Session 19
+ViewLiveData 19
+ViewDetailed PlayerData 19
+Tips 20
+LivePhases 20
+Addalivephase 20
+AddMarkers 20
+AddTeamMarker 21
+AddPlayerMarker 21
+Compare Players 21
+AddPlayertoComparison View 21
+ReleaseaPlayerfromComparison 21
+ReleaseAllPlayersfromComparison 21
+EndTraining Session 21
+Endtrainingsessionandsave 21
+EndTraining SessionandDelete 22
+SyncDatafromSensors toWebServiceviaDock 23
+Syncinginformation 23
+Unsynced Data 23
+AnalyzeDatainTeamProApp 23
+Edit 23
+Report 23
+Summary 24
+SortPlayers 24
+ViewPlayerSessionSummary 24
+Analysis 24
+Compare PlayerDatawithTeamAverage 24
+Compare TwoPlayerswithEachother 24
+ViewMarkers 24
+EditMarkers 24
+Map 24
+CreateTraining FieldforHeatMap 24
+AnalyzeDatainTeamProWebService 25
+Summary 25
+Editsession 25
+Moveplayers 25
+Remove players 25
+Createnewsession 25
+Analysis 26
+Addmarker 26
+Viewmarker 26
+Compare 26
+Compare Players 26
+Compare phasespecificdata 26
+Zoomthecompare view 26
+Trim 26
+TrimSession 27
+Phases 27
+AddPhase 27
+ViewPhaseData 27
+RRinterval 27
+ExportData 27
+Exportsessiondata 28
+
+--- Page 4 ---
+
+4ExportRawPlayerData 28
+Reports 28
+Templates 28
+CreateCustom ReportTemplate 28
+SaveReportTemplate 28
+Remove Template 29
+Summary 29
+Generate Summary Report 29
+Graphs 29
+Generate GraphReport 29
+Training load 29
+PolarHeartRateZones 31
+EditHeartRateZones 31
+Individual training 32
+Personal FlowAccount andPolarDevice 33
+GettingStartedGuideforCoach 33
+GettingStartedGuideforPlayer 34
+1.ReadyourDevice's GettingStartedGuide 34
+2.SyncyourPolardeviceDaily 34
+TeamProIndividual PlayerCalendar Month view 35
+TeamProIndividual PlayerCalendar Day view 36
+UnlinkaPlayer'sPersonal FlowAccount fromTeamProwebService 36
+PolarSpeedZones 37
+EditSpeedZones 37
+Sprints 37
+Sprintthreshold 37
+Training Load 37
+CardioLoad 38
+Verbaldescription andbulletscale 38
+CardioLoadstatus 38
+MuscleLoad 39
+AddMuscleLoadtoasportprofile 39
+CaringforYourPolarTeamProSolution 40
+PolarProSensor 40
+Straps 40
+PolarProTeamDock 40
+Technical Specification 40
+PolarProSensor 40
+PolarProTeamDock 40
+Important SafetyInformation 41
+AC-Powered Devices 41
+Battery-Powered Devices 41
+Wireless Devices 42
+AllDevices 42
+Choking Hazard 42
+Regulatory Information 42
+PolarProTeamDock 42
+Compliance Statement 42
+Canada 42
+USA 42
+FCCregulatory information 43
+PolarProSensor 43
+Compliance Statement 43
+Canada 43
+USA 43
+Precautions 44
+Interference DuringTraining 44
+
+--- Page 5 ---
+
+5Minimizing RisksWhenTraining 44
+LimitedPolarInternational Guarantee 45
+PolarPrivacy 46
+PolarTeamPro–Teaminstructions 46
+PolarTeamPro–Playerinstructions 46
+Disclaimer 47
+
+--- Page 6 ---
+
+6INTRODUCTION
+Thanksforchoosing Polar!Inthisusermanual, we’llwalkyouthroughthebasicsofusingandcaringforthePolar
+TeamProtrainingandcoaching solution designed formonitoring andanalyzing top-tierteamsportsperformance.
+Duetocontinuous development, thisusermanualisupdated whennewsoftware/firmware versions areavailable. The
+latestusermanualisavailable atsupport.polar.com/en/polar- team-pro,andyou'llalsofindlinkstoitinthePolar
+TeamProwebserviceandapp.
+POLARPROTEAMDOCK
+ThedockisusedtochargePolarProsensors andsynctrainingdatafromthemtothePolarTeamProappandPolar
+TeamProwebservice.ItalsoservesasabaseandchargerforyouriPad®.
+POLARPROSENSOR
+ThePolarProsensormeasures extensive playerperformance data,recordsthedataindetailandsendsitliveto
+iPad®viaBluetooth ®Smartallowing youtofollowreal-timeinformation duringtraining. Aftereachtrainingsession,
+placethesensorintothePolarProteamdocktochargeit,andtosyncthedatatothePolarTeamProiPadappand
+webservicefordetailedfurtheranalysis.
+ThePolarProsensorcanbewornwiththePolarTeamProshirtthathasadesignated pocketforthesensor.Theshirt
+iscomfortable towearandtransfers moisture awayfromtheskin.
+POLARTEAMPROAPP
+
+
+--- Page 7 ---
+
+7Viewextensive keyperformance datalivefromupto60players.Compare playersandaddnotesandmarkers during
+training. Instantsessionsummaries aftertrainingaswellasaheatmapviewforplayerlocation analysis.
+POLARTEAMPROWEBSERVICE
+Powerful sessionanalysis andreporting tools.Analyzesessiondataindetailforthewholeteam,aswellascompare
+players.Createcustomreportsforthewholeteamorindividual players.Getaholisticviewoftheplayers'recovery and
+sleepdatawhenusingPolarwatches outsideoftrainingsessions.
+IPAD(SOLDSEPARATELY)
+You'llalsoneedaniPad®tocomplete thePolarTeamProsolution. WiththePolarTeamProapprunningonyour
+iPad®you'llbeabletofollowlivetrainingdataduringsessions.
+MakesureyouhavethelatestiOSversiononyouriPad.Tobeabletosyncdatafromtheapptothewebservice,you
+needaninternetconnection.
+Pleasenotethatthelarge12.9inchiPadPromodeldoesnotfitinthedockconnector, butcanbe
+connected totheTeamProdockwithaLightning toUSBcableviatheUSBport
+FACTSANDFEATURES
+POLARPROSENSOR
+lBluetooth Smartheartratecompatible
+lLivedatabroadcast straighttoPolarTeamProiPadapp
+lLongrangeandlivedatabuffering
+lRangeUpto200meters
+lRunning speed,distance, sprints,accelerations andrunningcadence bothoutdoors andindoors
+lHeartrate
+lHeartratevariability
+lGPS
+lMEMSmotionsensor(Accelerometer, gyroscope, digitalcompass)
+l10hoursofoperating time
+lSensormemory upto72hours
+lRecharging (fromemptytofull)3hours
+lPolarProredsoftstrapcompatible
+lUpdatable firmware
+
+--- Page 8 ---
+
+8POLARPROTEAMDOCK
+l20sensorslots
+lDatasynconthegoandconvenient recharging foriPadandPolarProsensors
+lUpdatable firmware
+POLARTEAMPROWEBSERVICE ANDAPP
+lCloud-basedsoftware anddatabase solution
+lMultiple teamssupported
+lMultiple coaches accesssupported
+lSecured individual login
+lCustomizable heartratezones
+lCustomizable speedzones
+lHeartrategraphintrainingresults
+lHeartrateanalysis selection andzooming functions
+lSpeed,distance andsprintsanalysis functions
+lCustomizable sprintthreshold setting
+lCustomizable acceleration/deceleration zones
+lLocation analysis withheatmap
+lPhases
+lMarkers
+lExporttrainingsessiondatatoExcel
+lLongtermreports(week,month,season)
+
+--- Page 9 ---
+
+9GETTOKNOWPOLARTEAMPRO
+WHAT'SINTHEBOX
+lPolarProTeamDock(includes fourACadapters)
+l10PolarProSensors andStraps
+lWashing pouch
+lSensorfolder
+lShoulder bag
+POLARPROTEAMDOCK
+1.ACpowerport:Recharge thedockwithpowercordthatcameinthebox.
+2.USBport:Alternative waytoconnect iPadtothedockwithaLightning toUSBconnector. UsetheUSBportifyour
+iPadisnotcompatible withaLightning cableortheiPaddoesnotfitinthedockconnector. Pleasenotethatwhen
+iPadisconnected tothedockviatheprimaryconnection (placedintothedockandconnected viaLightning
+connector), theUSBportconnection doesnotworkatthesametime.TheUSBportconnection canonlybeused
+wheniPadisnotplacedintothedock.
+3.MicroUSBport:ForservicedonebyPolar.
+1.Dockbutton:Presstodisplaytheplayernumbers onthesensors whenthedockisnotconnected toawalloutlet.
+
+--- Page 10 ---
+
+10POLARPROSENSOR
+1a.Playernumber:Whenasensorisinthedocktheplayernumberisshown.Whenasensorisoutofthedock,press
+theconnectors onthebackside ofthesensorwithyourfingerstoviewthenumber. Whenwearing thesensor,tapthe
+displaytwicetoviewthenumber.
+2a.Heartrate:Aheartsymbolisshownwhenheartrateisdetected.
+2b.GPS:ThesatellitesymbolstopsblinkingwhenGPS signal isfound.
+FIRSTTIMESETUP
+Afterunboxing thePolarTeamProtrainingandcoaching solution, thefirstthingyouneedtodoischargethePolar
+ProteamdockandPolarProsensors.
+CHARGE
+1.Placethesensors intothedockandsnapthemfirmlyintoplace(makesurebothendsofthesensors snapinto
+place).WhenthePolarlogosonthesensoranddockfacethesameway,thesensors areplacedcorrectly .
+2.AttachtheACpowercordforyourregiontothedockfirst,andthenplugtheotherendintoawalloutlet.
+3.Thecharging animation appears onthesensors.
+ACTIVATE ACCOUNT
+Afterpurchase you’llgetaconfirmation e-mailwithalink.Clickittoopenawizardwhichguidesyouthroughsetting
+upyourorganization andteaminthewebservice.Followthewizardandfillintheneededinformation. Thengoto
+teampro.polar.com, andsigninwithyourcredentials.
+TEAMSETUPTHREESTEPWIZARD
+Thethreestepteamsetupwizardwillguideyouthroughthewholesetupprocess inthePolarTeamProwebservice.
+Withthewizardyou'llcreateyourteam,choosethesportandaddplayers.Fillinalltherequired fieldsforeachsetting
+duringthesetup.Ifyoudonothavealloftheplayerinformation available atthistime,theinformation canbeupdated
+laterintheTeamsettings.
+Whenyouaredonewithasetting,chooseNEXTtoproceed tothenextstepofthesetup.Ifatanytimeyouwanttogo
+backduringthesetup,choosePREVIOUS inthelowerrightcorner.
+1/3General
+Fillinthebasicdetailsofyourteam.
+lTeamname
+lTeamlogo(optional)
+
+--- Page 11 ---
+
+11lDefaultsport
+lTeamroles(youcanusethedefaultones,createyourownrolesornotusetherolesatall)
+lViewTraining loadas(choose CardioloadandMuscleload,Recovery timeorScore)
+ChooseNEXTtocontinue tothenextstep.
+2/3SportProfile
+ChooseifyouwanttouseMuscleloadandpowerzones.Definetheheartratezones,speedzones,
+acceleration/deceleration zonesandsprintthreshold yourteamwilluse.
+lMuscleloadandpowerzones(choose onoroff)
+lHeartratezones(choose defaultorfree)
+lSpeedzones(defaultorfree)
+lAcceleration zones(defaultorfree)
+lDeceleration zones(defaultorfree)
+lSprintthreshold type(defaultorfree)andspeedvalue(km/h)oracceleration (m/s2)
+lPowerzones(defaultorfree)
+ChooseNEXTtocontinue tothenextstep.
+3/3Players
+Addplayerstoyourteam.
+1.ChooseAddnewplayers.
+2.Fillintheplayerinformation fields.Linktheplayerspersonal Flowaccount byaddingtheiremailaddress tothe
+LinkFlowaccount field.
+3.ADD PLAYER TO THE TEAM mustchosenaftercreating eachplayerprofile.Otherwise theplayerwillnotbe
+addedtotheteam.
+4.ChoosetoviewNightlyRecharge, recovery statusorCardioloadstatusfromthedrop-downlist.
+ChooseDONEwhenyouhaveaddedalltheplayerstotheteam.ThenchooseNEXT.Welcome totheteamisshown
+onthescreenwhenyouhavefinishedtheteamsetupwizard.
+DOWNLOAD POLARTEAMPROAPPONTOYOURIPAD
+Aftercompleting theteamsetupinthePolarTeamProwebservice,it'stimetofinalizethefirsttimesetupby
+downloading thePolarTeamProapp,andsyncingtheplayerinformation viathePolarProteamdocktothesensors.
+1.Download thePolarTeamProappontoyouriPadfromtheAppStore.
+2.Logintotheappwiththesameaccount detailsthatyouusedwiththePolarTeamProwebservice.
+3.PlacetheiPadintothedock.Makesureitisproperly leveledandrestingfirmlyagainstthebase.
+4.TheSENSORS &DOCKviewappears ontheiPadscreen.
+5.TapAutoassignintheupperleftcornertoassignthesensors totheplayers.
+6.Whenasensorisassigned theplayernumberandagreencheckmarkisdisplayed oneachsensorontheiPad
+screen,and
+YourPolarTeamProsolution isnowsetup,andreadyforthefirsttrainingsession.
+Playerswithoutasensorarelistedwhenassigning thesensors.
+
+--- Page 12 ---
+
+12CHARGING
+CHARGING POLARPROTEAMDOCK
+PlugyourdockintoanoutletwiththeACadapterandtheACpowercordforyourregion.OnlyusetheACadapterunit
+andACpowercordprovided withyourdock.TheACadapterisforindooruseonly.Onlychargethedockandsensors
+indoors.
+CHARGING POLARPROSENSORS
+Chargethesensors inaPolarProteamdock.Detachthesensors fromthestraps,andplacethemintothedockand
+snapthemfirmlyintoplace(makesurebothendsofthesensors snapintoplace).WhenthePolarlogosonthe
+sensors anddockfacethesameway,thesensors areplacedcorrectly .Charging thesensors fromemptytocan
+takethreehours.
+UPDATEFIRMWARE
+ThePolarProTeamdockandPolarProsensors haveupdatable firmware. Whenanewfirmware versionavailable,
+PolarTeamProappwillnotifyyou,andaskyoutodownload it.Bothsensoranddockfirmware areupdated viathe
+PolarProTeamapponyouriPad.Pleaseupdatethefirmware ofwhenever updates areavailable.
+HowtoUpdateFirmware
+1.PlaceyouriPadintothedock,thePolarTeamProappwillgototheSensors &dockview.
+2.UPDATE AVAILABLE isdisplayed whennewfirmware isavailable.
+3.TapUPDATE AVAILABLE ,andthentapUpdatedockorUpdatesensors depending onwhatfirmware is
+available.
+UpdateInformation
+lDonottaketheiPadoutofthedockduringtheupdate,thiswillinterrupt theupdate.
+lPleasenotethattheupdatemaytakeupto40minutes withafulldock(20sensors).
+lAllsensors canbeupdated atthesametime.
+LANGUAGES
+ThePolarTeamProsolution isavailable inthefollowing languages: English,German, French,Italian,Dutch,Spanish,
+Portuguese, Danish,Finnish,Norwegian, Swedish, Polish,Czech,Russian, Turkish,Japanese, Simplified Chinese,
+Korean,Indonesian, Hungarian, Slovenian andEstonian.
+Thelanguage ofthePolarTeamProwebserviceandappdependonthelanguage settings ofyourinternetbrowser or
+iPad.Tochangethelanguage ofthewebservice,gotothelanguage settings ofyourinternetbrowser. Tochangethe
+language oftheapp,gotothelanguage settings ofyouriPad.
+NAVIGATION
+POLARTEAMPROWEBSERVICE
+ThePolarTeamProwebservicehastwomainviews:Activities andReports.
+Activities
+Everytimeyousigninyou'llbetakentotheActivities viewandseeacalendar containing yourteamstrainingsessions
+forthatweek.Youcanchangetheviewtoamonthordayview,andchoosetoviewthetrainingsessions forthewhole
+
+--- Page 13 ---
+
+13teamorjustoneplayer.Scrolldowntothebottomofthescreentoseeasummary ofthetrainingsessions fromthe
+chosentimeperiod,whichincludes thenumberandtotalduration ofthesessions.
+Theactivities viewservesasthebasefromwhichyoucanchoosewhattrainingsessiondatayouwishtoanalyzein
+depth.Formoreinformation onanalyzing trainingsessiondata,see"Analyze DatainTeamProWebService" on
+page 25
+Settings, UsermanualandSignout:Choose
+ (name/profile photo)intheupperrightcornertoview
+andedityourSettings (Account andGeneral), opentheusermanualandsignout.
+Teamsettings, Sportprofiles, PlayerrosterandCoaches .Choose
+ intheupperrightcornertoview
+andeditTeamsettings andOrganization settings
+Multiple TeamsinOrganization :Ifyouhavemultiple teamsinyourorganization, choosewhichteam'scalendar you
+wishtoviewfromthedropdownintheupperleftcorner.
+Notifications :Click
+ intheupperrightcornertoopenthenotification panel,whichinformsyouwhenanewcoach
+isaddedtoyourteamforexample.
+Reports
+Inthereportssectionyoucangenerate different typesofreportsfromyourteam'strainingsessions. Youcanchoose
+theperiodfromwhichyouwanttogenerate thereportaswellashowyouwanttoviewthedata.Areportcanbe
+generated forwholeteamatonceoryoucanchoosetojustincludecertainplayers.
+Formoreinformation oncreating reportssee,"Reports" onpage 28
+POLARTEAMPROAPP
+ThePolarTeamProapphasthreemainviews:Teamhome,PlayersandSensors &dock.
+Teamhome
+InTeamhomeyou'llseeyourteam'strainingsessions inaweekview.Thecurrentweekisshownbydefault.Swipe
+leftorrighttoswitchbetween weeks.You'llseeyourteam’stotalsforthechosenweekinthisview.
+Toviewtotalsforasingleplayer,choosetheplayerfromtheupperleftcorner.
+Players
+InthePlayersview,you'llseealltheplayersinyourteam,andtheIDofthesensorassigned tothem.
+Sensors &dock
+WhenyouplaceyouriPadintothedock,theSensors &dockviewwillappear.Inthisviewyou'llseeallthesensors, and
+towhichplayereachofthemareassigned to.PressSyncintheupperleftcornertosynchronize information between
+thePolarProsensors PolarTeamProappandwebservice.
+
+--- Page 14 ---
+
+14
+StartSession
+Presstogotothetrainingsessionpreviewview.
+UserManual
+Presstoviewtheusermanual. Pleasenotethatyouneedtohaveaninternetconnection tobeabletoaccessit.
+
+--- Page 15 ---
+
+15ORGANIZATION SETTINGS
+Manage andupdateinformation relatedtoyourorganization.
+Intheorganization settings you'llfind:
+lORGANIZATION SETTINGS :Addandeditgeneralorganization information including organization name,sport,
+address andmore.Viewyoursubscription status.
+lPLAYER ROSTER :Youcanseealltheplayersinyourorganization, andalsowhichteamtheyareassigned to.
+lCOACHES :Add,editandremovecoaches fromyourorganization.
+lPRODUCTS :Viewwhatproducts yourorganization has.
+EDITORGANIZATION SETTINGS
+1.Choose
+ intheupperrightcorner.
+2.Fromthelistunderthenameofyourorganization choosethesettingyouwishtoedit(Organization settings,
+Playerroster,Coaches orProducts .
+ADDCOACHTOORGANIZATION
+1.ChooseCOACHES .
+2.ClickADD NEW COACH .
+3.Addthecoach'semailaddress andtheteamsyouwanttoassignhimto.
+4.ClickSAVE.
+Thecoachreceives anemailwithalinktoactivatetheirpersonal account intheTeamProwebservice.Thesame
+emailaddress thattheinvitation wassenttomustbeusedwhenregistering tothewebservice.Pending isdisplayed
+intheCOACHES sectionoftheteamheisassigned tountilthecoachhasaccepted theinvitation.
+ADDEXISTING COACHTOTEAM
+1.ChooseCOACHES .
+2.ClickEDIT TEAMS inthecoachview.
+3.Choosewhichteamsthecoachisassigned to.
+4.ClickSAVE.
+TEAMSETTINGS
+Manage andupdateinformation relatedtoyourteam.
+Intheteamsettings you'llfind:
+lTEAM SETTINGS :Addandeditgeneralteaminformation including teamname,logoandsport.Deleteateam.
+ChoosehowtoviewTraining Load.
+lSPORT PROFILES :Manage andedityourteam'ssportprofileinformation including heartratezoneandspeed
+zonelimits.
+lPLAYER ROSTER :Add,editandremoveplayersfromyourteam.Viewtheplayers'role,Recovery status,Nightly
+Recharge™status, CardioLoadstatus,detailedsleepdata,flowconnectivity indicator andplayeroptions.
+lCOACHES :Add,editandremovecoaches fromyourteam.
+
+--- Page 16 ---
+
+16Editteamsettings
+1.Choose
+ intheupperrightcorner.
+2.Fromthelistunderthenameofyourteamchoosethesettingyouwishtoedit
+Addcoachtoteam
+1.ChooseCOACHES .
+2.ClickADD NEW COACH
+3.Addthecoach'semailaddress.
+4.ClickSAVE.
+Thecoachreceives anemailwithalinktoactivatetheirpersonal account intheTeamProwebservice.Pending is
+displayed intheuntilthecoachhasaccepted theinvitation.
+PLAYER ROSTER VIEW
+Theplayerrosterviewallowsyoutoviewalltheplayersonateamandtheirdataataglance.Add,editandremove
+playersfromyourteam.Viewtheplayers'role,Recovery status,sleepdata,flowconnectivity indicator andplayer
+options.
+Role:Settingaroleforaplayer,andviewingtherosterviewbasedonrole,therosterviewwillbecategorized
+accordingly
+Recovery status:Therecovery statusofaplayerwillnowalsobeindicated underthePlayerrosterviewwhen
+available.
+Sleepdata:Similarly, thesleeptimeanddataisshownunderthePlayerrosterviewwhenavailable.
+lSleeptimeusesthelastavailable sleeptimeduringthepast7days.
+Connectivity indicator: Theredribbonontheupperrightcornerindicates thattheplayerhasbeenlinkedwithaPolar
+Flowaccount.
+Playeroptions
+Hoovering themouseatheplayerprofilewillprovidethefollowing options:
+lEditplayerprofile(Intheplayerprofileyoucaneditplayernameandnumber, roleinteam,height,weight,
+trainingbackground, maximum heartrate,restingheartrate,anaerobic threshold, VO2max, MAS,MAPaswell
+asaddaphoto.)
+lRemove player
+lGototheplayer'srecovery status(shownifavailable)
+Notethatthedataisupdated in10-minuteintervals.
+Addnewplayertoteam
+1.ChoosePLAYER ROSTER .
+2.ClickNEW PLAYER .
+3.Fillintheplayerinformation, andclickSAVE,
+4.ClickSAVEROSTER .
+Addexistingplayertoteam
+1.ChoosePLAYER ROSTER .
+2.ClickADD PLAYER ,alltheplayersinyourorganization areshown.
+
+--- Page 17 ---
+
+173.Clickaplayer,andcheckmarkappears.
+4.ClickSAVE ROSTER ,andalltheplayersthathavebeenchosen(thathaveacheckmark)areaddedtotheteam.
+EditPlayerSettings
+1.ChoosePLAYER ROSTER .
+2.Click
+  onaplayer.
+3.Afterediting,clickSAVE.
+Intheplayersettings youcaneditplayernameandnumber, roleinteam,height,weight,trainingbackground,
+maximum heartrate,restingheartrate,aerobicthreshold, anaerobic threshold, VO2max, MAP,MAS,personal Flow
+account emailaddress aswellasaddaphoto.
+PROFILESETTINGS
+Editinformation relatedtoyouraccount andcustomize thegeneralsettings.
+Intheprofilesettings you'llfind:
+lAccount :Intheaccount settings youcanedityouremailandpassword aswellasaddyouraddress tothe
+profile.
+lGeneral:Inthegeneralsettings youcancustomize date,timeandunitsettings.
+EditProfileSettings
+1.Choose
+ (name/profile photo)intheupperrightcorner.
+2.ChooseSettings .Editthesettings youwish.
+3.ClickSAVEafterediting.
+
+--- Page 18 ---
+
+18WEARPOLARPROSENSOR
+WEARPOLARPROSENSORWITHASTRAP
+Beforestartingatrainingsession, handoutthePolarProsensors andstrapstotheplayers,andhelpthemtoputthem
+oncorrectly. IfyourPolarTeamProdockisnotconnected intoawalloutletwiththecableyoucanseetheplayer
+numbers bypressing thebuttononthedock.
+1.Moisten theelectrode areaofthestrap(picture1).
+2.Clipthestraparoundyourchestandadjustthestraptofitsnugly.
+3.Attachthesensor(picture2).
+4.Aftereachtrainingsession, detachthesensorandrinsethestrapunderrunningwatertokeepitclean.
+1.
+2.
+WEARPOLARPROSENSORWITHTEAMPROSHIRT
+WearthePolarTeamProshirtsothatthesensorpocketisontheback.
+1.InsertthesensorintothepocketonthetopbackoftheshirtsothatthePolarlogoonthesensorisupright.
+2.Snapitfirmlyintoplace.Makesurebothendsofthesensorsnapintoplace.
+
+--- Page 19 ---
+
+19
+STARTTRAININGSESSION
+Beforestartingatrainingsessionmakesurealltheplayerstakingpartarewearing thePolarProsensors correctly.
+ThegreenlightonthesensorstopsblinkingwhenGPSsignalisfoundandyoucanseeaheartsymbolwhenheartrate
+isfound.
+1.LogintothePolarTeamProapponyouriPad.
+2.Press
+ onthescreen(located inthemiddleontheleftsidepanel)
+3.Onthetrainingsessionpreviewviewyouwillseeeachplayer’snameandnumber, heartrateandifGPSisOK.
+4.PressSTARTintheupperrightcornertostarttrainingsessionrecording.
+Atrainingsessioncanbestartedeventhoughalltheplayersarenotpresentwhenstarting. Playersthatarrivelaterare
+automatically addedtothesession, andtheirdatacanbecomes visibleonTeamProiPadappwhentheyhavejoined
+thesession. Noadditional actionsareneeded.
+Notethatatrainingsessioncanbeperformed withoutusinganiPadandtheapp.Inthiscasethesensors
+recordthesessiondataanditcanbeviewedaftersyncingthedatafromthesensors.
+VIEWLIVEDATA
+LivetrainingsessiondatacanbeviewedonyouriPadfromthePolarTeamProapp.TheTeamProapptraining
+sessionviewhasthreemainviews:List,WholeTeamandComparison .
+Youcanviewkeyperformance datalivethatincludes:
+lHeartrate(bpmand%ofmax)
+lDistance
+lNumber ofsprints
+lTimeinheartratezones
+lDistance inspeedzones
+lTraining load
+lReal-timespeed
+ViewDetailed PlayerData
+1.TapaplayerintheList,WholeteamorComparison view.
+2.Tap
+ inthepopup.
+
+--- Page 20 ---
+
+20Detailed information ofthatplayerisshown.Swipeleftorrighttoswitchbetween players.
+Tips
+lYoucanholdyouriPadinahorizontal orverticalposition, theTeamProappworksbothways.
+lSwitchbetween viewsbyswipingleftorright.
+lItisrecommended thattheHomebuttonispositioned totherightsidewhenholdingtheiPadtoensurethe
+bestconnectivity tothesensors. TheiPad’sBluetooth radiosarelocatedinthecornertotherightfromthe
+homebutton.Togetthebestconnectivity, itisimportant nottocoverthecornerwithyourhand.
+IftheGPSconnection islostduringasessionyou'llgetanotification.
+LIVEPHASES
+Createphasesduringalivesession. Afterthesessionthephaseswillbesynchronized tothewebserviceandcanbe
+viewedinthetrainingsessiondata.Youcanrecordseverallivephaseatthesametime.Addingphasesduringa
+sessionallowyoutomarkcertaindrillsorperiods,andviewandexamine themindetailafterthesession.
+ADDALIVEPHASE
+1.Duringalivesession, choose
+ tostartaphase.
+2.NamethephasebytypinganameintheAddphasenamefieldatthebottomofthephaseselection view.
+3.ChooseStarttostartrecording thephase.
+4.Stoprecording thephasebychoosing
+ nexttothephasetime.
+Notethatyoucanstartanewphaseevenifanearlieroneisstillrunningsoyoucanhavemultiple phases
+simultaneously.
+ADDMARKERS
+Addmarkers withnotesthatyoucancomebacktoaftertraining. Theycanbeusedtomarkthebeginning andendof
+different phasesforexample. Themarkers canbeviewedinthePolarTeamProwebserviceafterdatasync.
+
+--- Page 21 ---
+
+21AddTeamMarker
+1.Tap
+ intheupperrightcornerofthescreen.
+2.Addanotetothemarker(optional).
+3.TapDONEtoclosethemarkerpopup.
+AddPlayerMarker
+1.Tapaplayer.
+2.Tap
+inthepopup.
+3.Addanotetothemarker(optional).
+4.TapDONEtoclosethemarkerpopup.
+COMPAREPLAYERS
+Haveacloserlookatcertainplayersduringasessionbyaddingthemtothecomparison view.Itallowsyoutoeasily
+viewandcompare livedatafromthechosenplayers.
+AddPlayertoComparison View
+1.Tapaplayer.
+2.Tap
+ inthepopup.
+3.Theplayerisaddedtothecomparison view.
+ReleaseaPlayerfromComparison
+1.Tapaplayer.
+2.Tap
+ inthepopup.
+ReleaseAllPlayersfromComparison
+TapReleaseplayerstoremoveallplayersfromthecomparison view.
+ENDTRAININGSESSION
+Endtrainingsessionandsave
+1.Tap
+ intheupperleftcorner.
+2.TapSavetostoptrainingsessionrecording andsaveit.
+Afterendingthesessionbeforesyncingyoucanviewdatafromyoursessionontheapp.Theinformation includes
+distance, detailedspeedandheartratedata,andsprints.
+Whenendingatrainingsessionananimation indicates thatthesessionisbeingsaved.
+Iftimebetween trainingsessionfilesislessthanoneminutetheiPadwillmergetheseintoasingle
+sessionwhensynchronizing trainingfiles.
+
+--- Page 22 ---
+
+22EndTraining SessionandDelete
+1.Tap
+ intheupperleftcorner.
+2.TapDeletetostoptrainingsessionrecording anddeleteit.
+
+--- Page 23 ---
+
+23SYNCDATAFROMSENSORSTOWEBSERVICEVIADOCK
+Afterendingatrainingsession, it'stimetosyncthedatafromthesensors tothePolarProTeamdockandthentothe
+TeamProwebserviceforfurtheranalysis.
+1.CollectthePolarProsensors andstrapsfromtheplayers.
+2.PlacethePolarProsensors intothedock.
+3.PlacetheiPadintothedock.
+4.PressSYNCintheSENSORS &DOCKviewontheapp.
+5.A greencheckmarkwillappearonthesensors onthescreenwhenthesynciscomplete.
+SYNCING INFORMATION
+lAmaximum of20sensors canbesyncedatatime.Ifyouhavemorethan20sensors, theycanbesynced
+successively.
+lYouriPadneedstohaveaninternetconnection forthedatatobetransferred tothePolarTeamProweb
+service.
+lSynceddataisstoredinasecurecloudserver.
+UNSYNCED DATA
+lIf
+ isdisplayed nexttothesession, thedataisnotsyncedwiththedock.Tap
+ toopenapopup,and
+tapSyncnow.
+lIfthedatafromallsensors isnotsynced(oneormoresensors arenotsynced), Partlysyncedisdisplayed in
+thepopup.Inthiscaseplacethesensors thathavenotbeensyncedinthedockandsync.
+lIf
+  isdisplayed nexttothesession, thedataisnotsyncedwiththewebservice.PlaceyouriPadintothe
+dock.Tap
+ toopenapopup,andtapSyncnow.
+Non-synchronized trainingfileswillbestoredintheiPaduntiltheyaresuccessfully synchronized tothe
+webservice.
+Donotsignoutoftheappduringsynchronization tokeepthedataintheappuntilthesynchronization is
+complete.
+ANALYZEDATAINTEAMPROAPP
+ThePolarTeamProappprovides instantsessionsummary rightaftertraining, anadvanced analysis viewforin-depth
+sampledatacomparison andaheatmapviewforlocation analysis. ThePolarTeamProapptrainingsessionviewhas
+threemainviews:SUMMARY ,ANALYSIS andMAP.
+EDIT
+ChooseEditintheupperrightcornertoeditthestartorendtimeofasession. Theareahighlighted inredshowsthe
+livesessionrecorded withapp,andtheareaoutsideitshowsthewholesessionrecorded withthesensors.
+REPORT
+Located intheupperrightcorneroftheSummary viewafterfinishing asession. Choosing Reportopenstheteam
+sessionaverage viewandplayerspecificviews.ThereportcanbesavedtotheiPadfilesystemorsentoverseveral
+mediaoptionsusingtheshareiconinthetoprightcorneroftheview.
+
+--- Page 24 ---
+
+24SUMMARY
+TheSUMMARY viewshowsalltheplayerdatafromthesession.
+SortPlayers
+Playerscanbesortedbyname,numberorbytrainingdata(heartrate,speed,sprintsetc.).Tapthevariabletosortthe
+playersbyit.
+ViewPlayerSessionSummary
+lTapaplayerprofileontheSUMMARY viewtoopenadetailedsessionsummary.
+lUsethehorizontal scrollbarunderthegraphtoseeheartrate,speedorcadence datafromacertainpoint.
+lSwipeleftorrighttoswitchbetween players.
+ANALYSIS
+Intheanalysis viewyoucancompare playerdatawiththeteamaverage orcompare twoplayerswitheachother.You
+canalsoviewandeditmarkers.
+Compare PlayerDatawithTeamAverage
+1.ChooseTaptocompare .
+2.Choosetheplayeryouwishtocompare.
+Compare TwoPlayerswithEachother
+1.ChooseTaptocompare .
+2.Choosetheplayeryouwishtocompare.
+3.TapTeamaverage,andchooseaplayer.
+ViewMarkers
+Tap
+ toviewthemarkers forthesession.
+EditMarkers
+1.Tap
+ toviewthemarkers.
+2.Tapthemarkeryouwishtoedit.
+3.Afterediting,tapDone.
+MAP
+Themapisavisualrepresentation ofplayers'locations onthefieldovertheselected timerange.Thewarmerthecolor
+themoretheplayerhasbeenpositioned withinthatgivenarea.Youcanchoosetoviewalltheplayers'heatmapsor
+justtheheatmapsofcertainplayers.Alinegraphoraheatmap,andasatelliteorillustration viewofthefieldcanbe
+viewed.Pleasenotethat:
+lThesensors mustbesyncedwiththedocktobeabletoseetheheatmap.
+lToviewaheatmaponthetrainingfieldillustration youneedtocreateafieldintheapp.Thisonlyneedstobe
+doneonceforeachfield.
+CreateTraining FieldforHeatMap
+1.TapatrainingsessionintheTeamhomeview.
+2.ChoosetheMAPview,andtapCreateanewfield.
+3.Drag,zoomandrotatethefieldinsidetheframewithtwofingers.
+
+--- Page 25 ---
+
+254.Dragthehandlestothefieldcornerswithonefinger.
+5.Placethecornersasaccurately aspossible, andtapLockcorners.
+6.Nameyourfield,andtapCreate.
+ANALYZEDATAINTEAMPROWEBSERVICE
+ThePolarTeamProwebserviceprovides trainingsummaries, anoverview fortheentireteamoraselected player,
+powerful sessionanalysis andcomparison, playerlocation onaheatmaporalinegraph,breakdown graphsofheart
+rateandspeedzonesandnumberofsprintsduringasessionaswelllong-termreportsanddataexport.
+Iftrainingsessiondataisnotvisibleinthewebservice,makesureyouhavesyncedthedatafromthesensors tothe
+webserviceviathedock.Formoreinformation, see"SyncDatafromSensors toWebServiceviaDock"onpage 23
+Viewandanalyzesingletrainingsession:Chooseasessionfromthecalendar intheActivities view.Training
+sessions havetwomainviews:SUMMARY andANALYSIS .
+SUMMARY
+Thesummary viewshowsyouanoverview oftheyourteam'ssession, andplayerspecificperformance variables.
+TeamAverage :Thissectiondisplays theteamaverages forthevariables.
+Players:Alltheplayersincluded inthetrainingsessionarelisted.
+View:Therearetwoviews:fullandcompact.
+Sortplayers:Therearetwowaystosortplayers:Clickthevariableyouwishtosortbyintheplayerstaborchoosethe
+variableafterSORT BY .
+EDITSESSION
+TheSessioneditfeatureallowscoaches toeditthesessionrosterbyremoving playersfromitormovingplayersinto
+anotherexistingsession. Inaddition coaches cancreatenewsessions.
+Moveplayers
+1.Openasessionsummary.
+2.Choosetheplayerstobemoved.
+3.AtthebottomofthescreenchooseMove.
+4.Choosethesessiontowhichtheplayerswillbemoved.
+5.ChooseSave.Theplayersarethenmovedintothesession.
+Notethatyoucanonlymoveplayersintosessions doneonthesameday.
+Remove players
+1.Openasessionsummary.
+2.Choosetheplayerstoberemoved.
+3.AtthebottomofthescreenchooseRemove.
+Createnewsession
+1.Openasessionsummary.
+2.Choosetheplayersyouwanttoincludeinthenewsession.
+
+--- Page 26 ---
+
+263.AtthebottomofthescreenchooseCreatenew.
+4.A newpageopens,choosesport,type,andaddanameandnotes.ThenchooseSave.
+ANALYSIS
+Intheanalysis viewyoucancompare players'performance data.
+ADDMARKER
+Markers canalsobeaddedtothetrainingsessionintheanalysis view.Clickonthegraphtoaddamarkertoit.
+VIEWMARKER
+Themarkers youhaveaddedtoatrainingsessioncanbeviewedbychoosing SHOW MARKERS .
+COMPARE
+Compare severalplayersatatime.Youcancompare heartrate,speed,cadence graphsaswellasviewheartrate
+zone,speedzoneandsprintdata.
+COMPARE PLAYERS
+Whenchoosing oneplayeryoucanviewseveralvariables atatimeonthegraph,andwhenchoosing severalplayers
+youcancompare onevariableatatimeonthegraph.
+1.Chooseatrainingsession.
+2.ClickANALYSIS .
+3.Choosetheplayerstocompare fromthedrop-downlist.
+or
+1.Chooseatrainingsession.
+2.Clicktheplayersonthelist.
+3.ClickANALYZE atthebottomofthescreen.
+COMPARE PHASESPECIFIC DATA
+1.Tickthephaseboxofthephaseyouwanttoview.
+2.Thedataforthatphaseonlyisshown.
+ZOOMTHECOMPARE VIEW
+1.Onthegraph,pressandholdtherightmousebuttonatthepointyouwanttostartthephase,anddraguntilyou
+reachthepointyouwanttoendthephase,andthenreleasethemousebutton.
+2.Toresetthezoomandreturntothedefaultview,click
+ .
+TRIM
+Editthestartandendtimeofatrainingsession. Youcantrimatrainingsessionfromthestart,endorboth.
+
+--- Page 27 ---
+
+27TRIMSESSION
+1.Chooseatrainingsession.
+2.Click
+ ontheright
+3.ChooseTRIM SESSION ,andusetheslidertotrimthesessionstarttimeorendtime.Ortypethestartandend
+timeintheboxes.
+4.ClickSAVE.
+Pleasenotethataftertrimming asessionitcannotbeundone.
+PHASES
+Addphasestoyourtrainingsession. Afteraddingaphaseyoucanchoosetoviewperformance datafromthatphase
+only.Phasescanonlybeaddedinthewebservice,andtheycanonlybeaddedafteratrainingsessionisfinished.
+Phasescannotbeaddedduringatrainingsession.
+ADDPHASE
+1.ChooseatrainingsessionintheActivities view.
+2.Click
+ ontheright.
+3.ClickADD PHASE ,pressandholdtherightmousebuttonandatthepointyouwanttostartthephase,anddrag
+untilyoureachthepointyouwanttoendthephase,andthenreleasethemousebutton.Ortypethephasestart
+andendtimeintheboxes.
+4.Namethephase.
+5.ClickSAVE PHASE .
+VIEWPHASEDATA
+1.Chooseatrainingsession.
+2.Tickthephasebox
+ ofthephaseyouwanttoview.
+3.Thedataforthatphaseonlyisshown.
+Nowausercancreatephasesalreadyduringalivesession. Phaseswillbesynchronized tothewebserviceandare
+seeninthetrainingsessiondata.
+Therecanbeseveralphaserecordings goingonatthesametime.
+Livephaserecording hasindependent start/stop mechanisms fromthelivesessioncorresponding ones,i.e.stopping
+alivephasedoesnotstopalivesession. Thenagainalivephasecannotbestartedwithoutstartingalivesessionfirst.
+RRINTERVAL
+ViewtheRRintervals, i.e.timebetween successive heartbeats, fromheartratedatafromtrainingsessions ormatches
+onagraph.Thegraphallowsyoutozoominandisolatesections ofthedataforfurtheranalysis. Information shown
+includes minRRinterval,maxRRinterval,avgRRintervalandHRV(RMSSD).
+EXPORTDATA
+ExporttrainingsessiondatainXLS orCSVformat.Youcanchoosetoexportthedataofthewholeteamorjustthe
+dataofcertainplayers,andyoucanalsochooseifyouwanttoexportthedatafromjustcertainphasesorfromthe
+
+--- Page 28 ---
+
+28wholesession. Choosetheinformation andvariables displayed inthecolumns.
+Thevariables youcanchoosefrominclude:Playernumber, Playername,Sessionname,Type,Phasename,Duration,
+Starttime,Endtime,HRmin(bpm),HRavg(bpm),HRmax(bpm),HRmin(%),HRavg(%),HRmax(%),TimeinHR
+zone,Totaldistance, Distance /Min,Maximum speed,Average speed,Sprints,Distance inspeedzone,Number of
+accelerations, Calories, Training loadscore,Cardioload,Recovery time,Timeinpowerzones,Muscleloadinpower
+zones,Muscleload,Min RRinterval,MaxRRinterval,AvgRRintervalandHRV(RMSSD).
+EXPORT SESSION DATA
+1.ChooseatrainingsessionintheActivities view.
+2.ClickEXPORT intheupperrightcorner.
+3.Choosetheplayers.
+4.Choosethephases.
+5.Choosewhatdataisshown.
+6.ClickEXPORT AS XLSorEXPORT AS CSV.
+EXPORT RAWPLAYER DATA
+1.ChooseatrainingsessionintheActivities view.
+2.ClickEXPORT intheupperrightcorner.
+3.Choosetheplayers.
+4.ClickEXPORT RAW DATA .
+Theexportrawdatafunction exportssecond-by-seconddatafromatrainingsession. Rawdataexportgivesyouazip
+filewithplayerspecificfolderswhichcontainaCSVfile,anda.txtfileandaGPXfile.
+lTheCSVfilecontains secondbysecondinformation aboutheartrate,speed,distance,
+acceleration/deceleration andrunningcadence.
+lThe.txtfilecontains unfiltered RRintervaldatathatcanbeanalyzed withthirdpartyheartratevariability tools.
+lTheGPXfilecontains location information thatcanbeviewedinthirdpartytools.
+REPORTS
+Inthereportssectionyoucangenerate different typesofreportsfromyourteam'strainingsessions. Youcanchoose
+theperiodfromwhichyouwanttogenerate thereportaswellashowyouwanttoviewthedata.Areportcanbe
+generated forthewholeteamoryoucanchoosetojustincludecertainplayers.Youalsocancreateweeklyindividual
+ormultiple playerreports.
+Reportscanbeprinteddirectlyfromtheserviceandsummary reportscanbeexported in.csvformat.Name,typeand
+anotecanbeaddedtoeveryteamtrainingsessionexportsummary.
+TEMPLATES
+Createcustomtemplates togetthedatayouneedeasilyeverytime.
+CreateCustomReportTemplate
+1.ChooseCustomtemplate fromtheReporttemplate drop-downlist.
+2.Choosewhatinformation isshownonthebargraph.
+3.Choosewhatinformation isshownonthelinegraph.
+4.Chosethesport.
+5.ClickCreatereport.
+SaveReportTemplate
+Aftercreating areporttemplate itneedstobesaved.
+
+--- Page 29 ---
+
+291.ChooseSAVE TEMPLATE .
+2.Namethetemplate.
+3.ClickSAVE.
+Thetemplate isaddedtoyourreporttemplate drop-downlist.
+Remove Template
+1.ChooseREMOVE TEMPLATES .
+2.Choosethetemplates youwishtoremove.
+3.ClickREMOVE .
+SUMMARY
+Generate Summary Report
+Useatemplate orfollowtheinstructions below:
+1.Choosethetimeperiodfromwhichyouwantthereport.YoucanchooseDailyreport,Weeklyreport,Monthly
+report,YearlyreportorCustomPeriod.
+2.Choosethetimeperiod/date forthereport.
+3.Choosetheplayers.
+4.Chosethetypeofsession.
+5.Choosethevaluesshown.
+6.ClickCREATE REPORT .
+Youcanalsoexportyourchosenplayers'dataintoindividual .csvfilesbychoosing Export.
+GRAPHS
+Createreportswhichcanincludeonebarandtwolinegraphsforindividual playersorthewholeteam.Choosethe
+periodfromwhichyouwanttogenerate thereportaswellaswhatdatayouwanttoseeandhowyouwanttoviewthe
+data.
+Generate GraphReport
+Useatemplate orfollowtheinstructions below:
+1.Choosethetimeperiodfromwhichyouwantthereport.YoucanchooseDailyreport,Weeklyreport,Monthly
+report,YearlyreportorCustomPeriod.
+2.Choosehowthedatafromthechosentimeperiodisshowninthereport.Youcanviewdataclassified byDay,
+WeekorMonth.
+3.Choosethetimeperiod/date forthereport.
+4.Choosetheplayers.
+5.Chosethesport.
+6.Choosewhatinformation isshownonthebargraph.
+7.Choosewhatinformation isshownonthelinegraph.
+8.ClickCREATE REPORT .
+TRAINING LOAD
+UnderTraining loadyou'llfindCardioloadandMuscleload.
+TheCardioloadreportshowsyoutheCardioloadstatusandCardioloadbuildupofthechosenplayer.CardioLoad
+StatuslooksathowStraincompares toTolerance andshowshowtrainingisimpacting thebody.Following Cardio
+LoadStatushelpsyoukeepyourtotaltrainingvolumeincontrolintheshortandlong-term.Choosethetimeperiod
+fromwhichyouwanttoviewthereportfrombychoosing Lastmonth,Last3months,orLast6months.
+
+--- Page 30 ---
+
+30TheMuscleloadreportcanhelptomonitortheplayers'traininghabits'effectontheirreadiness toenduretraining.
+Whenpowerzonesareused,onlythedatainthepowerzonesisusedforcreating thereport.Choosethetimeperiod
+fromwhichyouwanttoviewthereportfrombychoosing Lastmonth,Last3months,orLast6months.
+YoucanchoosetoincludePowerzonesinthegraphaswell.NotethatonlythechosenPowerzonesareincluded in
+theMuscleloadstatus.
+Formoreinformation onCardioloadandMuscleloadsee"Training Load"onpage 37
+
+--- Page 31 ---
+
+31POLARHEARTRATEZONES
+Whentheplayer'smaximum heartrateisselected astheheartzonecalculation method, heartratezoneswhichthe
+usercandetermine arespecified asapercentage ofaplayer'smaximum heartrate.Asthezonesarebasedon
+percentages ofaplayer'sownmaximum heartrate,theyareindividual foreachplayer.Thesamepercentages are,
+however, usedforthewholeteam.Training isdividedintofiveheartratezonesbasedonpercentages ofmaximum
+heartrate.ThezonescanbeeditedintheTeamProwebservice,andcanbeindividually customized foreachsport.
+EDITHEARTRATEZONES
+1.Choose
+ intheupperrightcorner.
+2.ChooseTeamsettings.
+3.ChooseSPORT PROFILES ,andtheprofileyouwishtoedit(ifyouonlyhaveonesportprofile,itisautomatically
+chosen).
+4.ChooseFreeunderHEARTRATEZONE TYPE ,andadjustthezones.
+5.ClickSAVE.
+TargetzoneIntensity %ofHRmax*,
+bpmExample durations Training effect
+MAXIMUM
+90–100%171–190
+bpmlessthan5
+minutesBenefits: Maximal ornearmaximal effortfor
+breathing andmuscles.
+Feelslike:Veryexhausting forbreathing and
+muscles.
+Recommended for:Veryexperienced andfit
+athletes. Shortintervals only,usuallyinfinal
+preparation forshortevents.
+HARD
+80–90%152–172bpm2–10minutesBenefits: Increased abilitytosustainhighspeed
+endurance.
+Feelslike:Causesmuscular fatigueandheavy
+breathing.
+Recommended for:Experienced athletes foryear-
+roundtraining, andforvariousdurations.
+Becomes moreimportant duringprecompetition
+season.
+MODERATE
+70–80%133–152bpm10–40minutesBenefits: Enhances generaltrainingpace,makes
+moderate intensity effortseasierandimproves
+efficiency.
+Feelslike:Steady,controlled, fastbreathing.
+Recommended for:Athletes trainingforevents,
+orlookingforperformance gains.
+
+--- Page 32 ---
+
+32TargetzoneIntensity %ofHRmax*,
+bpmExample durations Training effect
+LIGHT
+60–70%114-133bpm40–80minutesBenefits: Improves generalbasefitness,
+improves recovery andboostsmetabolism.
+Feelslike:Comfortable andeasy,lowmuscleand
+cardiovascular load.
+Recommended for:Everybody forlongtraining
+sessions duringbasetrainingperiodsandfor
+recovery exercises duringcompetition season.
+VERYLIGHT
+50–60%104–114bpm20–40minutesBenefits: Helpstowarmupandcooldownand
+assistsrecovery.
+Feelslike:Veryeasy,littlestrain.
+Recommended for:Forrecovery andcool-down,
+throughout trainingseason.
+*HRmax=Maximum heartrate(220-age).Example: 30yearsold,220–30=190bpm.
+Training inheartratezone1isdoneataverylowintensity. Themaintrainingprinciple isthatperformance improves
+whenrecovering after,andnotonlyduringtraining. Accelerate therecovery process withverylightintensity training.
+Training inheartratezone2isforendurance training, anessential partofanytrainingprogram. Training sessions in
+thiszoneareeasyandaerobic. Long-duration traininginthislightzoneresultsineffective energyexpenditure.
+Progress willrequirepersistence.
+Aerobicpowerisenhanced inheartratezone3.Thetrainingintensity ishigherthaninzones1and2,butstillmainly
+aerobic. Training inzone3may,forexample, consistofintervals followed byrecovery. Training inthiszoneis
+especially effective forimproving theefficiency ofbloodcirculation intheheartandskeletalmuscles.
+Ifyourgoalistocompete attoppotential, youwillhavetotraininheartratezones4and5.Inthesezones,you
+exercise anaerobically inintervals ofupto10minutes. Theshortertheinterval,thehighertheintensity. Sufficient
+recovery between intervals isveryimportant. Thetrainingpatterninzones4and5isdesigned toproduce peak
+performance.
+ThePolartargetheartratezonescanbepersonalized inthesportprofilesettings inthewebservicebyusinga
+laboratory measured HRmaxvalue,orbytakingafieldtesttomeasure thevalueyourself. Whentraininginatarget
+heartratezone,trytomakeuseoftheentirezone.Themid-zoneisagoodtarget,butkeepingyourheartrateatthat
+exactlevelallthetimeisnotnecessary. Heartrategradually adjuststotrainingintensity. Forinstance, whencrossing
+fromheartratetargetzone1to3,thecirculatory systemandheartratewilladjustin3-5minutes.
+Heartrateresponds totrainingintensity depending onfactorssuchasfitnessandrecovery levels,aswellas
+environmental factors.Itisimportant tolookoutforsubjective feelingsoffatigue,andtoadjustyourtrainingprogram
+accordingly.
+INDIVIDUALTRAINING
+Theindividual trainingfeaturecombines datafromtheplayers'individual trainingsessions withdatafromteam
+trainingsessions. Inaddition todatafromindividual trainingsessions, youcanviewtheplayers'activity,sleep,Nightly
+Recharge™, trainingload,Cardioloadstatus,andrecovery statusinformation. Findtheperfectbalancebetween
+
+--- Page 33 ---
+
+33trainingandrestandgetatruepictureofyourplayers’recovery statusbeforegettingoutthereagain.Training load
+showsyouhowtrainingaffectsyourplayersandhelpsyourecognize theirlimits,adjusttrainingintensity andprevent
+injuries.Theplayers'dataisavailable rightaftertheysynctheirPolardevicewiththeFlowwebserviceandcanbe
+viewedfromtheActivities calendar viewaswellasfromtheplayercards.
+PERSONAL FLOWACCOUNT ANDPOLARDEVICE
+Togetthemostoutoftheindividual trainingfeature,andgainathorough understanding ofyourplayers’overall
+condition andreadiness throughout theseason,eachplayerwillneedapersonal PolarFlowwebserviceaccount
+available atflow.polar.com/start andaPolardevicewiththeactivitytracking feature.Theindividual training
+featurecanalsobeusedwithoutaPolardevice,butitcannotbeutilizedfullywithoutone.
+WhenusingtheFlowwebservicewithaPolardevice:
+lPlayerscanseetheirTeamProtrainingsessions intheirpersonal Flowaccount
+lPlayersweartheirPolardevicesduringpersonal trainingsessions, andsyncthedatatotheFlowwebservice
+lCoachcanseetheplayers'personal trainingsessions intheTeamProwebservice
+lCoachcanseetheplayers'activityandsleepinformation
+lCoachandplayerscanviewtrainingload,CardioloadstatusandNightlyRecharge™ recovery information for
+balancing trainingandrest
+WhenusingtheFlowwebservicewithoutaPolardevice:
+lPlayerscanseetheirTeamProtrainingsessionintheirpersonal Flowaccount
+lPlayerscanmanually addtrainingsessions totheirFlowaccount
+GETTING STARTED GUIDEFORCOACH
+Preparations :Theplayerscreatepersonal PolarFlowwebserviceaccounts atflow.polar.com/start .IftheyhavePolar
+devicestheywillbeinstructed howtotakethemintouseduringtheaccount creation process. Oncetheyhavecreated
+accounts, theywillgiveyoutheirFlowaccount usernames.
+1.Makesureyouhavesyncedallunsynced trainingdatafromthePolarProsensors beforelinkingpersonal player
+accounts withtheTeamProwebservice.
+2.Logintoyourteam'saccount intheTeamProwebservice.
+3.Click
+  ,andchoosePlayerRoster.
+4.Click
+  onaplayertoopentheplayerprofile.
+5.Typetheplayer'sexistingFlowaccount username intotheLinkPolaraccount field.
+6.ClickSave.
+7.Theplayersthenlogintotheirpersonal Flowaccounts, andacceptthelinkinginvitations fromtheNotifications
+tab.
+8.Theirpersonal Flowaccounts arenowlinkedwithyourteam'sPolarTeamProaccount.
+9.AlwayssyncthePolarProsensors afterlinkingapersonal playeraccount withtheTeamProwebservice.
+Theinvitation mustbesenttoeachplayerindividually. It isrecommended thattheplayerscreatean
+account firstbutifaplayerdoesnothaveaFlowaccount registered totheemailaddress theinvitation is
+sent,theplayerwillreceiveanemailmessage thatcontains alinktocreating aFlowaccount.
+Theplayerswhosepersonal accounts havebeenlinkedareindicated withachainicon
+ ontheir
+profilepictureintheplayerrosterviewinTeamProwebservice.Allpersonal trainingsessions (including
+onesdoneinthepast)become visibleintheTeamProaccount afterlinkingtheaccounts. Teamtraining
+sessions donebeforelinkingtheaccounts donotbecome visibleintheplayer'spersonal Flowaccount.
+
+--- Page 34 ---
+
+34
+It'spossible tocancelaplayerinvitation beforetheplayerhasaccepted it.Oncetheinvitation isaccepted,
+thesameoptionchanges toUnlinkwhichallowsyoutounlinkapersonal Flowprofile.
+GETTING STARTED GUIDEFORPLAYER
+1.Createapersonal Flowwebserviceaccount atflow.polar.com/start ,andfollowtheon-screeninstructions. If
+youhaveaPolardeviceyou'llbeinstructed howtotakeitintouseduringtheaccount creation process.
+2.Onceyouhavecreatedanaccount, giveyouraccount emailaddress toyourcoach.Yourcoachwillthensend
+youanaccount linkinginvitation.
+3.Logintoyourpersonal Flowaccount withyouremailaddress andpassword, andacceptthelinkinginvitation
+fromtheNotifications
+ tab.
+4.Yourpersonal Flowaccount isnowlinkedwithyourteam'sPolarTeamProaccount.
+Allpersonal trainingsessions (including onesdoneinthepast)become visibletothecoaches inthe
+TeamProaccount afterlinkingtheaccounts. Inaddition topersonal trainingsessions thecoaches can
+seetheplayers'sleepstatistics, nightlyrecharge statusrecovery statusandcardioloadstatus.Team
+trainingsessions donebeforelinkingtheaccounts donotbecome visibleinyourpersonal Flowaccount.
+1.ReadyourDevice's GettingStartedGuide
+GettoknowyourPolardevicebyreadingthegettingstartedguidethatcamewithit.Formoreinformation andhelp
+seethefullusermanualandtutorialvideosatsupport.polar.com .
+2.SyncyourPolardeviceDaily
+Remember tosyncyourPolardevicewiththeFlowwebservicedaily.Thismakessurethatallofyourtraining, activity
+andsleepdata,aswellasotherinformation isuptodateatalltimes.
+TosyncdatawiththeFlowwebserviceyouneedFlowSync software. Gotoflow.polar.com/start ,anddownload and
+installitbeforetryingtosync.
+1.Connect yourPolardevicetoyourcomputer withtheUSBcablethatcamewithit.
+2.TheFlowSync windowopensonyourcomputer, andthesyncingstarts.
+3.Completed isdisplayed whenyouaredone.
+EverytimeyouplugyourPolardeviceintoyourcomputer, thePolarFlowSync software willtransferyourdatatothe
+PolarFlowwebserviceandsyncanysettings youmayhavechanged. Ifthesyncingdoesnotautomatically start,start
+FlowSync fromthedesktop icon(Windows) orfromtheapplications folder(MacOSX).Everytimeafirmware update
+isavailable, FlowSync willnotifyyou,andrequestyoutoinstallit.Ifyouchangesettings intheFlowwebservicewhile
+yourPolardeviceisplugged intoyourcomputer, pressthesynchronize buttononFlowSync totransfertothesettings
+toyourPolardevice.
+
+--- Page 35 ---
+
+35
+Youcanalsosyncyourdevicewirelessly withtheFlowmobileappforiOSandAndroid. Flowappisthe
+easiestwaytosyncyourtrainingdatafromyourPolardevicewiththewebservice.Tostartusingthe
+Flowapp,download itfromAppStoreorGooglePlayontoyourmobile.Forsupportandmoreinformation
+aboutusingPolarFlowapp,gotowww.polar.com/en/support/Flow_ app.Beforetakinganewmobile
+device(smartphone, tablet)intouse,ithastobepairedwithyourPolardevice.
+TEAMPROINDIVIDUAL PLAYER CALENDAR MONTH VIEW
+Theindividual trainingfeaturebringsnewelements totheindividual playerviewintheTeamProwebservice.These
+includepersonal trainingsessions, activityinformation andanyPolartests*(forexample fitnesstest,orthostatic test,
+jumptest,RRrecording, runningperformance test,cyclingtest,legrecovery test)theplayerhasperformed.
+*Pleasenotethattheavailable features dependonyourPolardevice.
+Recovery status:Therecovery statusfeatureestimates howmuchtrainingloadyoucantolerate. Itkeepstrackofyour
+cumulative load–thatis,intensity, volumeandfrequency ofyourtrainingandactivity–takingyourtraining
+background intoaccount, andestimates yourcurrentandfuturelevelofphysical strain.Clicktoopeninanew
+window. You'llseethesamerecovery statusviewthatisshownintheplayer'spersonal Flowaccount. Thisisaview
+only,theinformation cannotbeaccessed.
+Inactivity stamp:Ifyou'vebeenstillfortoolong(1hour),you'llgetaninactivity stamp.
+Percentage ofdailyactivitygoalaccumulated: Showshowmuchofyourdaily
+activitygoalyou'vereached.
+Testsperformed: RRrecording, Orthostatic test,Fitnesstest,Jumptest,Running perfomance test,
+Cyclingperformance test,Legrecovery test.
+Teamtrainingsession: Teamtrainingsessions areshownwiththeteamlogo.
+Personal trainingsessions: Personal trainingsessions areshownwiththesporticon.Clicktoopeninanew
+window. You'llseethesamerecovery statusviewthatisshownintheplayer'spersonal Flowaccount. Thisisaview
+only,theinformation cannotbeaccessed.
+Match/game: Teamsessions thatarematch/game typeareillustrated withablacksporticon.
+
+--- Page 36 ---
+
+36 TEAMPROINDIVIDUAL PLAYER CALENDAR DAY VIEW
+Goodtoknow
+lInthewholeteamcalendar viewonlyteamtrainingsessions areshown.
+lIntheindividual playercalendar viewteamtrainingsessions aswellaspersonal trainingsessions areshown.
+lReportsonlyincludeteamtrainingsessions, noindividual sessions areincluded.
+lIntheplayers'personal Flowaccounts teamtrainingsessions areshownwiththesportprofileicon(inthe
+TeamProaccount thesesessions areshownwiththeteamlogo).
+UnlinkaPlayer'sPersonal FlowAccount fromTeamProwebService
+Aplayerorcoachcanremovetheaccount accesslinkatanytime.Whenunlinking aplayerfromtheTeamPro
+account, theplayers’personal traininginformation isdeletedfromtheteam'saccount. Thelinkcanbedeletedbythe
+coachinTeamProwebserviceorbytheplayerintheirpersonal Flowaccount.
+Coach
+1.Logintoyourteam'saccount intheTeamProwebservice.
+2.Click
+  ,andchoosePlayerRoster.
+3.Click
+  onaplayertoopentheplayerprofile.
+4.ClickUnlinkaftertheplayer'semailaddress inLinkedPolaraccount field.
+5.ClickSave.
+Player
+1.Logintoyourpersonal PolarFlowaccount atflow.polar.com
+2.Click
+ (name/profile photo)intheupperrightcorner.
+3.ChooseSettings .
+4.IntheAccount accesssection,clickremoveontheorganization youwishtoremove.
+
+--- Page 37 ---
+
+37POLARSPEEDZONES
+Speedzonesprovideaneasywaytochooseandmonitortheintensity ofyourtrainingbasedonspeed,andhelpyou
+mixupyourtrainingwithdifferent intensities foroptimaleffects.Therearefivezones,andyoucanusethedefault
+onesordefineyourown.Thedefaultzonesareanexample ofspeedzonesforapersonwitharelatively highfitness
+level.ThezonescanbeeditedintheTeamProwebservice,andcanbeindividually customized foreachsport.
+EDITSPEEDZONES
+1.Choose
+ intheupperrightcorner.
+2.ChooseTeamsettings.
+3.ChooseSPORT PROFILES ,andtheprofileyouwishtoedit(ifyouonlyhaveonesportprofile,itisautomatically
+chosen).
+4.ChooseFreeunderSPEED ZONE TYPE ,andadjustthezones.
+5.ClickSAVE.
+SPRINTS
+Thenumberofsprintsaplayertakesduringatrainingsessioniscounted. Allacceleration valuesover2.8m/s2are
+classified assprints.Thelengthofanacceleration canvary.Itcanonlybeathreestepexplosive movement oritcan
+bealonger20-30metermaximal sprint.Botheffortsareclassified asonesprintwhenthethreshold valueof2.8m/s2
+isexceeded.
+SPRINTTHRESHOLD
+Followthenumberofsprintsactionsbasedoneitheracceleration orspeedthreshold. Youcanchoosedefaultorfree.
+Withfreeyoucansetthethreshold manually. Thevaluecanbesetasspeed(km/h)oracceleration (m/s2).The
+defaultacceleration valueis2.8m/s2.
+Youcaneditthesprintthreshold typeintheTeamProwebserviceinSettings >Sportprofiles.
+TRAININGLOAD
+TheTraining Loadfeaturehelpsyoutounderstand theamountofeffortthatyouputintoatrainingsession. Training
+Loadiscalculated foreverytrainingsessionbasedonintensity andduration. TheTraining Loadfeaturemakesthe
+effortofashorthighintensity sessioncomparable tothatofalonglowintensity session. Training Loadvalueis
+indicated totheuserindaysandhoursformoredetailedcomparison between sessions.
+Training Loadisbasedonintensity andduration ofatrainingsession. Theintensity ofasessionismeasured using
+heartrateandthecalculation isfurtheraffected byyourpersonal information, suchasage,sex,weight,VO2max, and
+
+--- Page 38 ---
+
+38traininghistory.Beforetraininghistoryisavailable, yourtrainingbackground selection isusedinthecalculation. We
+alsouseyouraerobicandanaerobic threshold valuesinthecalculation. Ifyouhavereliablymeasured them,please
+updatethedefaultvaluesinthewebservice.Thesportofasessionistakenintoaccount viasportspecificfactor,
+whichimproves thecalculation accuracy.
+Mild0-6hours
+Reasonable 7-12hours
+Demanding 13-24hours
+Verydemanding 25-48hours
+Extreme Over48hours
+Training loadcanbeviewedasCardioLoadandMuscleload,recovery timeoraasascore.CardioLoadmeasures
+yourcardiacresponse toatrainingsession, orinotherwordshowmuchstrainatrainingsessionputonyour
+cardiovascular system.MuscleLoadmeasures thestrainatrainingsessioncausestoyourmusculoskeletal system
+thatiscomprised ofyourjoints,muscular andskeletalsystems. Recovery timeisanestimate ofthetimeyouneedto
+fullyrecoverfromyourtraining. Training loadscoreisanumeric valueoftheapproximate measure ofcarbohydrate
+andproteinusedasenergyduringtraining. Itsnumeric valuetypically rangesfrom50to250ina30to90minute
+trainingsession.
+YoucanedithowtoviewTraining loadintheTeamProwebserviceinTeamSettings >General.Youcanchooseto
+viewTraining loadasCardioloadandMuscleLoad,Recovery timeorScore.
+CARDIOLOAD
+CardioLoadmeasures yourcardiacresponse toatrainingsession, orinotherwordshowmuchstrainatraining
+sessionputsonyourcardiovascular system.YourCardioLoadisshownastrainingimpulse(TRIMP), acommonly
+accepted methodtoquantify trainingload.TRIMPiscalculated aftereveryworkout fromyourheartrateandsession
+duration, andit’saffected byyourphysical settings, restingandmaximal heartrate,andgender.
+CardioLoadisnotupdated duringlivesessions totheapplication. Itiscalculated intheTeamProwebserviceafter
+thesessionwhensyncing.
+Verbaldescription andbulletscale
+Theverbaldescriptions andbulletscalesforCardioLoadusesafive-stepscale:Verylow,Low,Medium, High,Very
+High.Thescalesareadaptive andhavebeenaddedinaddition totheabsolute numeric valuetohelpyouinterpret the
+loadofasinglesession. Theyshowhowhardyoursessionwascompared toyoursessionaverage fromthepast90
+days.Sincetheyareadaptive theydonothaveadirectlinkwiththeabsolutes numeric values.
+Theyadaptaccording toyourprogress: themoreyoutrain,themoreyoutolerate. Thisalsomeansthataloadvalue
+thatwasforexample rankedasthreebullets(medium) acoupleofmonthsagocouldnowberankedastwobullets
+(low)asyourtolerance fortraininghasimproved. Thisreflectsthefactthatthesamekindoftrainingsessioncanhave
+adifferent impactonyourcardiosystemdepending onyourtraininghistoryandcurrentcondition.
+CardioLoadstatus
+YourCardioLoadStatuslooksathowyourStraincompares toyourTolerance andshowshowyourtrainingis
+impacting yourbody.Following yourCardioLoadStatushelpsyoukeepyourtotaltrainingvolumeincontrolinthe
+shortandlong-term.
+Whenyoustartfollowing yourCardioLoadStatus,youneedtogatherdataforawhiletobuildupyourpersonal
+baseline foranalysis beforewecangiveyouaccurate feedback onyourstatus.Youneedacertainamountoftraining
+historybeforeyourstrainandtolerance canbedetermined reliably.Thiswhyyouwon’tseealloftheavailable
+information rightaway.Ittakessomeweekstoestablish abaseline. Beforewecangiveaccurate feedback, you’llsee
+anestimate (indicated with*).
+
+--- Page 39 ---
+
+39SinceyourCardioLoadStatususesyouraverage dailyloadfromthepast28-daytrainingwindowasaninput,ifyou
+don’thaveanytraininghistoryinFlowyou’restillgathering datatobuildabaseline duringyourfirstfourtraining
+weeks.DuringthisperiodyourCardioLoadStatuscanstillbeinaccurate. Especially ifyouhappentohavelighteror
+heaviertrainingweeksthatdeviatefromyourregulartraininghabits,theycandistortyourCardioLoadStatusinthe
+short-termandgiveyouastatusthatmaynotbeaccurate. Afteramonthoftrainingthatreflectsyourtypicaltraining
+amountyourCardioLoadStatusshouldbereliable.
+MUSCLE LOAD
+MuscleLoadmeasures thestrainatrainingsessioncausestoyourmusculoskeletal systemthatiscomprised ofyour
+joints,muscular andskeletalsystems. Ithelpsquantify trainingloadsinanaerobic high-intensity trainingsessions,
+suchasshortintervals, sprintsandhillsessions, whenyourheartratedoesn’thaveenoughtimetoreacttothe
+changes inintensity.
+Muscleloadisillustrated withanumerical value.Inaddition, averbaldescription andbulletscaleforMuscleLoad
+usesafive-stepscale:Verylow,Low,Medium, High,VeryHigh.Thescalesareadaptive andhavebeenaddedin
+addition totheabsolute numeric valuetohelpplayersinterpret theloadofasinglesession. MuscleLoadis
+automatically calculated fromyourpowerdatafromtrainingsessions withbothoutdoorandindoorprofileswhen
+GPSandoracceleration dataisavailable fromrunningbasedsportprofiles(excluding icehockeyandvolleyball).
+SinceMuscleloadiscalculated frompowerdataitisimportant thatthepowerzonesareaccurately definedforeach
+player.PowerzonesaredefinedinrelationtoMAP(Maximum aerobicpower).Iftheplayers'havemeasured theirMAP
+(Maximum aerobicpower)values,updatethethemplayerprofilesettings inthePlayerrosterviewunderTeam
+settings.Ifaplayers'personal Flowaccount isnotlinkedtoTeamPro,theirMAPvalueiscalculated fromtheir
+VO2max value.
+AddMuscleLoadtoasportprofile
+1.Choose
+ intheupperrightcorner.
+2.ChooseSportprofiles.
+3.Chooseeditunderthesportprofileyouwishtoaddmuscleloadto.
+4.SetMuscleloadandpowerzonesOn.
+5.ChooseSave.
+Afterchanging theMuscleloadsettingfromthesportprofilesettings (onoroff)fromtheTeamProweb
+serviceyouneedtologoutfromtheTeamProappandlogbackinagaintoactivatethechange.
+
+--- Page 40 ---
+
+40CARINGFORYOURPOLARTEAMPROSOLUTION
+Itisimportant tofollowthecareandmaintenance instructions toassurethelonglifeofthePolarTeamProtraining
+andcoaching solution.
+POLARPROSENSOR
+lDetachthesensors fromthestrapsandstoreseparately.
+lRinsethesensors underrunninglukewarm wateraftereveryuse.
+lDonotinsertwetsensors intothedock.
+lStorethesensors inthedock.
+lWhenthesensors arenotindailyuseorarestoredforalongerperiodoftime,recharge themregularly to
+preventacomplete exhaustion ofthesensorbatteries.
+STRAPS
+lRinsethestrapsunderrunninglukewarm wateraftereveryuse.
+lWashthestrapsinawashing machine at40°C(104°F)aftereveryfifthuse.Alwaysusethewashing pouch
+(included intheset).Detachthesensorfromthestrapbeforewashing!
+lDonotusebleachorfabricsoftener.
+lStorethestrapsinthePolarTeamProbag,inapocketwithvents.
+lDonotstorethestorestrapswet.
+POLARPROTEAMDOCK
+lWipethedockwithamoistclothregularly.
+lDonotuseinrainorwetconditions.
+lAvoidusingandleavingthedockindirectsunlight.
+TECHNICALSPECIFICATION
+PolarProSensor
+Batterytype:390mAhLi-polrechargeable batteryor501mAhLi-polrechargeable battery(sensors markedwitha
+circlesymbolontheback).
+Sensormaterials :ABS,ABS+30%GF,PC,stainless steel
+Strapmaterials: 38%Polyamide, 29%Polyurethane, 20%Elastane, 13%Polyester
+Operating temperature: -10°Cto+45°C(14°Fto113°F)
+PolarProTeamDock
+Batterytype:2800mAhLi-polyrechargeable battery
+
+--- Page 41 ---
+
+41DockMaterials: ABS+PC,PC,brass(goldplated),steel,stainless steel,aluminium, LDPE/TPR
+Operating temperature: 0°Cto+35°C(32°Fto95°F)
+IMPORTANTSAFETYINFORMATION
+AC-POWERED DEVICES
+Theseprecautions applytoallproducts thatplugintoastandard wallpoweroutlet.
+Failuretotakethefollowing precautions canresultinseriousinjuryordeathfromelectronic shockorfireorindamage
+tothedevice.
+ToSelectanAppropriate PowerSourceForYourDevice:
+lUseonlythepowersupplyunitandACpowercordthatcamewithyourdeviceorthatyourreceived froman
+authorized repaircenter.
+lACadapters areonlyforindooruse.
+lConfirm thatyourelectrical outletprovides thetypeofpowerindicated onthepowersupplyunit(intermsof
+voltage[V]andfrequency [Hz]).Ifyouarenotsureofthetypeofpowersupplied toyourhome,consulta
+qualified electrician.
+lDonotusenon-standard powersources, suchasgenerators orinverters,even ifthevoltageandfrequency
+appearacceptable. UseonlyACpowerprovided byastandard walloutlet.
+lDonotoverload yourwalloutlet,extension cord,powerstrip,orotherelectrical receptacle. Confirm thatthey
+areratedtohandlethetotalcurrent(inamps[A])drawnbythedevice(indicated onthepowersupplyunit)and
+anyotherdevicesthatareonthesamecircuit.
+ToAvoidDamaging thePowerCordsandPowerSupply:
+lProtectthepowercordsfrombeingwalkedon.
+lProtectcordsfrombeingpinchedorsharplybent,particularly wheretheyconnect tothepoweroutlet,the
+powersupplyunit,andthedevice.
+lDonotjerk,knot,sharplybend,orotherwise abusethepowercords.
+lDonotexposethepowercordstosources ofheat.
+lKeepchildren andpetsawayfromthepowercords.Donotallowthemtobiteorchewonthem.
+lWhendisconnecting thepowercords,pullontheplug-donotpullonthecord.
+Ifapowercordorpowersupplybecomes damaged inanyway,stopusingitimmediately. Unplugyourdeviceduring
+lightning stormsorwhenunusedforlongperiodsoftime.
+FordeviceswithanACpowercordthatconnects tothepowersupply,alwaysconnect thepowercordaccording to
+thefollowing instructions:
+1.PlugtheACpowercordintothepowersupplyunituntilitstops.
+2.PlugtheotherendoftheACpowercordintothewalloutlet.
+BATTERY- POWERED DEVICES
+Theseprecautions applytoallproducts thatuserechargeable ordisposable batteries.
+Improper useofbatteries mayresultinbatteryfluidleakage, overheating, orexplosion. Released batteryfluidis
+corrosive andmaybetoxic.Itcancauseskinandeyeburns,andisharmfulifswallowed.
+Rechargeable Batteries Only:
+lChargeonlywiththerecharger provided withtheproduct.
+
+--- Page 42 ---
+
+42WIRELESS DEVICES
+Beforeboarding anyaircraftorpackingawireless deviceinluggage thatwillbechecked, removethebatteries from
+thewireless deviceorturnthewireless deviceoff(ifithasanon/offswitch).Wireless devicescantransmit radio
+frequency (RF)energy,muchlikeacellulartelephone, whenever batteries areinstalled andthewireless deviceis
+turnedon(ifithasanon/offswitch).
+ALLDEVICES
+DoNotAttempt Repairs
+Donotattempttotakeapart,open,service,ormodifythehardware deviceorpowersupply.Doingsocouldpresentthe
+riskofelectrical shockoranotherhazard.Anyevidence ofanyattempttoopenand/ormodifythedevice,including any
+peeling,puncturing, orremoval ofanyofthelabels,willvoidtheLimitedWarranty.
+CHOKING HAZARD
+Thisdevicemaycontainsmallpartsthatwhichmaybeachokinghazardtochildren under3.Keepsmallpartsaway
+fromchildren.
+REGULATORY INFORMATION
+POLARPROTEAMDOCK
+PolarElectroOyisaISO9001:2015 certified company.
+Thisproductiscompliant withDirectives 2014/35/EU, 2014/30/EU, 2011/65/EU and2015/863/EU. Therelevant
+Declaration ofConformity andotherregulatory information foreachproductareavailable at
+www.polar.com/en/regulatory_ information .
+Thisproductiscompliant withDirectives 2006/66/EC and2012/19/EU. Separate disposal forbatteryandelectronics.
+Compliance Statement
+Canada
+PolarElectroOyhasnotapproved anychanges ormodifications tothisdevicebytheuser.Anychanges or
+modifications couldvoidtheuser’sauthority tooperatetheequipment.
+PolarElectroOyn’aapproué aucunemodification apportée àl’appareil parl’utilisateur, quellequ’ensoitlanature.Tout
+changement outoutemodification peuvent annulerledroitd’utilisation del’appareil parl’utilisateur.
+USA
+PolarElectroOyhasnotapproved anychanges ormodifications tothisdevicebytheuser.Anychanges or
+modifications couldvoidtheuser’sauthority tooperatetheequipment.
+
+--- Page 43 ---
+
+43FCCregulatory information
+Thisdevicecomplies withpart15oftheFCCrules.Operation issubjecttothefollowing twoconditions: (1)This
+devicemaynotcauseharmfulinterference, and(2)Thisdevicemustacceptanyinterference received, including
+interference thatmaycauseundesired operation.
+POLARPROSENSOR
+PolarElectroOyisaISO9001:2015 certified company.
+Thisproductiscompliant withDirectives 2014/53/EU, 2011/65/EU and2015/863/EU. Therelevant Declaration of
+Conformity andotherregulatory information foreachproductareavailable atwww.polar.com/en/regulatory_
+information .
+Thisproductiscompliant withDirectives 2006/66/EC and2012/19/EU. Separate disposal forbatteryandelectronics.
+COMPLIANCE STATEMENT
+Canada
+PolarElectroOyhasnotapproved anychanges ormodifications tothisdevicebytheuser.Anychanges or
+modifications couldvoidtheuser’sauthority tooperatetheequipment.
+PolarElectroOyn’aapproué aucunemodification apportée àl’appareil parl’utilisateur, quellequ’ensoitlanature.Tout
+changement outoutemodification peuvent annulerledroitd’utilisation del’appareil parl’utilisateur.
+Industry Canada(IC)regulatory information
+Thisdevicecomplies withIndustry Canadalicence-exemptRSSstandard (s).Operation issubjecttothefollowing two
+conditions: (1)thisdevicemaynotcauseinterference, and(2)thisdevicemustacceptanyinterference, including
+interference thatmaycauseundesired operation ofthedevice.
+Avisdeconformité àlaréglementation d’Industrie Canada
+Leprésentappareil estconforme auxCNRd’Industrie Canadaapplicables auxappareils radioexempts delicence.
+L’exploitation estautorisée auxdeuxconditions suivantes :(1)l’appareil nedoitpasproduire debrouillage, et(2)
+l’utilisateur del’appareil doitaccepter toutbrouillage radioélectrique subi,mêmesilebrouillage estsusceptible d’en
+compromettre lefonctionnement.
+CANICES-3(B)/NMB- 3(B)
+USA
+PolarElectroOyhasnotapproved anychanges ormodifications tothisdevicebytheuser.Anychanges or
+modifications couldvoidtheuser’sauthority tooperatetheequipment.
+FCCregulatory information
+Thisdevicecomplies withpart15oftheFCCrules.Operation issubjecttothefollowing twoconditions: (1)This
+devicemaynotcauseharmfulinterference, and(2)Thisdevicemustacceptanyinterference received, including
+interference thatmaycauseundesired operation.
+
+--- Page 44 ---
+
+44Note:Thisequipment hasbeentestedandfoundtocomplywiththelimitsforaClassBdigitaldevice,pursuant topart
+15oftheFCCRules.Theselimitsaredesigned toprovidereasonable protection againstharmfulinterference ina
+residential installation. Thisequipment generates, usesandcanradiateradiofrequency energyand,ifnotinstalled
+andusedinaccordance withtheinstructions, maycauseharmfulinterference toradiocommunications. However,
+thereisnoguarantee thatinterference willnotoccurinaparticular installation.
+Ifthisequipment doescauseharmfulinterference toradioortelevision reception, whichcanbedetermined byturning
+theequipment offandon,theuserisencouraged totrytocorrecttheinterference byoneormoreofthefollowing
+measures:
+1.Reorient orrelocate thereceiving antenna.
+2.Increase theseparation between theequipment andreceiver.
+3.Connect theequipment intoanoutletonacircuitdifferent fromthattowhichthereceiverisconnected.
+4.Consultthedealeroranexperienced radio/TVtechnician forhelp.
+Thisproductemitsradiofrequency energy,buttheradiated outputpowerofthisdeviceisfarbelowtheFCCradio
+frequency exposure limits.Thisequipment complies withFCCRFradiation exposure limitsforthforanuncontrolled
+environment. Nevertheless, thedeviceshouldbeusedinsuchamannerthatthepotential forhumancontactwiththe
+antenna duringnormaloperation isminimized.
+PRECAUTIONS
+ThePolarTeamProsolution showsperformance indicators. Thesolution isdesigned toindicatethelevelof
+physiological strainandrecovery duringandafteranexercise session. Itmeasures heartrate,speedanddistance. No
+otheruseisintended orimplied.
+Thesolution shouldnotbeusedforobtaining environmental measurements thatrequireprofessional orindustrial
+precision.
+INTERFERENCE DURING TRAINING
+Electromagnetic Interference andTraining Equipment
+Disturbance mayoccurnearelectrical devices. AlsoWLANbasestations maycauseinterference whentrainingwith
+thetrainingdevice.Toavoiderraticreadingormisbehavior, moveawayfrompossible sources ofdisturbance.
+Training equipment withelectronic orelectrical components suchasLEDdisplays, motorsandelectrical brakesmay
+causeinterfering straysignals.Tosolvetheseproblems, trythefollowing:
+1.Remove thesensorstrapfromyourchestandusethetrainingequipment asyouwouldnormally.
+2.Movethetrainingdevicearounduntilyoufindanareainwhichitdisplays nostrayreadingordoesnotflashthe
+heartsymbol.Interference isoftenworstdirectlyinfrontofthedisplaypaneloftheequipment, whiletheleftor
+rightsideofthedisplayisrelatively freeofdisturbance.
+3.Putthesensorstrapbackonyourchestandkeepthetrainingdeviceinthisinterference- freeareaasmuchas
+possible.
+Ifthetrainingdevicestilldoesnotworkwiththetrainingequipment, itmaybeelectrically toonoisyforwireless heart
+ratemeasurement. Forfurtherinformation, seewww.polar.com/support .
+MINIMIZING RISKSWHENTRAINING
+Training mayincludesomerisk.Beforebeginning aregulartrainingprogram, itisrecommended thatyouanswerthe
+following questions concerning yourhealthstatus.Ifyouansweryestoanyofthesequestions, werecommend that
+youconsultadoctorbeforestartinganytrainingprogram.
+lHaveyoubeenphysically inactiveforthepast5years?
+lDoyouhavehighbloodpressure orhighbloodcholesterol?
+
+--- Page 45 ---
+
+45lAreyoutakinganybloodpressure orheartmedication?
+lDoyouhaveahistoryofbreathing problems?
+lDoyouhavesymptoms ofanydisease?
+lAreyourecovering fromaseriousillnessormedicaltreatment?
+lDoyouuseapacemaker orotherimplanted electronic device?
+lDoyousmoke?
+lAreyoupregnant?
+Notethatinaddition totrainingintensity, medications forheartconditions, bloodpressure, psychological conditions,
+asthma, breathing, etc.,aswellassomeenergydrinks,alcohol,andnicotine mayalsoaffectheartrate.
+Itisimportant tobesensitive toyourbody’sresponses duringtraining.Ifyoufeelunexpected painorexcessive
+fatiguewhentraining, itisrecommended thatyoustopthetrainingorcontinue atalighterintensity.
+Note!Ifyouareusingapacemaker, defibrillator orotherimplanted electronic device,youcanusePolarproducts. In
+theoryinterference topacemaker causedbyPolarproducts shouldnotbepossible. Inpractice noreportsexistto
+suggest anyoneeverhavingexperienced interference. Wecannothowever issueanofficialguarantee onourproducts’
+suitability withallpacemakers orotherimplanted devices, suchasdefibrillators, duetothevarietyofdevices
+available. Ifyouhaveanydoubts,orifyouexperience anyunusualsensations whileusingPolarproducts, please
+consultyourphysician orcontacttheimplanted electronic devicemanufacturer todetermine safetyinyourcase.
+Ifyouareallergictoanysubstance thatcomesintocontactwithyourskinorifyoususpect anallergicreaction dueto
+usingtheproduct, checkthelistedmaterials inTechnical Specifications. Toavoidanyskinreaction totheheartrate
+sensor,wearitoverashirt,butmoisten theshirtwellundertheelectrodes toensureflawless operation.
+Thecombined impactofmoisture andintenseabrasion maycauseablackcolortocomeofftheheartratesensor’s
+surface, possibly staining light-coloredclothes.Ifyouuseperfume orinsectrepellent onyourskin,youmustensure
+thatitdoesnotcomeintocontactwiththetrainingdeviceortheheartratesensor.
+LIMITEDPOLARINTERNATIONAL GUARANTEE
+lThisguarantee doesnotaffecttheconsumer’s statutory rightsunderapplicable national orstatelawsinforce,
+ortheconsumer’s rightsagainstthedealerarisingfromtheirsales/purchase contract.
+lThislimitedPolarinternational guarantee isissuedbyPolarElectroInc.forconsumers whohavepurchased
+thisproductintheUSAorCanada. ThislimitedPolarinternational guarantee isissuedbyPolarElectroOyfor
+consumers whohavepurchased thisproductinothercountries.
+lPolarElectroOy/Polar ElectroInc.guarantees theoriginalconsumer/purchaser ofthisdevicethattheproduct
+willbefreefromdefectsinmaterial orworkmanship fortwo(2)yearsfromthedateofpurchase.
+lThereceiptoftheoriginalpurchase isyourproofofpurchase!
+lTheguarantee doesnotcoverthebattery,normalwearandtear,damage duetomisuse,abuse,accidents or
+non-compliance withtheprecautions; improper maintenance, commercial use,cracked, brokenorscratched
+cases/displays, armband, elasticstrapandPolarapparel.
+lTheguarantee doesnotcoveranydamage/s, losses,costsorexpenses, direct,indirectorincidental,
+consequential orspecial,arisingoutof,orrelatedtotheproduct.
+lItemspurchased secondhandarenotcovered bythetwo(2)yearwarranty, unlessotherwise stipulated by
+locallaw.
+lDuringtheguarantee period,theproductwillbeeitherrepaired orreplaced atanyoftheauthorized Polar
+ServiceCentersregardless ofthecountryofpurchase.
+Guarantee withrespecttoanyproductwillbelimitedtocountries wheretheproducthasbeeninitiallymarketed.
+Manufactured byPolarElectroOy,Professorintie 5,FI-90440KEMPELE, Tel+35885202100,Fax+35885202300,
+www.polar.com.
+PolarElectroOyisaISO9001:2008 certified company.
+
+--- Page 46 ---
+
+46©2021PolarElectroOy,FI-90440KEMPELE, Finland.Allrightsreserved. Nopartofthismanualmaybeusedor
+reproduced inanyformorbyanymeanswithoutpriorwrittenpermission ofPolarElectroOy.
+Thenamesandlogosinthisusermanualorinthepackage ofthisproductaretrademarks ofPolarElectroOy.The
+namesandlogosmarkedwitha®symbolinthisusermanualorinthepackage ofthisproductareregistered
+trademarks ofPolarElectroOy.Windows isaregistered trademark ofMicrosoft Corporation andMacOSisa
+registered trademark ofAppleInc.TheBluetooth® wordmarkandlogosareregistered trademarks ownedby
+Bluetooth SIG,Inc.andanyuseofsuchmarksbyPolarElectroOyisunderlicense.
+iPadisatrademark ofAppleInc.,registered intheU.S.andothercountries. Lightning isatrademark ofAppleInc.
+“MadeforiPad”meansthatanelectronic accessory hasbeendesigned toconnect specifically toiPad,respectively,
+andhasbeencertified bythedeveloper tomeetAppleperformance standards. Appleisnotresponsible forthe
+operation ofthisdeviceoritscompliance withsafetyandregulatory standards. Pleasenotethattheuseofthis
+accessory withiPadmayaffectwireless performance.
+Lightning connector andUSBType-A:
+TheLightning connector workswithiPadAir2,iPadmini3,iPadwithRetinadisplay,iPadAir,iPadmini2,iPad(4th
+generation), iPadmini.
+USBworkswithiPadAir2,iPadmini3,iPadwithRetinadisplay,iPadAir,iPadmini2,iPad(4thgeneration), iPadmini.
+iPadandRetinaaretrademarks ofAppleInc.,registered intheU.S.andothercountries. iPadAir,iPadmini,and
+Lightning aretrademarks ofAppleInc.
+POLARPRIVACY
+POLARTEAMPRO–TEAMINSTRUCTIONS
+Whenpurchasing thePolarTeamProproduct, theteamentersintoanagreement withPolar.Inthisagreement, Polar
+willbeactingasthedataprocessor responsible forstoringandmanaging theinformation uploaded intoPolarTeam
+Proservice.Theteamactsasthedatacontroller, anditisresponsible forthedatathatisuploaded intotheservice
+andhowthedataisprocessed. Theteamisresponsible formakingsurethattheplayers’information iscorrect,as
+wellashandling dataprocessing requests fromindividual players,suchasdeleting information fromtheservice.Polar
+willprocess theinformation according totheinstructions andtermsofuseagreedwiththedatacontroller.
+Whenthemainuseroftheteamregisters thePolarTeamProservice,aconfirmation message willbesenttothe
+emailaddress theyhaveprovided. Theemailaddress mustbeconfirmed within30days,otherwise thecreated
+account willbelocked,andsigningintothePolarTeamproservicewillnotsucceed. However, verification isstill
+possible after30days.
+Theplayers’personal information isstoredinthePolarTeamProservice.Theinformation shouldbehandled
+according tothedataprivacylawsofthecountryinwhichPolarTeamProisused.Theteamisresponsible for
+obtaining permission fromitsplayersifthelegislation ofthecountryinquestion sorequires. Inthecaseofaminor,
+writtenconsent fromtheplayer’slegalguardian mustbeobtained ifthelegislation ofthecountryinquestion so
+requires.
+According tolegislation inmostcountries, apersonhastherighttoaccesstheirpersonal information. Inpractice this
+canmeanforexample thataplayercanrequesttoseetheirinformation orrequesttheirinformation toberemoved. In
+suchcasestheplayershouldcontactthepersonresponsible fortheteam’sinformation.
+Polarprivacypolicymustbeavailable toplayersandguardians ofunderaged playerssotheycanunderstand howthe
+information ishandled inPolar’ssystem.
+POLARTEAMPRO–PLAYER INSTRUCTIONS
+Theplayers’information (e.g.,number, name,dateofbirth)isstoredinthePolarTeamProservice.Allinformation is
+savedontheserversoftheserviceprovider usedbyPolar.Training sessioninformation isstoredontheteam’siPad
+
+--- Page 47 ---
+
+47foramaximum oftwomonths, andfromthereitissenttothePolarTeamProwebservice.Individual players’
+personal Polaraccounts canbelinkedtothePolarTeamProservicesothatthecoachcanalsoseethem.Eachplayer
+grantstheteampermission toseetheirtraininginformation ontheirpersonal account. Theplayercanalsorevokethis
+permission. Eachplayer’spersonal Flowaccounts arelocatedinthePolarFlowservice,andtheinformation issaved
+ontheserversofPolar’sserviceprovider. TheserversarelocatedintheEUoroutsidetheEU.
+Eachplayerisplayerisentitledtoaccesstheirinformation asstatedinthedataprivacylawsofthecountryin
+question. Usuallythismeansforexample thattheplayerhastherighttoseewhatinformation concerning themis
+saved,andrequestthisinformation toberemoved ifnecessary. Whentheplayerwishestoaccesstheirinformation,
+theplayershouldcontactthepersonresponsible fortheteam’sinformation.
+Moreinformation onPolardataprotection athttps://www.polar.com/en/legal/privacy- notice
+DISCLAIMER
+lThematerial inthismanualisforinformational purposes only.Theproducts itdescribes aresubjecttochange
+withoutpriornotice,duetothemanufacturer’s continuous development program.
+lPolarElectroInc./Polar ElectroOymakesnorepresentations orwarranties withrespecttothismanualorwith
+respecttotheproducts described herein.
+lPolarElectroInc./Polar ElectroOyshallnotbeliableforanydamages, losses,costsorexpenses, direct,indirect
+orincidental, consequential orspecial,arisingoutof,orrelatedtotheuseofthismaterial ortheproducts
+described herein.
+1.6EN3/2023

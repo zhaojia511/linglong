@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -11,6 +12,7 @@ class SyncService extends ChangeNotifier {
   String _baseUrl = defaultBaseUrl;
   String? _authToken;
   bool _isSyncing = false;
+  Timer? _periodicSyncTimer;
 
   bool get isSyncing => _isSyncing;
   String get baseUrl => _baseUrl;
@@ -19,6 +21,32 @@ class SyncService extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     _baseUrl = prefs.getString('api_base_url') ?? defaultBaseUrl;
     _authToken = prefs.getString('auth_token');
+    
+    // Start periodic sync if authenticated
+    if (_authToken != null) {
+      _startPeriodicSync();
+    }
+  }
+
+  void _startPeriodicSync() {
+    _periodicSyncTimer?.cancel();
+    // Periodic profile sync only (profiles can be edited on web)
+    _periodicSyncTimer = Timer.periodic(const Duration(minutes: 5), (_) {
+      syncAllPersons();
+    });
+    debugPrint('Periodic profile sync started (every 5 minutes)');
+  }
+
+  void _stopPeriodicSync() {
+    _periodicSyncTimer?.cancel();
+    _periodicSyncTimer = null;
+    debugPrint('Periodic profile sync stopped');
+  }
+
+  @override
+  void dispose() {
+    _stopPeriodicSync();
+    super.dispose();
   }
 
   Future<void> setBaseUrl(String url) async {
@@ -43,6 +71,7 @@ class SyncService extends ChangeNotifier {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('auth_token', _authToken!);
         
+        _startPeriodicSync();
         notifyListeners();
         return true;
       }
@@ -54,6 +83,7 @@ class SyncService extends ChangeNotifier {
   }
 
   Future<void> logout() async {
+    _stopPeriodicSync();
     _authToken = null;
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('auth_token');
@@ -79,6 +109,31 @@ class SyncService extends ChangeNotifier {
     } catch (e) {
       debugPrint('Error syncing person: $e');
       return false;
+    }
+  }
+
+  Future<int> syncAllPersons() async {
+    if (_authToken == null) {
+      debugPrint('Cannot sync persons: not authenticated');
+      return 0;
+    }
+
+    try {
+      final persons = DatabaseService.instance.getAllPersons();
+      int syncedCount = 0;
+
+      for (var person in persons) {
+        final success = await syncPerson(person);
+        if (success) {
+          syncedCount++;
+        }
+      }
+
+      debugPrint('Synced $syncedCount/${persons.length} profiles to backend');
+      return syncedCount;
+    } catch (e) {
+      debugPrint('Error syncing all persons: $e');
+      return 0;
     }
   }
 
@@ -109,11 +164,8 @@ class SyncService extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Sync current person
-      final person = DatabaseService.instance.currentPerson;
-      if (person != null) {
-        await syncPerson(person);
-      }
+      // Sync all persons/profiles
+      await syncAllPersons();
 
       // Sync unsynced sessions
       final unsyncedSessions = DatabaseService.instance.getUnsyncedSessions();
@@ -126,27 +178,4 @@ class SyncService extends ChangeNotifier {
     }
   }
 
-  Future<List<TrainingSession>> fetchSessions({int? limit, int? offset}) async {
-    try {
-      final uri = Uri.parse('$_baseUrl/sessions').replace(
-        queryParameters: {
-          if (limit != null) 'limit': limit.toString(),
-          if (offset != null) 'offset': offset.toString(),
-        },
-      );
 
-      final response = await http.get(uri, headers: _getHeaders());
-
-      if (response.statusCode == 200) {
-        final List<dynamic> data = jsonDecode(response.body);
-        return data.map((json) => TrainingSession.fromJson(json)).toList();
-      }
-      return [];
-    } catch (e) {
-      debugPrint('Error fetching sessions: $e');
-      return [];
-    }
-  }
-
-  bool get isAuthenticated => _authToken != null;
-}

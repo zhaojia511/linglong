@@ -6,6 +6,8 @@ class HRDevice {
   bool isConnected;
   int? currentHeartRate;
   int? batteryLevel;
+  List<int>? rrIntervals; // RR intervals in milliseconds (for HRV analysis)
+  bool supportsHRV; // Flag to track if device supports HRV
 
   HRDevice({
     required this.id,
@@ -15,6 +17,8 @@ class HRDevice {
     this.isConnected = false,
     this.currentHeartRate,
     this.batteryLevel,
+    this.rrIntervals,
+    this.supportsHRV = false,
   });
 
   Map<String, dynamic> toJson() => {
@@ -25,6 +29,8 @@ class HRDevice {
     'isConnected': isConnected,
     'currentHeartRate': currentHeartRate,
     'batteryLevel': batteryLevel,
+    'rrIntervals': rrIntervals,
+    'supportsHRV': supportsHRV,
   };
 
   factory HRDevice.fromJson(Map<String, dynamic> json) => HRDevice(
@@ -35,5 +41,7 @@ class HRDevice {
     isConnected: json['isConnected'] ?? false,
     currentHeartRate: json['currentHeartRate'],
     batteryLevel: json['batteryLevel'],
+    rrIntervals: json['rrIntervals'] != null ? List<int>.from(json['rrIntervals']) : null,
+    supportsHRV: json['supportsHRV'] ?? false,
   );
 }

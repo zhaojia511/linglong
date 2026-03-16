@@ -1,7 +1,12 @@
 import { createClient } from '@supabase/supabase-js'
+// Use Node helper for tests, Vite helper otherwise
+const isTest = typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test';
+const { getEnvVar } = isTest
+  ? require('./envHelperNode.js')
+  : require('./envHelperVite.js');
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabaseUrl = getEnvVar('VITE_SUPABASE_URL')
+const supabaseAnonKey = getEnvVar('VITE_SUPABASE_ANON_KEY')
 
 if (!supabaseUrl || !supabaseAnonKey) {
   // Fail fast so local dev notices missing env

@@ -1,6 +1,6 @@
 # Linglong HR Monitor - Project Roadmap
 
-## Current Status: Active Development (v1.1.0 in progress)
+## Current Status: Initial Release (v1.0.0)
 
 ### Completed Features ✅
 
@@ -48,21 +48,93 @@
 - [x] API documentation
 - [x] BLE sensor compatibility list
 
-## Phase 2: Enhanced Features (v1.1.0) - Q2 2026 (in progress)
+## Phase 2: Enhanced HR Analytics & Sports Science (v1.1.0) - Q2 2024
 
-### Training Analytics
-- [x] Training zones calculation (Zone 1-5 based on HR) — in progress
-- [ ] Training load metrics (TRIMP)
-- [ ] Recovery time estimation
+### Training Zones (HR-Based)
+- [ ] Customizable heart rate zones configuration
+  - [ ] % of Max HR method
+  - [ ] % of HR Reserve (Karvonen method)
+  - [ ] Custom zone boundaries
+- [ ] Zone-based training classification (Zone 1-5)
+- [ ] Time in zone analysis per session
+- [ ] Zone distribution visualization
+- [ ] Zone recommendations based on training goals
+
+### Training Load Monitoring
+- [ ] **TRIMP (Training Impulse) calculation**
+  - [ ] Edwards TRIMP (zone-based)
+  - [ ] Banister TRIMP (exponential)
+  - [ ] Lucia TRIMP (3-zone method)
+- [ ] **Acute:Chronic Workload Ratio (ACWR)**
+  - [ ] 7-day acute load tracking
+  - [ ] 28-day chronic load tracking
+  - [ ] Injury risk indicators
+  - [ ] Optimal training zone visualization
+- [ ] **Cardio Load metrics**
+  - [ ] Session cardio load
+  - [ ] Weekly/monthly cardio load trends
+  - [ ] Load progression charts
+  - [ ] Training monotony calculation
+  - [ ] Training strain calculation
+
+### HRV (Heart Rate Variability) Analysis
+- [ ] **RR interval recording and storage**
+  - [ ] Raw RR interval data capture from sensors
+  - [ ] RR interval validation and filtering
+- [ ] **Time-domain HRV metrics**
+  - [ ] SDNN (Standard Deviation of NN intervals)
+  - [ ] RMSSD (Root Mean Square of Successive Differences)
+  - [ ] pNN50 (Percentage of successive intervals >50ms)
+- [ ] **Frequency-domain HRV metrics**
+  - [ ] LF (Low Frequency) power
+  - [ ] HF (High Frequency) power
+  - [ ] LF/HF ratio
+- [ ] **HRV-based recovery status**
+  - [ ] Daily HRV baseline tracking
+  - [ ] Recovery readiness score
+  - [ ] Training recommendations based on HRV
+
+### Recovery & Fatigue Management
+- [ ] Recovery time estimation (based on training load)
+- [ ] Fatigue accumulation tracking
+- [ ] Overtraining risk alerts
+- [ ] Recovery status dashboard
+- [ ] Optimal training readiness indicators
+
+### Advanced HR Analytics
+- [ ] **Heart rate recovery analysis**
+  - [ ] 1-minute recovery rate
+  - [ ] Recovery curve visualization
+- [ ] **Cardiovascular fitness trends**
+  - [ ] Resting heart rate trends
+  - [ ] Exercise HR trends at same intensity
+  - [ ] Fitness progression indicators
+- [ ] **Session quality metrics**
+  - [ ] HR consistency analysis
+  - [ ] Training efficiency score
+  - [ ] Session Rating of Perceived Exertion (sRPE) integration
+
+### Fitness Assessment
+- [ ] VO2max estimation (from HR data)
+- [ ] Lactate threshold estimation (HR-based)
+- [ ] Aerobic/Anaerobic threshold detection
+- [ ] Fitness level classification
+- [ ] Training effect calculation
+
+### Reports & Visualization
+- [ ] Weekly/monthly training load reports
+- [ ] ACWR trend charts
+- [ ] HRV baseline and trend graphs
+- [ ] Training zone distribution pie charts
+- [ ] Load vs Recovery comparison views
 - [ ] Fitness trends over time
-- [ ] Weekly/monthly statistics dashboard
 
 ### Data Export
-- [ ] Export sessions to GPX format
-- [ ] Export to TCX format
-- [ ] Export to FIT format
-- [ ] CSV export for raw data
-- [ ] PDF training reports
+- [ ] Export sessions to CSV with HR/HRV data
+- [ ] Export training load data (TRIMP, ACWR)
+- [ ] Export HRV metrics
+- [ ] PDF training reports with charts
+- [ ] Excel-compatible format for analysis
 
 ### Mobile App Enhancements
 - [ ] Workout templates
@@ -81,7 +153,7 @@
 - [ ] Export functionality
 - [ ] Print-friendly views
 
-## Phase 3: Team Features (v2.0.0) - Q3 2026
+## Phase 3: Team Features (v2.0.0) - Q3 2024
 
 ### Coach/Team Management
 - [ ] Coach account type
@@ -93,12 +165,13 @@
 - [ ] Communication system (messages/notes)
 
 ### Advanced Analytics
-- [ ] Heart Rate Variability (HRV) analysis
-- [ ] VO2 max estimation
-- [ ] Lactate threshold estimation
-- [ ] Training effect calculation
-- [ ] Performance predictions
-- [ ] Recovery recommendations
+- [ ] Heart Rate Variability (HRV) deep analysis
+- [ ] HRV trends and patterns over time
+- [ ] Stress and recovery balance indicators
+- [ ] Autonomic nervous system status
+- [ ] Training load periodization analysis
+- [ ] Performance predictions based on HR trends
+- [ ] Recovery recommendations based on HRV and load
 
 ### Social Features
 - [ ] Activity sharing
@@ -108,7 +181,7 @@
 - [ ] Achievement badges
 - [ ] Friend connections
 
-## Phase 4: Integration & Advanced Features (v2.5.0) - Q4 2026
+## Phase 4: Integration & Advanced Features (v2.5.0) - Q4 2024
 
 ### Third-Party Integrations
 - [ ] Strava integration
@@ -119,21 +192,22 @@
 - [ ] Polar Flow integration
 
 ### Advanced Sensor Support
-- [ ] Power meter support
-- [ ] Cadence sensor support
-- [ ] Speed sensor support
-- [ ] Multiple HR sensor zones configuration
-- [ ] ECG data recording (where available)
-- [ ] SpO2 monitoring
+- [ ] Multiple HR sensor brands compatibility testing
+- [ ] Advanced HR metrics from compatible sensors
+- [ ] RR interval data streaming
+- [ ] Sensor data quality indicators
+- [ ] Battery level monitoring for all sensors
 
-### AI & Machine Learning
-- [ ] Workout recommendations
-- [ ] Anomaly detection in HR patterns
-- [ ] Injury risk prediction
-- [ ] Optimal training time suggestions
-- [ ] Personalized training zones
+### AI & Machine Learning (HR-Focused)
+- [ ] Workout recommendations based on HR patterns
+- [ ] Anomaly detection in HR/HRV patterns
+- [ ] Injury risk prediction from training load
+- [ ] Optimal training intensity suggestions
+- [ ] Personalized HR zone optimization
+- [ ] Recovery time prediction
+- [ ] Overtraining detection algorithms
 
-## Phase 5: Enterprise & Professional (v3.0.0) - 2027
+## Phase 5: Enterprise & Professional (v3.0.0) - 2025
 
 ### Professional Features
 - [ ] White-label solution
@@ -152,12 +226,14 @@
 - [ ] CDN integration
 
 ### Research & Scientific Features
-- [ ] Data export for research
-- [ ] Anonymized data sets
+- [ ] Data export for research (anonymized)
+- [ ] HRV research metrics (additional time/frequency domain)
 - [ ] Research protocol support
-- [ ] Advanced statistical analysis
+- [ ] Advanced statistical analysis of HR/HRV data
 - [ ] Scientific paper export format
 - [ ] IRB compliance tools
+- [ ] Raw RR interval data export
+- [ ] Batch data processing for studies
 
 ## Technical Debt & Infrastructure
 
@@ -283,6 +359,34 @@ Have ideas for features or improvements? Please:
 
 ---
 
-**Last Updated**: 2026-03-16
-**Version**: 1.1.0-dev
-**Status**: Active Development
+**Last Updated**: 2026-01-02
+**Version**: 1.0.0
+**Status**: Initial Release
+**Focus**: Heart Rate & HRV-based training load monitoring
+
+## Sports Science References
+
+### Implemented/Planned Algorithms Based On:
+- **NSCA's Essentials of Strength Training and Conditioning** (CSCS)
+  - Training load principles
+  - Periodization concepts
+  - Recovery science
+  
+- **ACSM's Exercise Testing and Prescription**
+  - Heart rate zone calculations
+  - VO2max estimation methods
+  - Cardiovascular fitness assessment
+  
+- **Sports Science Literature**
+  - TRIMP methods (Edwards, Banister, Lucia)
+  - ACWR for injury prevention (Gabbett et al.)
+  - HRV metrics and interpretation (Task Force 1996)
+  - Training monotony and strain (Foster 1998)
+
+### Data Collected (HR-Focused)
+- ✅ Beat-to-beat heart rate (BPM)
+- 🔄 RR intervals (for HRV analysis)
+- ✅ Session duration
+- ✅ Training timestamps
+- ❌ Speed/GPS (out of scope)
+- ❌ Power meters (out of scope)

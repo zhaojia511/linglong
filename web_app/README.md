@@ -7,7 +7,7 @@
 cd web_app
 npm install
 npm run dev
-# Open http://localhost:5173
+# Open your deployed Cloudflare Pages URL
 ```
 
 ## Build for Production
@@ -15,7 +15,7 @@ npm run dev
 ```bash
 npm run build
 npm run preview
-# Open the preview URL (default http://localhost:5173)
+# Open the preview URL (your deployed Cloudflare Pages URL)
 ```
 
 ## Lint & Format
@@ -35,7 +35,7 @@ npm run test      # Run unit and a11y tests
 ## Storybook (UI Components)
 
 ```bash
-npm run storybook # Open Storybook at http://localhost:6006
+npm run storybook # Open Storybook at http://localhost:6006 (local only)
 ```
 
 ## CI/CD

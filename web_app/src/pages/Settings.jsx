@@ -30,7 +30,7 @@ function Settings() {
 
   return (
     <div className="settings-container">
-      <h1 className="settings-title">Settings</h1>
+      <h1 className="page-title">Settings</h1>
       
       <div className="settings-card">
         <h2 className="settings-section">Display</h2>

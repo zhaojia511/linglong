@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { protect } = require('../middleware/auth');
-const TrainingSession = require('../models/TrainingSession');
+const supabase = require('../lib/supabaseClient');
 
 // @route   POST /api/sessions
 // @desc    Create a new training session
@@ -10,36 +10,24 @@ router.post('/', protect, async (req, res) => {
   try {
     const sessionData = {
       ...req.body,
-      userId: req.user._id
+      user_id: req.user.id // supabase column uses snake_case
     };
 
-    // Check if session already exists (for sync)
-    let session = await TrainingSession.findOne({ 
-      id: req.body.id, 
-      userId: req.user._id 
-    });
+    // Upsert based on natural id + user
+    const { data, error } = await supabase
+      .from('training_sessions')
+      .upsert(sessionData, { onConflict: 'id' })
+      .select()
+      .single();
 
-    if (session) {
-      // Update existing session
-      session = await TrainingSession.findByIdAndUpdate(
-        session._id,
-        sessionData,
-        { new: true, runValidators: true }
-      );
-    } else {
-      // Create new session
-      session = await TrainingSession.create(sessionData);
+    if (error) {
+      return res.status(500).json({ error: { message: error.message } });
     }
 
-    res.status(201).json({
-      success: true,
-      data: session
-    });
+    res.status(201).json({ success: true, data });
   } catch (error) {
     console.error(error);
-    res.status(500).json({
-      error: { message: error.message || 'Server error' }
-    });
+    res.status(500).json({ error: { message: error.message || 'Server error' } });
   }
 });
 
@@ -50,37 +38,35 @@ router.get('/', protect, async (req, res) => {
   try {
     const { limit = 50, offset = 0, personId, startDate, endDate } = req.query;
 
-    const query = { userId: req.user._id };
+    const pageLimit = parseInt(limit);
+    const pageOffset = parseInt(offset);
 
-    if (personId) {
-      query.personId = personId;
+    let query = supabase
+      .from('training_sessions')
+      .select('*', { count: 'exact' })
+      .eq('user_id', req.user.id)
+      .order('start_time', { ascending: false })
+      .range(pageOffset, pageOffset + pageLimit - 1);
+
+    if (personId) query = query.eq('person_id', personId);
+    if (startDate) query = query.gte('start_time', startDate);
+    if (endDate) query = query.lte('start_time', endDate);
+
+    const { data, count, error } = await query;
+
+    if (error) {
+      return res.status(500).json({ error: { message: error.message } });
     }
-
-    if (startDate || endDate) {
-      query.startTime = {};
-      if (startDate) query.startTime.$gte = new Date(startDate);
-      if (endDate) query.startTime.$lte = new Date(endDate);
-    }
-
-    const sessions = await TrainingSession
-      .find(query)
-      .sort({ startTime: -1 })
-      .limit(parseInt(limit))
-      .skip(parseInt(offset));
-
-    const total = await TrainingSession.countDocuments(query);
 
     res.json({
       success: true,
-      count: sessions.length,
-      total,
-      data: sessions
+      count: data.length,
+      total: count,
+      data
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({
-      error: { message: 'Server error' }
-    });
+    res.status(500).json({ error: { message: 'Server error' } });
   }
 });
 
@@ -91,46 +77,46 @@ router.get('/stats/summary', protect, async (req, res) => {
   try {
     const { startDate, endDate, personId } = req.query;
 
-    const query = { userId: req.user._id };
-    if (personId) query.personId = personId;
-    if (startDate || endDate) {
-      query.startTime = {};
-      if (startDate) query.startTime.$gte = new Date(startDate);
-      if (endDate) query.startTime.$lte = new Date(endDate);
-    }
+    let query = supabase
+      .from('training_sessions')
+      .select('*')
+      .eq('user_id', req.user.id);
 
-    const sessions = await TrainingSession.find(query);
+    if (personId) query = query.eq('person_id', personId);
+    if (startDate) query = query.gte('start_time', startDate);
+    if (endDate) query = query.lte('start_time', endDate);
+
+    const { data: sessions, error } = await query;
+    if (error) {
+      return res.status(500).json({ error: { message: error.message } });
+    }
 
     const stats = {
       totalSessions: sessions.length,
-      totalDuration: sessions.reduce((sum, s) => sum + s.duration, 0),
+      totalDuration: sessions.reduce((sum, s) => sum + (s.duration || 0), 0),
       totalCalories: sessions.reduce((sum, s) => sum + (s.calories || 0), 0),
       avgHeartRate: 0,
       maxHeartRate: 0,
       trainingTypes: {}
     };
 
-    const validHRSessions = sessions.filter(s => s.avgHeartRate);
+    const validHRSessions = sessions.filter(s => s.avg_heart_rate);
     if (validHRSessions.length > 0) {
       stats.avgHeartRate = Math.round(
-        validHRSessions.reduce((sum, s) => sum + s.avgHeartRate, 0) / validHRSessions.length
+        validHRSessions.reduce((sum, s) => sum + s.avg_heart_rate, 0) / validHRSessions.length
       );
-      stats.maxHeartRate = Math.max(...sessions.map(s => s.maxHeartRate || 0));
+      stats.maxHeartRate = Math.max(...sessions.map(s => s.max_heart_rate || 0));
     }
 
     sessions.forEach(s => {
-      stats.trainingTypes[s.trainingType] = (stats.trainingTypes[s.trainingType] || 0) + 1;
+      const type = s.training_type;
+      stats.trainingTypes[type] = (stats.trainingTypes[type] || 0) + 1;
     });
 
-    res.json({
-      success: true,
-      data: stats
-    });
+    res.json({ success: true, data: stats });
   } catch (error) {
     console.error(error);
-    res.status(500).json({
-      error: { message: 'Server error' }
-    });
+    res.status(500).json({ error: { message: 'Server error' } });
   }
 });
 
@@ -139,26 +125,24 @@ router.get('/stats/summary', protect, async (req, res) => {
 // @access  Private
 router.get('/:id', protect, async (req, res) => {
   try {
-    const session = await TrainingSession.findOne({
-      id: req.params.id,
-      userId: req.user._id
-    });
+    const { data, error } = await supabase
+      .from('training_sessions')
+      .select('*')
+      .eq('id', req.params.id)
+      .eq('user_id', req.user.id)
+      .single();
 
-    if (!session) {
-      return res.status(404).json({
-        error: { message: 'Training session not found' }
-      });
+    if (error && error.code === 'PGRST116') {
+      return res.status(404).json({ error: { message: 'Training session not found' } });
+    }
+    if (error) {
+      return res.status(500).json({ error: { message: error.message } });
     }
 
-    res.json({
-      success: true,
-      data: session
-    });
+    res.json({ success: true, data });
   } catch (error) {
     console.error(error);
-    res.status(500).json({
-      error: { message: 'Server error' }
-    });
+    res.status(500).json({ error: { message: 'Server error' } });
   }
 });
 
@@ -167,28 +151,20 @@ router.get('/:id', protect, async (req, res) => {
 // @access  Private
 router.delete('/:id', protect, async (req, res) => {
   try {
-    const session = await TrainingSession.findOne({ 
-      id: req.params.id, 
-      userId: req.user._id 
-    });
+    const { error } = await supabase
+      .from('training_sessions')
+      .delete()
+      .eq('id', req.params.id)
+      .eq('user_id', req.user._id);
 
-    if (!session) {
-      return res.status(404).json({
-        error: { message: 'Training session not found' }
-      });
+    if (error) {
+      return res.status(500).json({ error: { message: error.message } });
     }
 
-    await TrainingSession.findByIdAndDelete(session._id);
-
-    res.json({
-      success: true,
-      message: 'Training session deleted'
-    });
+    res.json({ success: true, message: 'Training session deleted' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({
-      error: { message: 'Server error' }
-    });
+    res.status(500).json({ error: { message: 'Server error' } });
   }
 });
 

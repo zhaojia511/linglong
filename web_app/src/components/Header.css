@@ -3,22 +3,22 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 60px;
-  background: white;
-  border-bottom: 1px solid #eee;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  background: var(--surface, #f5ecd7);
+  border-bottom: 1px solid var(--border, #e5e1d8);
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 20px;
+  padding: 0 24px;
   z-index: 1000;
 }
 
 .header-spacer {
   flex: 1;
 }
-
-.header-right {
+  background: var(--primary, #bfa980);
+  color: var(--text, #3d3a34);
   display: flex;
   align-items: center;
   gap: 20px;
@@ -29,33 +29,45 @@
 }
 
 .user-avatar {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #4a5568;
   color: white;
-  border: 2px solid #667eea;
-  cursor: pointer;
-  font-weight: bold;
+  background: var(--success, #7bbfae);
+  border: 2px solid var(--surface, #f5ecd7);
+  font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
-  transition: all 0.3s;
+  font-size: 14px;
+  position: relative;
+}
+  box-shadow: 0 4px 12px rgba(191, 169, 128, 0.18);
+.user-avatar::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border: 2px solid white;
+  background: var(--surface, #f5ecd7);
+  bottom: 0;
+  right: 0;
 }
 
 .user-avatar:hover {
   transform: scale(1.05);
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
-.user-dropdown {
+  color: var(--text, #3d3a34);
   position: absolute;
   top: 100%;
   right: 0;
   margin-top: 8px;
   background: white;
-  border: 1px solid #eee;
+  color: var(--text, #3d3a34);
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   min-width: 200px;
@@ -67,7 +79,7 @@
 }
 
 .user-email {
-  margin: 0;
+  color: var(--text, #3d3a34);
   font-size: 14px;
   color: #333;
   font-weight: 500;
@@ -76,15 +88,15 @@
 
 .user-dropdown hr {
   margin: 8px 0;
-  border: none;
+  background: var(--gray-100, #f5ecd7);
   border-top: 1px solid #eee;
 }
 
-.dropdown-item {
+  color: var(--danger, #e28f8f);
   width: 100%;
   padding: 10px 16px;
   border: none;
-  background: none;
+  background: #fbeaea;
   text-align: left;
   cursor: pointer;
   color: #333;

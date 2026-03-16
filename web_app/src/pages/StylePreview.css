@@ -1,0 +1,273 @@
+.style-preview-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.style-section {
+  margin-bottom: 48px;
+  padding-bottom: 32px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.style-heading {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2d3748;
+  margin: 0 0 8px 0;
+}
+
+.style-description {
+  color: #666;
+  font-size: 14px;
+  margin: 0 0 16px 0;
+}
+
+.style-demo {
+  padding: 24px;
+  background: #fafafa;
+  border-radius: 8px;
+}
+
+.demo-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.demo-stat-label {
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.demo-stat-value {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.demo-card {
+  background: white;
+  padding: 20px;
+  margin-top: 16px;
+}
+
+.demo-card h3 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.demo-card p {
+  margin: 0 0 16px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.demo-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* Style 1: Minimal Clean (current style) */
+.style-1 .demo-stat-card {
+  background: white;
+  padding: 16px;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.style-1 .demo-stat-label {
+  color: #666;
+}
+
+.style-1 .demo-stat-value {
+  color: #2d3748;
+}
+
+.style-1 .demo-card {
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.style-1 .demo-btn {
+  background: #4a5568;
+  color: white;
+}
+
+.style-1 .demo-btn:hover {
+  background: #2d3748;
+}
+
+/* Style 2: Bordered */
+.style-2 .demo-stat-card {
+  background: white;
+  padding: 16px;
+  border-radius: 0;
+  border: 2px solid #d0d0d0;
+  box-shadow: none;
+  text-align: center;
+}
+
+.style-2 .demo-stat-label {
+  color: #666;
+}
+
+.style-2 .demo-stat-value {
+  color: #333;
+}
+
+.style-2 .demo-card {
+  border-radius: 0;
+  border: 2px solid #d0d0d0;
+  box-shadow: none;
+}
+
+.style-2 .demo-btn {
+  background: white;
+  color: #333;
+  border: 2px solid #333;
+  border-radius: 0;
+}
+
+.style-2 .demo-btn:hover {
+  background: #333;
+  color: white;
+}
+
+/* Style 3: Soft */
+.style-3 {
+  background: #f8f8f8;
+}
+
+.style-3 .demo-stat-card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  text-align: center;
+}
+
+.style-3 .demo-stat-label {
+  color: #888;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.style-3 .demo-stat-value {
+  color: #4a90e2;
+}
+
+.style-3 .demo-card {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.style-3 .demo-btn {
+  background: #4a90e2;
+  color: white;
+  border-radius: 8px;
+}
+
+.style-3 .demo-btn:hover {
+  background: #357abd;
+}
+
+/* Style 4: Material */
+.style-4 .demo-stat-card {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  transition: transform 0.2s;
+}
+
+.style-4 .demo-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.style-4 .demo-stat-label {
+  color: #757575;
+  font-weight: 500;
+}
+
+.style-4 .demo-stat-value {
+  color: #1976d2;
+}
+
+.style-4 .demo-card {
+  border-radius: 8px;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.style-4 .demo-btn {
+  background: #1976d2;
+  color: white;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(25, 118, 210, 0.3);
+}
+
+.style-4 .demo-btn:hover {
+  background: #1565c0;
+  box-shadow: 0 4px 8px rgba(25, 118, 210, 0.4);
+}
+
+/* Style 5: Compact Dark Accents */
+.style-5 .demo-stat-card {
+  background: #2d3748;
+  padding: 14px;
+  border-radius: 6px;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.style-5 .demo-stat-label {
+  color: #cbd5e0;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.style-5 .demo-stat-value {
+  color: #fff;
+  font-size: 26px;
+}
+
+.style-5 .demo-card {
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.style-5 .demo-card h3 {
+  background: #2d3748;
+  color: white;
+  padding: 12px 20px;
+  margin: -20px -20px 12px -20px;
+  border-radius: 6px 6px 0 0;
+}
+
+.style-5 .demo-btn {
+  background: #2d3748;
+  color: white;
+  border-radius: 4px;
+}
+
+.style-5 .demo-btn:hover {
+  background: #1a202c;
+}

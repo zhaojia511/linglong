@@ -10,8 +10,8 @@ import PersonsManagement from './pages/PersonsManagement'
 import RecordingManagement from './pages/RecordingManagement'
 import HistoryAnalysis from './pages/HistoryAnalysis'
 import Settings from './pages/Settings'
+import StylePreview from './pages/StylePreview'
 import { authService } from './services/api'
-import { supabase } from './services/supabaseClient'
 import { queryClient } from './lib/queryClient'
 import Header from './components/Header'
 import TabSidebar from './components/TabSidebar'
@@ -21,23 +21,26 @@ function App() {
   const [authChecked, setAuthChecked] = useState(false)
 
   useEffect(() => {
-    // Check current session
+    let mounted = true
     authService.isAuthenticated().then((authed) => {
-      setIsAuthenticated(authed)
-      setAuthChecked(true)
+      if (mounted) {
+        setIsAuthenticated(authed)
+        setAuthChecked(true)
+      }
     })
-
-    // Subscribe to future auth changes (token refresh, logout from another tab)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsAuthenticated(!!session)
-      setAuthChecked(true)
-    })
-
-    return () => subscription.unsubscribe()
+    return () => {
+      mounted = false
+    }
   }, [])
 
   const PrivateRoute = ({ children }) => {
-    if (!authChecked) return <div className="container">Loading...</div>
+    if (!authChecked) {
+      return (
+        <div className="container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+          <div>Loading...</div>
+        </div>
+      )
+    }
     return isAuthenticated ? children : <Navigate to="/login" />
   }
 
@@ -45,11 +48,16 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Router>
         <div className="app-layout">
-          <Header />
-          <TabSidebar />
-          <main className="main-content">
+          {isAuthenticated && <Header />}
+          {isAuthenticated && <TabSidebar />}
+          <main className={isAuthenticated ? "main-content" : "main-content-full"}>
             <Routes>
-              <Route path="/login" element={<Login onLogin={() => setIsAuthenticated(true)} />} />
+              <Route 
+                path="/login" 
+                element={
+                  authChecked && isAuthenticated ? <Navigate to="/" /> : <Login onLogin={() => setIsAuthenticated(true)} />
+                } 
+              />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route
                 path="/"
@@ -72,6 +80,7 @@ function App() {
               <Route path="/recordings" element={<PrivateRoute><RecordingManagement /></PrivateRoute>} />
               <Route path="/analysis" element={<PrivateRoute><HistoryAnalysis /></PrivateRoute>} />
               <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
+              <Route path="/style-preview" element={<PrivateRoute><StylePreview /></PrivateRoute>} />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
           </main>

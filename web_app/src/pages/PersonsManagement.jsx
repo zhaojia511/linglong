@@ -28,9 +28,9 @@ const PersonsManagement = () => {
   const loadPersons = async () => {
     try {
       setLoading(true)
-      // Request only persons with role 'athlete'
-      const response = await api.get('/persons', { params: { role: 'athlete' } })
-      setPersons(response.data.data || [])
+      // Fetch persons directly from Supabase
+      const data = await personService.getPersons()
+      setPersons(data.filter(p => p.role === 'athlete'))
     } catch (error) {
       console.error('Error loading persons:', error)
       setError('Failed to load persons')
@@ -136,9 +136,9 @@ const PersonsManagement = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Athlete Management</h1>
+        <h1 className="page-title">People Management</h1>
         <button
           onClick={() => setShowForm(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"

@@ -5,6 +5,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { getZoneForHR, ZONE_DEFINITIONS } from '../lib/trainingZones'
 
 const HistoryAnalysis = () => {
+
   const [stats, setStats] = useState(null)
   const [sessions, setSessions] = useState([])
   const [persons, setPersons] = useState([])
@@ -15,10 +16,33 @@ const HistoryAnalysis = () => {
     startDate: '',
     endDate: ''
   })
+  // Track if default date has been set
+  const [defaultDateSet, setDefaultDateSet] = useState(false)
 
   useEffect(() => {
     loadData()
   }, [filters])
+
+  // Set default date range to nearest week or month on first load
+  useEffect(() => {
+    if (!defaultDateSet && sessions.length > 0 && !filters.startDate && !filters.endDate) {
+      // Find the most recent session date
+      const mostRecent = sessions.reduce((latest, s) => {
+        const d = new Date(s.start_time)
+        return d > latest ? d : latest
+      }, new Date(sessions[0].start_time))
+
+      // Default: show the nearest week (last 7 days) or month (last 30 days)
+      // You can switch between week/month by changing daysBack
+      const daysBack = 7 // set to 30 for month
+      const start = new Date(mostRecent)
+      start.setDate(start.getDate() - (daysBack - 1))
+      const startDateStr = start.toISOString().slice(0, 10)
+      const endDateStr = mostRecent.toISOString().slice(0, 10)
+      setFilters(f => ({ ...f, startDate: startDateStr, endDate: endDateStr }))
+      setDefaultDateSet(true)
+    }
+  }, [sessions, filters.startDate, filters.endDate, defaultDateSet])
 
   const loadData = async () => {
     try {
@@ -135,15 +159,15 @@ const HistoryAnalysis = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">Training History Analysis</h1>
+        <h1 className="page-title">Analysis</h1>
 
         {/* Filters */}
         <div className="bg-white shadow-md rounded-lg p-6 mb-6">
           <h2 className="text-xl font-semibold mb-4">Filters</h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
+          <div className="flex flex-col md:flex-row md:items-end gap-4">
+            <div className="flex-1 min-w-[160px]">
               <label className="block text-sm font-medium text-gray-700 mb-1">Person</label>
               <select
                 value={filters.personId}
@@ -156,8 +180,7 @@ const HistoryAnalysis = () => {
                 ))}
               </select>
             </div>
-
-            <div>
+            <div className="flex-1 min-w-[160px]">
               <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
               <input
                 type="date"
@@ -166,8 +189,7 @@ const HistoryAnalysis = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-
-            <div>
+            <div className="flex-1 min-w-[160px]">
               <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
               <input
                 type="date"
@@ -176,11 +198,10 @@ const HistoryAnalysis = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-
             <div className="flex items-end">
               <button
                 onClick={clearFilters}
-                className="w-full bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+                className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 w-full md:w-auto"
               >
                 Clear Filters
               </button>

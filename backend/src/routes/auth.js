@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
-const User = require('../models/User');
-const { getSignedJwtToken } = require('../middleware/auth');
+const supabase = require('../lib/supabaseClient');
 
 // @route   POST /api/auth/register
-// @desc    Register a new user
+// @desc    Register a new user (Supabase Auth)
 // @access  Public
 router.post('/register', [
   body('email').isEmail().withMessage('Please provide a valid email'),
@@ -20,44 +19,34 @@ router.post('/register', [
   try {
     const { email, password, name } = req.body;
 
-    // Check if user exists
-    let user = await User.findOne({ email });
-    if (user) {
-      return res.status(400).json({
-        error: { message: 'User already exists' }
-      });
-    }
-
-    // Create user
-    user = await User.create({
+    // Create user via Supabase Admin API; auto-confirm email to simplify dev
+    const { data, error } = await supabase.auth.admin.createUser({
       email,
       password,
-      name
+      email_confirm: true,
+      user_metadata: { name }
     });
 
-    // Create token
-    const token = getSignedJwtToken(user._id);
+    if (error) {
+      return res.status(400).json({ error: { message: error.message } });
+    }
 
     res.status(201).json({
       success: true,
-      token,
       user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role
+        id: data.user.id,
+        email: data.user.email,
+        name: data.user.user_metadata?.name || name
       }
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({
-      error: { message: 'Server error' }
-    });
+    res.status(500).json({ error: { message: 'Server error' } });
   }
 });
 
 // @route   POST /api/auth/login
-// @desc    Login user
+// @desc    Login user (Supabase Auth)
 // @access  Public
 router.post('/login', [
   body('email').isEmail().withMessage('Please provide a valid email'),
@@ -71,40 +60,29 @@ router.post('/login', [
   try {
     const { email, password } = req.body;
 
-    // Check for user
-    const user = await User.findOne({ email }).select('+password');
-    if (!user) {
-      return res.status(401).json({
-        error: { message: 'Invalid credentials' }
-      });
-    }
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
 
-    // Check password
-    const isMatch = await user.matchPassword(password);
-    if (!isMatch) {
-      return res.status(401).json({
-        error: { message: 'Invalid credentials' }
-      });
+    if (error) {
+      return res.status(401).json({ error: { message: error.message } });
     }
-
-    // Create token
-    const token = getSignedJwtToken(user._id);
 
     res.json({
       success: true,
-      token,
+      token: data.session?.access_token,
+      refresh_token: data.session?.refresh_token,
       user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role
+        id: data.user.id,
+        email: data.user.email,
+        name: data.user.user_metadata?.name,
+        role: data.user.app_metadata?.role || 'user'
       }
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({
-      error: { message: 'Server error' }
-    });
+    res.status(500).json({ error: { message: 'Server error' } });
   }
 });
 

@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { sessionService, personService } from '../services/api'
-import TrainingZonesChart from '../components/TrainingZonesChart'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { sessionService } from '../services/api'
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { format } from 'date-fns'
 
 function SessionDetail() {
@@ -10,24 +9,15 @@ function SessionDetail() {
   const navigate = useNavigate()
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [person, setPerson] = useState(null)
 
   useEffect(() => {
     loadSession()
   }, [id])
 
-  useEffect(() => {
-    if (session?.personId) {
-      personService.getPerson(session.personId)
-        .then(res => setPerson(res?.data ?? res))
-        .catch(() => {})
-    }
-  }, [session?.personId])
-
   const loadSession = async () => {
     try {
       const data = await sessionService.getSession(id)
-      setSession(data.data)
+      setSession(data)
     } catch (error) {
       console.error('Error loading session:', error)
     } finally {
@@ -65,20 +55,26 @@ function SessionDetail() {
     return <div className="container">Session not found</div>
   }
 
+  // Debug: log the data structure
+  console.log('Session data:', session)
+  console.log('Heart rate data:', session.heartRateData)
+
   // Prepare chart data - sample every 10th point if there's too much data
-  const chartData = session.heartRateData
-    .filter((_, index) => session.heartRateData.length > 100 ? index % 10 === 0 : true)
-    .map((data, index) => ({
-      time: index,
-      heartRate: data.heartRate,
-      timestamp: format(new Date(data.timestamp), 'HH:mm:ss')
-    }))
+  const chartData = session.heartRateData && session.heartRateData.length > 0
+    ? session.heartRateData
+        .filter((_, index) => session.heartRateData.length > 100 ? index % 10 === 0 : true)
+        .map((data, index) => ({
+          time: index,
+          heartRate: data.heartRate,
+          timestamp: format(new Date(data.timestamp), 'HH:mm:ss')
+        }))
+    : []
 
   return (
     <div>
       <div className="header">
         <div className="container">
-          <h1>Session Details</h1>
+          <h1 className="page-title">Session Details</h1>
           <div className="nav">
             <Link to="/">Dashboard</Link>
             <Link to="/sessions">All Sessions</Link>
@@ -140,10 +136,16 @@ function SessionDetail() {
 
         {session.heartRateData && session.heartRateData.length > 0 && (
           <div className="card">
-            <h2>Heart Rate Chart</h2>
+            <h2>Heart Rate Training Impulse</h2>
             <div style={{ height: '400px', marginTop: '20px' }}>
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData}>
+                <AreaChart data={chartData}>
+                  <defs>
+                    <linearGradient id="colorHeartRate" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#ff0000" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#ff0000" stopOpacity={0.1}/>
+                    </linearGradient>
+                  </defs>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis 
                     dataKey="time" 
@@ -167,15 +169,15 @@ function SessionDetail() {
                     }}
                   />
                   <Legend />
-                  <Line 
+                  <Area 
                     type="monotone" 
                     dataKey="heartRate" 
                     stroke="#ff0000" 
                     strokeWidth={2}
-                    dot={false}
+                    fill="url(#colorHeartRate)"
                     name="Heart Rate"
                   />
-                </LineChart>
+                </AreaChart>
               </ResponsiveContainer>
             </div>
           </div>
@@ -187,15 +189,6 @@ function SessionDetail() {
             <p>{session.notes}</p>
           </div>
         )}
-
-        <div className="card" style={{ marginTop: '20px' }}>
-          <h2>Training Zones</h2>
-          <TrainingZonesChart
-            maxHR={person?.maxHeartRate}
-            hrData={session?.heartRateData}
-            avgHR={session?.avgHeartRate}
-          />
-        </div>
 
         <div className="card">
           <h2>Session Information</h2>
