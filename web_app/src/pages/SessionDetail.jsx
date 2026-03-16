@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { sessionService } from '../services/api'
+import { sessionService, personService } from '../services/api'
+import TrainingZonesChart from '../components/TrainingZonesChart'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { format } from 'date-fns'
 
@@ -9,10 +10,19 @@ function SessionDetail() {
   const navigate = useNavigate()
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [person, setPerson] = useState(null)
 
   useEffect(() => {
     loadSession()
   }, [id])
+
+  useEffect(() => {
+    if (session?.personId) {
+      personService.getPerson(session.personId)
+        .then(res => setPerson(res?.data ?? res))
+        .catch(() => {})
+    }
+  }, [session?.personId])
 
   const loadSession = async () => {
     try {
@@ -177,6 +187,15 @@ function SessionDetail() {
             <p>{session.notes}</p>
           </div>
         )}
+
+        <div className="card" style={{ marginTop: '20px' }}>
+          <h2>Training Zones</h2>
+          <TrainingZonesChart
+            maxHR={person?.maxHeartRate}
+            hrData={session?.heartRateData}
+            avgHR={session?.avgHeartRate}
+          />
+        </div>
 
         <div className="card">
           <h2>Session Information</h2>
