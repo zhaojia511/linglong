@@ -15,6 +15,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordCtrl = TextEditingController();
   bool _obscurePassword = true;
   bool _submitting = false;
+  bool _isSignUp = false;
   String? _errorMessage;
 
   @override
@@ -32,7 +33,9 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     final auth = context.read<AuthService>();
-    final err = await auth.signIn(_emailCtrl.text, _passwordCtrl.text);
+    final err = _isSignUp
+        ? await auth.signUp(_emailCtrl.text, _passwordCtrl.text)
+        : await auth.signIn(_emailCtrl.text, _passwordCtrl.text);
 
     if (mounted) {
       setState(() {
@@ -152,17 +155,21 @@ class _LoginScreenState extends State<LoginScreen> {
                                 color: Colors.white,
                               ),
                             )
-                          : const Text('Sign In',
-                              style: TextStyle(fontSize: 16)),
+                          : Text(_isSignUp ? 'Sign Up' : 'Sign In',
+                              style: const TextStyle(fontSize: 16)),
                     ),
 
-                    const SizedBox(height: 24),
-                    Text(
-                      'Contact your administrator to get an account.',
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                      ),
+                    const SizedBox(height: 16),
+                    TextButton(
+                      onPressed: _submitting
+                          ? null
+                          : () => setState(() {
+                                _isSignUp = !_isSignUp;
+                                _errorMessage = null;
+                              }),
+                      child: Text(_isSignUp
+                          ? 'Already have an account? Sign In'
+                          : 'Don\'t have an account? Sign Up'),
                     ),
                   ],
                 ),

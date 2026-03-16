@@ -55,6 +55,36 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  /// Sign up with email + password. Returns null on success, error message on failure.
+  Future<String?> signUp(String email, String password) async {
+    _loading = true;
+    _error = null;
+    notifyListeners();
+    try {
+      final res = await _client.auth.signUp(
+        email: email.trim(),
+        password: password,
+      );
+      if (res.user == null) {
+        _loading = false;
+        _error = 'Sign up failed';
+        notifyListeners();
+        return 'Sign up failed';
+      }
+      return null;
+    } on AuthException catch (e) {
+      _loading = false;
+      _error = e.message;
+      notifyListeners();
+      return e.message;
+    } catch (e) {
+      _loading = false;
+      _error = e.toString();
+      notifyListeners();
+      return e.toString();
+    }
+  }
+
   Future<void> signOut() async {
     await _client.auth.signOut();
   }
