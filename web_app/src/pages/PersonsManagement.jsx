@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { supabase } from '../services/supabaseClient'
-import api from '../services/api'
+import { v4 as uuidv4 } from 'uuid'
+import { personService } from '../services/api'
 
 const PersonsManagement = () => {
   const [persons, setPersons] = useState([])
@@ -29,8 +29,8 @@ const PersonsManagement = () => {
     try {
       setLoading(true)
       // Request only persons with role 'athlete'
-      const response = await api.get('/persons', { params: { role: 'athlete' } })
-      setPersons(response.data.data || [])
+      const response = await personService.getPersons({ role: 'athlete' })
+      setPersons(response.data || [])
     } catch (error) {
       console.error('Error loading persons:', error)
       setError('Failed to load persons')
@@ -62,9 +62,9 @@ const PersonsManagement = () => {
       }
 
       if (editingPerson) {
-        await api.post(`/persons`, { ...data, id: editingPerson.id })
+        await personService.upsertPerson({ ...data, id: editingPerson.id })
       } else {
-        await api.post('/persons', data)
+        await personService.upsertPerson({ ...data, id: uuidv4() })
       }
 
       await loadPersons()
@@ -98,7 +98,7 @@ const PersonsManagement = () => {
     if (!window.confirm('Are you sure you want to delete this person?')) return
 
     try {
-      // Note: Backend doesn't have delete endpoint, so we'll just remove from UI
+      await personService.deletePerson(personId)
       setPersons(persons.filter(p => p.id !== personId))
     } catch (error) {
       console.error('Error deleting person:', error)

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { supabase } from '../services/supabaseClient'
-import api from '../services/api'
 import { v4 as uuidv4 } from 'uuid'
+import { sessionService, personService } from '../services/api'
 
 const RecordingManagement = () => {
   const [sessions, setSessions] = useState([])
@@ -33,11 +32,11 @@ const RecordingManagement = () => {
     try {
       setLoading(true)
       const [sessionsResponse, personsResponse] = await Promise.all([
-        api.get('/sessions'),
-        api.get('/persons')
+        sessionService.getSessions(),
+        personService.getPersons()
       ])
-      setSessions(sessionsResponse.data.data || [])
-      setPersons(personsResponse.data.data || [])
+      setSessions(sessionsResponse.data || [])
+      setPersons(personsResponse.data || [])
     } catch (error) {
       console.error('Error loading data:', error)
       setError('Failed to load data')
@@ -62,9 +61,9 @@ const RecordingManagement = () => {
       }
 
       if (editingSession) {
-        await api.post(`/sessions`, { ...data, id: editingSession.id })
+        await sessionService.upsertSession({ ...data, id: editingSession.id })
       } else {
-        await api.post('/sessions', { ...data, id: uuidv4() })
+        await sessionService.upsertSession({ ...data, id: uuidv4() })
       }
 
       await loadData()
@@ -100,7 +99,7 @@ const RecordingManagement = () => {
     if (!window.confirm('Are you sure you want to delete this session?')) return
 
     try {
-      // Note: Backend doesn't have delete endpoint, so we'll just remove from UI
+      await sessionService.deleteSession(sessionId)
       setSessions(sessions.filter(s => s.id !== sessionId))
     } catch (error) {
       console.error('Error deleting session:', error)

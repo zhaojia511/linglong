@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { supabase } from '../services/supabaseClient'
-import api from '../services/api'
+import { sessionService, personService } from '../services/api'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts'
 import { getZoneForHR, ZONE_DEFINITIONS } from '../lib/trainingZones'
 
@@ -25,20 +24,20 @@ const HistoryAnalysis = () => {
       setLoading(true)
 
       // Load stats with filters
-      const statsParams = new URLSearchParams()
-      if (filters.personId) statsParams.append('personId', filters.personId)
-      if (filters.startDate) statsParams.append('startDate', filters.startDate)
-      if (filters.endDate) statsParams.append('endDate', filters.endDate)
+      const params = {}
+      if (filters.personId) params.personId = filters.personId
+      if (filters.startDate) params.startDate = filters.startDate
+      if (filters.endDate) params.endDate = filters.endDate
 
       const [statsResponse, sessionsResponse, personsResponse] = await Promise.all([
-        api.get(`/sessions/stats/summary?${statsParams}`),
-        api.get('/sessions?limit=100'),
-        api.get('/persons')
+        sessionService.getStats(params),
+        sessionService.getSessions({ limit: 100 }),
+        personService.getPersons()
       ])
 
-      setStats(statsResponse.data.data)
-      setSessions(sessionsResponse.data.data || [])
-      setPersons(personsResponse.data.data || [])
+      setStats(statsResponse.data)
+      setSessions(sessionsResponse.data || [])
+      setPersons(personsResponse.data || [])
     } catch (error) {
       console.error('Error loading analysis data:', error)
       setError('Failed to load analysis data')
