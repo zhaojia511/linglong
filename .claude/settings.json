@@ -3,7 +3,8 @@
     "allow": [
       "Bash(grep -r \"iOS\\\\|ios\\\\|not available\\\\|unavailable\\\\|App Store\" /d/github/linglong --include=*.md --include=*.dart --include=*.yaml)",
       "Bash(grep -r \"not available\\\\|unavailable\\\\|ios\\\\|iOS\\\\|app store\\\\|testflight\\\\|disabled\" /d/github/linglong --include=*.md --include=*.dart)",
-      "Bash(xargs grep:*)"
+      "Bash(xargs grep:*)",
+      "WebFetch(domain:github.com)"
     ]
   }
 }

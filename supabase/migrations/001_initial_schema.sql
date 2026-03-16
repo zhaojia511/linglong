@@ -106,41 +106,41 @@ CREATE POLICY "profiles_delete_own" ON public.profiles FOR DELETE USING (id = au
 
 -- RLS: persons
 DROP POLICY IF EXISTS "persons_select_own" ON public.persons;
-CREATE POLICY "persons_select_own" ON public.persons FOR SELECT USING (user_id = auth.uid());
+CREATE POLICY "persons_select_own" ON public.persons FOR SELECT USING (user_id::text = auth.uid()::text);
 DROP POLICY IF EXISTS "persons_insert_own" ON public.persons;
-CREATE POLICY "persons_insert_own" ON public.persons FOR INSERT WITH CHECK (user_id = auth.uid());
+CREATE POLICY "persons_insert_own" ON public.persons FOR INSERT WITH CHECK (user_id::text = auth.uid()::text);
 DROP POLICY IF EXISTS "persons_update_own" ON public.persons;
-CREATE POLICY "persons_update_own" ON public.persons FOR UPDATE USING (user_id = auth.uid());
+CREATE POLICY "persons_update_own" ON public.persons FOR UPDATE USING (user_id::text = auth.uid()::text);
 DROP POLICY IF EXISTS "persons_delete_own" ON public.persons;
-CREATE POLICY "persons_delete_own" ON public.persons FOR DELETE USING (user_id = auth.uid());
+CREATE POLICY "persons_delete_own" ON public.persons FOR DELETE USING (user_id::text = auth.uid()::text);
 
 -- RLS: training_sessions
 DROP POLICY IF EXISTS "training_sessions_select_own" ON public.training_sessions;
-CREATE POLICY "training_sessions_select_own" ON public.training_sessions FOR SELECT USING (user_id = auth.uid());
+CREATE POLICY "training_sessions_select_own" ON public.training_sessions FOR SELECT USING (user_id::text = auth.uid()::text);
 DROP POLICY IF EXISTS "training_sessions_insert_own" ON public.training_sessions;
 CREATE POLICY "training_sessions_insert_own" ON public.training_sessions
   FOR INSERT WITH CHECK (
-    user_id = auth.uid() AND
-    EXISTS (SELECT 1 FROM public.persons WHERE id = person_id AND user_id = auth.uid())
+    user_id::text = auth.uid()::text AND
+    EXISTS (SELECT 1 FROM public.persons WHERE id = person_id AND user_id::text = auth.uid()::text)
   );
 DROP POLICY IF EXISTS "training_sessions_update_own" ON public.training_sessions;
-CREATE POLICY "training_sessions_update_own" ON public.training_sessions FOR UPDATE USING (user_id = auth.uid());
+CREATE POLICY "training_sessions_update_own" ON public.training_sessions FOR UPDATE USING (user_id::text = auth.uid()::text);
 DROP POLICY IF EXISTS "training_sessions_delete_own" ON public.training_sessions;
-CREATE POLICY "training_sessions_delete_own" ON public.training_sessions FOR DELETE USING (user_id = auth.uid());
+CREATE POLICY "training_sessions_delete_own" ON public.training_sessions FOR DELETE USING (user_id::text = auth.uid()::text);
 
 -- RLS: force_plate_sessions
 DROP POLICY IF EXISTS "force_plate_sessions_select_own" ON public.force_plate_sessions;
-CREATE POLICY "force_plate_sessions_select_own" ON public.force_plate_sessions FOR SELECT USING (user_id = auth.uid());
+CREATE POLICY "force_plate_sessions_select_own" ON public.force_plate_sessions FOR SELECT USING (user_id::text = auth.uid()::text);
 DROP POLICY IF EXISTS "force_plate_sessions_insert_own" ON public.force_plate_sessions;
 CREATE POLICY "force_plate_sessions_insert_own" ON public.force_plate_sessions
   FOR INSERT WITH CHECK (
-    user_id = auth.uid() AND
-    EXISTS (SELECT 1 FROM public.persons WHERE id = person_id AND user_id = auth.uid())
+    user_id::text = auth.uid()::text AND
+    EXISTS (SELECT 1 FROM public.persons WHERE id = person_id AND user_id::text = auth.uid()::text)
   );
 DROP POLICY IF EXISTS "force_plate_sessions_update_own" ON public.force_plate_sessions;
-CREATE POLICY "force_plate_sessions_update_own" ON public.force_plate_sessions FOR UPDATE USING (user_id = auth.uid());
+CREATE POLICY "force_plate_sessions_update_own" ON public.force_plate_sessions FOR UPDATE USING (user_id::text = auth.uid()::text);
 DROP POLICY IF EXISTS "force_plate_sessions_delete_own" ON public.force_plate_sessions;
-CREATE POLICY "force_plate_sessions_delete_own" ON public.force_plate_sessions FOR DELETE USING (user_id = auth.uid());
+CREATE POLICY "force_plate_sessions_delete_own" ON public.force_plate_sessions FOR DELETE USING (user_id::text = auth.uid()::text);
 
 -- auto-create profile row when a user signs up
 CREATE OR REPLACE FUNCTION public.handle_new_user()
