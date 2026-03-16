@@ -1,201 +1,84 @@
-# Web App Status & Known Issues
+# Web App Status
 
-**Date:** January 2, 2026  
-**Status:** Deployed to Cloudflare Pages  
+**Date:** 2026-03-16
+**Status:** In active development — bug fixes applied, Phase 2 starting
 **URL:** https://linglong-test.pages.dev/
 
 ---
 
-## ✅ Completed Features
+## ✅ Fixed (2026-03-16)
+
+- Backend route ordering: `/stats/summary` now reachable
+- Dashboard: `stats` variable was undefined, now correctly reads from `statsQuery.data`
+- Auth middleware: now accepts Supabase JWTs, auto-creates MongoDB user on first request
+- Field name mismatch: frontend aligned to backend camelCase (`avgHeartRate`, `startTime`, etc.)
+- RecordingManagement: training type enum fixed (`gym`, `general` instead of `weightlifting`, `yoga`)
+- Sessions page: shows error state when API is unreachable
+- App.jsx: subscribes to Supabase auth state changes, no blank screen flash
+
+## ✅ Working Features
 
 ### Authentication
-- [x] User registration with Supabase Auth
-- [x] User login with email/password
-- [x] Session management with JWT tokens
-- [x] Logout functionality
-- [x] Password reset via email
-- [x] Password reset page with token validation
-- [x] Protected routes (PrivateRoute component)
+- User registration and login via Supabase Auth
+- Session persistence across page refreshes
+- Password reset via email
+- Protected routes
 
-### UI/UX
-- [x] Login page with register toggle
-- [x] Forgot password link
-- [x] Reset password page
-- [x] Dashboard page structure
-- [x] Error and success message styling
-- [x] Loading states
-- [x] Navigation header with logout
+### Web App Pages
+- Dashboard (stats + recent sessions)
+- Sessions list with date filtering
+- Session detail view
+- Persons/Athlete management (create, edit)
+- Recording management (create, edit sessions manually)
+- History analysis with charts (HR trend, training types, monthly progress)
 
-### Infrastructure
-- [x] Deployed to Cloudflare Pages
-- [x] Build pipeline configured (npm run build → dist/)
-- [x] Environment variables support (Supabase credentials)
-- [x] Vite + React setup
-- [x] Axios API client with token injection
+### Backend API
+- All CRUD endpoints for sessions and persons
+- Stats summary endpoint
+- JWT auth (Supabase token passthrough)
 
 ---
 
-## 🚨 Known Business Logic Issues
+## 🚨 Known Issues & Limitations
 
-### 1. Dashboard Data Fetching
-**Status:** Failing with API errors  
-**Issue:** After login, dashboard shows blank or error state  
-**Cause:** 
-- Missing `VITE_API_BASE_URL` environment variable
-- Backend API endpoint may be unreachable
-- API response structure may differ from expected
+### Backend Not Publicly Deployed
+Backend must be run locally (`cd backend && npm start`).
+`VITE_API_BASE_URL` defaults to `http://localhost:3000/api` in development.
+For Cloudflare Pages production: set `VITE_API_BASE_URL` env var to your deployed backend URL.
 
-**Required Configuration:**
-```env
-VITE_API_BASE_URL=https://your-backend-domain.com/api
-```
+### No Token Signature Verification
+Backend decodes (not verifies) Supabase tokens. This is acceptable for development
+but production should verify via Supabase's JWKS endpoint.
 
-### 2. API Response Data Structure
-**Status:** Potential mismatch  
-**Issue:** Dashboard expects `statsData.data` but may receive different structure  
-**Location:** `src/pages/Dashboard.jsx` line ~24
-
-**Needs Verification:**
-```javascript
-// Check backend response format:
-GET /api/sessions/stats/summary
-GET /api/sessions?limit=5
-```
-
-### 3. Missing Backend Integration
-**Status:** Backend not configured  
-**Issue:** App queries backend at `/api/sessions/*` but backend may not be deployed
-**Solution:** 
-- Deploy backend to public URL
-- Set `VITE_API_BASE_URL` environment variable
-- Test API endpoints manually
+### Delete Person Not Implemented in Backend
+PersonsManagement delete only removes from UI state. Backend has no DELETE /persons/:id endpoint.
 
 ---
 
-## 🔧 Deployment Configuration
+## 🔧 Local Development Setup
 
-### Cloudflare Pages Settings
-**Root Directory:** `web_app`  
-**Build Command:** `npm run build`  
-**Build Output Directory:** `dist`  
-**Node Version:** 18+
-
-### Environment Variables (Required)
-```
-VITE_SUPABASE_URL = https://krbobzpwgzxhnqssgwoy.supabase.co
-VITE_SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-VITE_API_BASE_URL = [YOUR_BACKEND_URL]/api  ← NEEDS TO BE SET
-```
-
-### Supabase Configuration
-**Required:** Add reset password redirect URL to URL Configuration:
-```
-https://linglong-test.pages.dev/reset-password
-```
-
----
-
-## 📊 Current Code Quality
-
-### Strengths
-- ✅ Error handling with user-facing messages
-- ✅ Comprehensive console logging for debugging
-- ✅ Dynamic API base URL detection
-- ✅ Auth token injection in API requests
-- ✅ Response error interceptor with full logging
-
-### Areas for Improvement
-- ❌ No data validation on API responses
-- ❌ No loading skeleton UI (just "Loading..." text)
-- ❌ No cache/offline support
-- ❌ No retry logic for failed requests
-- ❌ Limited error recovery options
-
----
-
-## 🔍 Debugging Instructions
-
-### Step 1: Check API Base URL
-Open browser console (F12) after login, look for:
-```
-API Base URL: https://...
-```
-
-### Step 2: Check Auth Token
-Look for in console:
-```
-API Error: {status: 401, message: "..."}  ← Auth issue
-API Error: {status: 404, message: "..."}  ← Endpoint not found
-API Error: {status: 500, message: "..."}  ← Backend error
-```
-
-### Step 3: Verify Backend
 ```bash
-curl -H "Authorization: Bearer YOUR_TOKEN" \
-  https://your-backend/api/sessions/stats/summary
+# Terminal 1 — Backend
+cd backend
+cp .env.example .env   # edit with your MongoDB URI and JWT_SECRET
+npm install
+npm start              # runs on http://localhost:3000
+
+# Terminal 2 — Web App
+cd web_app
+cp .env.example .env.local  # set VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY
+npm install
+npm run dev            # runs on http://localhost:5173
 ```
 
 ---
 
-## 📝 Next Development Steps
+## 📝 Next Steps (Phase 2)
 
-### Priority 1: Backend Integration
-- [ ] Deploy backend server to public URL
-- [ ] Configure `VITE_API_BASE_URL` in Cloudflare Pages
-- [ ] Test API endpoints manually
-- [ ] Verify response data structures match frontend expectations
+- [ ] Training zones calculation (Zone 1–5) on session detail page
+- [ ] CSV export for sessions
+- [ ] Backend DELETE /persons/:id endpoint
+- [ ] Production backend deployment
+- [ ] Supabase JWT signature verification in backend
 
-### Priority 2: Data Display
-- [ ] Fix dashboard stats display
-- [ ] Implement sessions list view
-- [ ] Add session detail page
-- [ ] Add filtering/search
-
-### Priority 3: UX Improvements
-- [ ] Add loading skeletons
-- [ ] Add retry buttons for failed requests
-- [ ] Add toast notifications
-- [ ] Add pagination for sessions list
-
-### Priority 4: Error Handling
-- [ ] Better error messages for common issues
-- [ ] Automatic retry for network errors
-- [ ] Session timeout/refresh logic
-- [ ] Offline mode support
-
----
-
-## 📚 Relevant Files
-
-**Frontend Code:**
-- `web_app/src/pages/Dashboard.jsx` - Dashboard component (has error handling)
-- `web_app/src/services/api.js` - API client with diagnostics
-- `web_app/src/pages/ResetPassword.jsx` - Password reset page
-- `web_app/src/pages/Login.jsx` - Login/register page
-
-**Configuration:**
-- `web_app/package.json` - Dependencies
-- `web_app/vite.config.js` - Build configuration
-
-**Backend (needs configuration):**
-- `backend/src/routes/sessions.js` - Session endpoints
-- `backend/src/routes/auth.js` - Auth endpoints
-- `backend/src/server.js` - Server setup
-
----
-
-## 🚀 Quick Deployment Checklist
-
-- [ ] Backend deployed to public URL
-- [ ] `VITE_API_BASE_URL` set in Cloudflare Pages environment
-- [ ] Supabase redirect URL configured
-- [ ] All env vars set to plaintext (not secrets)
-- [ ] Latest code deployed
-- [ ] Password reset email link works
-- [ ] Login and dashboard load without errors
-
----
-
-**Last Updated:** 2026-01-02 13:15 UTC  
-**Branch:** copilot/build-heartrate-sensor-app  
-**Deployed:** Cloudflare Pages (linglong-test.pages.dev)
+**Last Updated:** 2026-03-16
