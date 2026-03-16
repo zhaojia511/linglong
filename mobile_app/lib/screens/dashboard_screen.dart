@@ -5,7 +5,6 @@ import 'dart:async';
 import '../services/ble_service.dart';
 import '../services/database_service.dart';
 import '../models/training_session.dart';
-import '../models/hr_device.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -27,12 +26,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void _startRecording() async {
     final dbService = Provider.of<DatabaseService>(context, listen: false);
-    
+
     final session = await dbService.createSession(
       title: 'Training Session ${DateTime.now().toString().substring(0, 16)}',
       trainingType: 'general',
     );
-    
+
     setState(() {
       _activeSession = session;
       _heartRateHistory.clear();
@@ -42,16 +41,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _recordTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       final bleService = Provider.of<BLEService>(context, listen: false);
       final avgHR = bleService.getAverageHeartRate();
-      
+
       if (avgHR != null && _activeSession != null) {
         final hrData = HeartRateData(
           timestamp: DateTime.now(),
           heartRate: avgHR,
           deviceId: bleService.connectedDevices.first.id,
         );
-        
+
         _activeSession!.heartRateData.add(hrData);
-        
+
         setState(() {
           _heartRateHistory.add(
             FlSpot(
@@ -66,11 +65,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void _stopRecording() async {
     _recordTimer?.cancel();
-    
+
     if (_activeSession != null) {
       final dbService = Provider.of<DatabaseService>(context, listen: false);
       await dbService.endSession(_activeSession!.id);
-      
+
       setState(() {
         _activeSession = null;
         _heartRateHistory.clear();
@@ -154,13 +153,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           const Text('No devices connected')
                         else
                           ...connectedDevices.map((device) => ListTile(
-                            leading: const Icon(Icons.favorite, color: Colors.red),
-                            title: Text(device.name),
-                            subtitle: Text('HR: ${device.currentHeartRate ?? '--'} bpm'),
-                            trailing: device.batteryLevel != null
-                                ? Text('${device.batteryLevel}%')
-                                : null,
-                          )),
+                                leading: const Icon(Icons.favorite,
+                                    color: Colors.red),
+                                title: Text(device.name),
+                                subtitle: Text(
+                                    'HR: ${device.currentHeartRate ?? '--'} bpm'),
+                                trailing: device.batteryLevel != null
+                                    ? Text('${device.batteryLevel}%')
+                                    : null,
+                              )),
                       ],
                     ),
                   ),
@@ -193,7 +194,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 lineBarsData: [
                                   LineChartBarData(
                                     spots: _heartRateHistory.length > 60
-                                        ? _heartRateHistory.sublist(_heartRateHistory.length - 60)
+                                        ? _heartRateHistory.sublist(
+                                            _heartRateHistory.length - 60)
                                         : _heartRateHistory,
                                     isCurved: true,
                                     color: Colors.red,
@@ -212,16 +214,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                 // Recording Controls
                 ElevatedButton.icon(
-                  onPressed: _activeSession == null && connectedDevices.isNotEmpty
-                      ? _startRecording
-                      : _activeSession != null
-                          ? _stopRecording
-                          : null,
-                  icon: Icon(_activeSession == null ? Icons.play_arrow : Icons.stop),
-                  label: Text(_activeSession == null ? 'Start Training' : 'Stop Training'),
+                  onPressed:
+                      _activeSession == null && connectedDevices.isNotEmpty
+                          ? _startRecording
+                          : _activeSession != null
+                              ? _stopRecording
+                              : null,
+                  icon: Icon(
+                      _activeSession == null ? Icons.play_arrow : Icons.stop),
+                  label: Text(_activeSession == null
+                      ? 'Start Training'
+                      : 'Stop Training'),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.all(16),
-                    backgroundColor: _activeSession == null ? Colors.green : Colors.red,
+                    backgroundColor:
+                        _activeSession == null ? Colors.green : Colors.red,
                     foregroundColor: Colors.white,
                   ),
                 ),
@@ -290,7 +297,8 @@ class _DeviceDialogState extends State<DeviceDialog> {
                             ? const Icon(Icons.check, color: Colors.green)
                             : ElevatedButton(
                                 onPressed: () async {
-                                  final success = await bleService.connectDevice(device);
+                                  final success =
+                                      await bleService.connectDevice(device);
                                   if (success && mounted) {
                                     Navigator.pop(context);
                                   }

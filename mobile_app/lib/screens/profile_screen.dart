@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/database_service.dart';
 import '../services/sync_service.dart';
-import '../models/person.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -28,7 +27,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _loadProfile() {
-    final person = Provider.of<DatabaseService>(context, listen: false).currentPerson;
+    final person =
+        Provider.of<DatabaseService>(context, listen: false).currentPerson;
     if (person != null) {
       _nameController.text = person.name;
       _ageController.text = person.age.toString();
@@ -55,9 +55,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (_formKey.currentState!.validate()) {
       final dbService = Provider.of<DatabaseService>(context, listen: false);
       final syncService = Provider.of<SyncService>(context, listen: false);
-      
+
       final person = dbService.currentPerson;
-      
+
       if (person == null) {
         // Create new person
         final newPerson = await dbService.createPerson(
@@ -66,14 +66,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
           gender: _gender,
           weight: double.parse(_weightController.text),
           height: double.parse(_heightController.text),
-          maxHeartRate: _maxHRController.text.isNotEmpty 
-              ? int.parse(_maxHRController.text) 
+          maxHeartRate: _maxHRController.text.isNotEmpty
+              ? int.parse(_maxHRController.text)
               : null,
-          restingHeartRate: _restingHRController.text.isNotEmpty 
-              ? int.parse(_restingHRController.text) 
+          restingHeartRate: _restingHRController.text.isNotEmpty
+              ? int.parse(_restingHRController.text)
               : null,
         );
-        
+
         if (syncService.isAuthenticated) {
           await syncService.syncPerson(newPerson);
         }
@@ -84,15 +84,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
         person.gender = _gender;
         person.weight = double.parse(_weightController.text);
         person.height = double.parse(_heightController.text);
-        person.maxHeartRate = _maxHRController.text.isNotEmpty 
-            ? int.parse(_maxHRController.text) 
+        person.maxHeartRate = _maxHRController.text.isNotEmpty
+            ? int.parse(_maxHRController.text)
             : null;
-        person.restingHeartRate = _restingHRController.text.isNotEmpty 
-            ? int.parse(_restingHRController.text) 
+        person.restingHeartRate = _restingHRController.text.isNotEmpty
+            ? int.parse(_restingHRController.text)
             : null;
-        
+
         await dbService.updatePerson(person);
-        
+
         if (syncService.isAuthenticated) {
           await syncService.syncPerson(person);
         }
@@ -130,7 +130,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Icon(Icons.person, size: 50),
               ),
               const SizedBox(height: 24),
-              
               TextFormField(
                 controller: _nameController,
                 decoration: const InputDecoration(
@@ -146,7 +145,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              
               Row(
                 children: [
                   Expanded(
@@ -173,14 +171,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(width: 16),
                   Expanded(
                     child: DropdownButtonFormField<String>(
-                      value: _gender,
+                      initialValue: _gender,
                       decoration: const InputDecoration(
                         labelText: 'Gender',
                         border: OutlineInputBorder(),
                       ),
                       items: const [
                         DropdownMenuItem(value: 'male', child: Text('Male')),
-                        DropdownMenuItem(value: 'female', child: Text('Female')),
+                        DropdownMenuItem(
+                            value: 'female', child: Text('Female')),
                         DropdownMenuItem(value: 'other', child: Text('Other')),
                       ],
                       onChanged: (value) {
@@ -193,7 +192,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
               const SizedBox(height: 16),
-              
               Row(
                 children: [
                   Expanded(
@@ -242,7 +240,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
               const SizedBox(height: 16),
-              
               const Divider(),
               const Text(
                 'Optional Heart Rate Information',
@@ -252,7 +249,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              
               Row(
                 children: [
                   Expanded(
@@ -281,7 +277,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
               const SizedBox(height: 24),
-              
               ElevatedButton(
                 onPressed: _saveProfile,
                 style: ElevatedButton.styleFrom(
