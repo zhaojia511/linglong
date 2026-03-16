@@ -9,7 +9,10 @@
       "Read(//c/Users/zhaoj/.claude/**)",
       "Bash(grep -rn \"signUp\\\\|sign_up\\\\|register\\\\|createUser\" d:/github/linglong/web_app/src/ --include=*.js --include=*.jsx)",
       "Bash(grep -r \"emailConfirm\\\\|email.confirm\\\\|confirm.*email\\\\|onAuthStateChange\\\\|signUpEmailConfirm\" /d/github/linglong --include=*.js --include=*.jsx --include=*.ts --include=*.tsx --include=*.sql)",
-      "Bash(grep -r \"redirectUrl\\\\|redirect_url\\\\|REDIRECT\" /d/github/linglong --include=*.js --include=*.jsx --include=*.sql --include=*.json)"
+      "Bash(grep -r \"redirectUrl\\\\|redirect_url\\\\|REDIRECT\" /d/github/linglong --include=*.js --include=*.jsx --include=*.sql --include=*.json)",
+      "Read(//c/Users/zhaoj/AppData/Local/Temp/claude/d--github-linglong/eb75d65e-d738-4d57-886d-acc7d0224890/tasks/**)",
+      "Bash(grep -r \"redirectTo\\\\|redirect_to\\\\|AUTH_REDIRECT\\\\|email.*confirm\" /d/github/linglong/mobile_app/lib --include=*.dart)",
+      "Bash(grep -r \"confirmEmail\\\\|verify_email\\\\|emailVerified\" /d/github/linglong --include=*.dart --include=*.js --include=*.jsx --include=*.sql)"
     ]
   }
 }
