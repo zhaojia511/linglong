@@ -5,7 +5,13 @@
       "Bash(git -C /d/github/linglong log --pretty=fuller --all -20)",
       "mcp__plugin_playwright_playwright__browser_navigate",
       "mcp__plugin_playwright_playwright__browser_wait_for",
-      "mcp__plugin_playwright_playwright__browser_snapshot"
+      "mcp__plugin_playwright_playwright__browser_snapshot",
+      "WebSearch",
+      "WebFetch(domain:www.analog.com)",
+      "WebFetch(domain:www.ti.com)"
+    ],
+    "additionalDirectories": [
+      "d:\\github\\linglong\\docs\\superpowers"
     ]
   }
 }
