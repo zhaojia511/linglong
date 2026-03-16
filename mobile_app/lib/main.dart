@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'dart:async';
 import 'screens/home_screen.dart';
 import 'screens/dashboard_screen.dart';

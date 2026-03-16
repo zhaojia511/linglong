@@ -4,6 +4,7 @@ import '../models/person.dart';
 import '../services/database_service.dart';
 import '../services/supabase_repository.dart';
 import '../services/settings_service.dart';
+import '../services/sync_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
