@@ -13,7 +13,7 @@ class SessionVisualizationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(session.title),
+        title: null,
         actions: [
           Icon(
             session.synced ? Icons.cloud_done : Icons.cloud_upload,

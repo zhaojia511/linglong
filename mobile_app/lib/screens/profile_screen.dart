@@ -321,7 +321,7 @@ class _PersonDetailScreenState extends State<PersonDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.person == null ? 'Add Team Member' : 'Edit ${widget.person!.name}'),
+        title: null,
         actions: [
           if (widget.person != null)
             IconButton(
