@@ -6,9 +6,7 @@ class TrainingHistoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Training History'),
-      ),
+      appBar: AppBar(title: null),
       body: const Center(
         child: Text('Training History Screen'),
       ),

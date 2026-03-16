@@ -144,7 +144,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final currentUser = repo.currentUser;
     
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: null),
       body: Consumer<SettingsService>(
         builder: (context, settings, child) {
           final categories = settings.getCategories();
