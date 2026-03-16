@@ -24,7 +24,9 @@
       "Bash(curl -s http://localhost:3000/api/sessions)",
       "Bash(git ls-tree:*)",
       "Bash(curl -s http://localhost:5173/)",
-      "Bash(find /d/github/linglong -type f \\\\\\(-name .env* -o -name docker-compose* -o -name README* \\\\\\))"
+      "Bash(find /d/github/linglong -type f \\\\\\(-name .env* -o -name docker-compose* -o -name README* \\\\\\))",
+      "Bash(grep -rn \"import axios\\\\|from ''axios''\" d:/github/linglong/web_app/src --include=\"*.js\" --include=\"*.jsx\")",
+      "Bash(npm uninstall:*)"
     ],
     "additionalDirectories": [
       "d:\\github\\linglong\\docs\\superpowers"
