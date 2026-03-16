@@ -22,7 +22,8 @@
       "Bash(cd:*)",
       "Bash(find:*)",
       "Bash(curl -s http://localhost:3000/api/sessions)",
-      "Bash(git ls-tree:*)"
+      "Bash(git ls-tree:*)",
+      "Bash(curl -s http://localhost:5173/)"
     ],
     "additionalDirectories": [
       "d:\\github\\linglong\\docs\\superpowers"
