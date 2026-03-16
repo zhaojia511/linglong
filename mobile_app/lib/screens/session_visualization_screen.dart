@@ -3,14 +3,51 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:provider/provider.dart';
 import '../services/database_service.dart';
 import '../models/training_session.dart';
+import '../utils/hr_data_processing.dart';
+import '../utils/hrv_analysis.dart';
 
-class SessionVisualizationScreen extends StatelessWidget {
+class SessionVisualizationScreen extends StatefulWidget {
   final TrainingSession session;
 
   const SessionVisualizationScreen({super.key, required this.session});
 
   @override
+  State<SessionVisualizationScreen> createState() => _SessionVisualizationScreenState();
+}
+
+class _SessionVisualizationScreenState extends State<SessionVisualizationScreen> {
+  bool _trimEnabled = false;
+  bool _noiseFilter = false;
+  int _warmupSec = 0;
+  int _cooldownSec = 0;
+
+  TrainingSession get session => widget.session;
+
+  List<HeartRateData> get _processedData {
+    var data = session.heartRateData;
+    if (_trimEnabled) {
+      data = HrDataProcessing.trim(data, warmupSeconds: _warmupSec, cooldownSeconds: _cooldownSec);
+    }
+    if (_noiseFilter) {
+      data = HrDataProcessing.filterNoise(data);
+    }
+    return data;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (session.heartRateData.isNotEmpty) {
+      _warmupSec = HrDataProcessing.detectWarmup(session.heartRateData);
+      _cooldownSec = HrDataProcessing.detectCooldown(session.heartRateData);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final processed = _processedData;
+    final processedStats = HrDataProcessing.calcStats(processed);
+
     return Scaffold(
       appBar: AppBar(
         title: null,
@@ -60,10 +97,71 @@ class SessionVisualizationScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
 
-            // Heart Rate Chart
+            // Data Processing Controls
             if (session.heartRateData.isNotEmpty) ...[
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Data Processing',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SwitchListTile(
+                        title: const Text('Trim warmup/cooldown'),
+                        subtitle: _trimEnabled
+                            ? Text('Warmup: ${_warmupSec}s | Cooldown: ${_cooldownSec}s')
+                            : null,
+                        value: _trimEnabled,
+                        onChanged: (v) => setState(() => _trimEnabled = v),
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                      if (_trimEnabled) ...[
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildSlider('Warmup', _warmupSec, 0, 300, (v) {
+                                setState(() => _warmupSec = v.round());
+                              }),
+                            ),
+                            Expanded(
+                              child: _buildSlider('Cooldown', _cooldownSec, 0, 300, (v) {
+                                setState(() => _cooldownSec = v.round());
+                              }),
+                            ),
+                          ],
+                        ),
+                      ],
+                      SwitchListTile(
+                        title: const Text('Noise filter'),
+                        subtitle: const Text('Remove HR spikes'),
+                        value: _noiseFilter,
+                        onChanged: (v) => setState(() => _noiseFilter = v),
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                      if (_trimEnabled || _noiseFilter)
+                        Text(
+                          'After processing: Avg ${processedStats.avgHR} bpm | '
+                          'Max ${processedStats.maxHR} bpm | Min ${processedStats.minHR} bpm',
+                          style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // HRV Analysis Card
+              _buildHrvCard(),
+
+              // Heart Rate Chart
               Text(
                 'Heart Rate Over Time',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -110,6 +208,85 @@ class SessionVisualizationScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildSlider(String label, int value, double min, double max, ValueChanged<double> onChanged) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('$label: ${value}s', style: const TextStyle(fontSize: 12)),
+        Slider(
+          value: value.toDouble(),
+          min: min,
+          max: max,
+          divisions: (max - min).round(),
+          onChanged: onChanged,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHrvCard() {
+    // Extract RR intervals from consecutive HR data timestamps
+    // Real RR intervals come from BLE; this approximates from HR values
+    if (session.heartRateData.length < 10) return const SizedBox.shrink();
+
+    final rrIntervals = session.heartRateData
+        .where((d) => d.heartRate > 30 && d.heartRate < 220)
+        .map((d) => (60000 / d.heartRate).round()) // Convert BPM to ms interval
+        .toList();
+
+    if (rrIntervals.length < 10) return const SizedBox.shrink();
+
+    final hrv = HrvAnalysis.analyze(rrIntervals);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'HRV Analysis',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  _buildHrvMetric('RMSSD', '${hrv.rmssd.toStringAsFixed(1)} ms'),
+                  _buildHrvMetric('SDNN', '${hrv.sdnn.toStringAsFixed(1)} ms'),
+                  _buildHrvMetric('pNN50', '${hrv.pnn50.toStringAsFixed(1)}%'),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  _buildHrvMetric('Mean RR', '${hrv.meanRR.toStringAsFixed(0)} ms'),
+                  _buildHrvMetric('Stress', hrv.stressLevel),
+                  _buildHrvMetric('Valid', '${hrv.validIntervals}/${hrv.totalIntervals}'),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHrvMetric(String label, String value) {
+    return Expanded(
+      child: Column(
+        children: [
+          Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 4),
+          Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+        ],
+      ),
+    );
+  }
+
   Widget _buildInfoRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -140,7 +317,7 @@ class SessionVisualizationScreen extends StatelessWidget {
   }
 
   Widget _buildHeartRateChart() {
-    final data = session.heartRateData;
+    final data = List<HeartRateData>.from(_processedData);
     if (data.isEmpty) return const SizedBox.shrink();
 
     // Sort data by timestamp

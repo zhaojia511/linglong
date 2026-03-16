@@ -38,7 +38,19 @@ class _LoginScreenState extends State<LoginScreen> {
         : await auth.signIn(_emailCtrl.text, _passwordCtrl.text);
 
     if (mounted) {
-      if (err == 'CHECK_EMAIL') {
+      if (_isSignUp && err == null) {
+        // Auto-confirm: sign-up succeeded and session is active
+        setState(() => _submitting = false);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Account created successfully!'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+      } else if (err == 'CHECK_EMAIL') {
         setState(() {
           _submitting = false;
           _errorMessage = null;
