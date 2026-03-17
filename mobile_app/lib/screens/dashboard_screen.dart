@@ -33,7 +33,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   bool _isSyncing = false;
   bool _bleEnabled = true;
   Timer? _bleCheckTimer;
-  bool _hasAttemptedReconnect = false;
+
   final Map<String, List<HeartRateDataPoint>> _heartRateHistoryByDevice = {};
 
   @override
@@ -45,11 +45,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
-        // Only attempt reconnect once per app session, not on every tab switch
-        if (!_hasAttemptedReconnect) {
-          _hasAttemptedReconnect = true;
-          await bleService.autoReconnectToSavedDevices();
-        }
+        await bleService.autoReconnectToSavedDevices();
 
         await _checkBluetoothStatus();
         final updatedBleService = Provider.of<BLEService>(context, listen: false);

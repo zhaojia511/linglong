@@ -38,7 +38,8 @@
       "Read(//tmp/**)",
       "Bash(grep -r \"pages.dev\\\\|cloudflare\" d:/github/linglong --include=*.json --include=*.toml --include=*.yml --include=*.yaml --include=*.md -l)",
       "Bash(grep -r \"pages.dev\\\\|cloudflare\\\\|linglong\" d:/github/linglong --include=*.md -h)",
-      "WebFetch(domain:linglong-test.pages.dev)"
+      "WebFetch(domain:linglong-test.pages.dev)",
+      "Bash(cat d:/github/linglong/.github/workflows/*.yml)"
     ],
     "additionalDirectories": [
       "d:\\github\\linglong\\docs\\superpowers",
