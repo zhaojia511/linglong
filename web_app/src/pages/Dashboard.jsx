@@ -61,7 +61,6 @@ function Dashboard() {
           <div className="nav">
             <Link to="/" className="active">Dashboard</Link>
             <Link to="/persons">Persons</Link>
-            <Link to="/recordings">Recordings</Link>
             <Link to="/analysis">Analysis</Link>
             <Link to="/sessions">All Sessions</Link>
             <button onClick={handleLogout} className="btn btn-primary">Logout</button>
@@ -75,7 +74,6 @@ function Dashboard() {
           <h2>Quick Actions</h2>
           <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', marginTop: '15px' }}>
             <Link to="/persons" className="btn btn-primary">Manage Persons</Link>
-            <Link to="/recordings" className="btn btn-primary">Add Recording</Link>
             <Link to="/analysis" className="btn btn-primary">View Analysis</Link>
             <Link to="/sessions" className="btn btn-primary">All Sessions</Link>
           </div>
