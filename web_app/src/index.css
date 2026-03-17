@@ -37,7 +37,7 @@ body {
 }
 
 .btn-primary {
-  background-color: #007bff;
+  background-color: #e0192f;
   color: white;
 }
 
@@ -85,7 +85,7 @@ body {
 }
 
 .nav a.active {
-  background: #007bff;
+  background: #e0192f;
   color: white;
 }
 
@@ -147,7 +147,7 @@ body {
 .stat-value {
   font-size: 32px;
   font-weight: bold;
-  color: #007bff;
+  color: #e0192f;
   margin: 10px 0;
 }
 
@@ -221,7 +221,7 @@ body {
 .link-btn {
   background: none;
   border: none;
-  color: #007bff;
+  color: #e0192f;
   cursor: pointer;
   text-decoration: underline;
   padding: 0.5rem 0;

@@ -28,7 +28,7 @@
 .sidebar-logo h2 {
   margin: 0;
   font-size: 24px;
-  color: #667eea;
+  color: #e0192f;
   font-weight: 700;
 }
 
@@ -63,14 +63,14 @@
 }
 
 .tab-link:hover {
-  background: #f0f1ff;
-  color: #667eea;
+  background: #fff0f1;
+  color: #e0192f;
 }
 
 .tab-link.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #e0192f 0%, #b3001b 100%);
   color: white;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 12px rgba(224, 25, 47, 0.25);
 }
 
 .tab-icon {
