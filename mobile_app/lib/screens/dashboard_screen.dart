@@ -519,7 +519,12 @@ class _DashboardScreenState extends State<DashboardScreen>
             final bpmFontSize = (h * 0.38).clamp(24.0, 80.0);
             final labelFontSize = (h * 0.07).clamp(7.0, 14.0);
 
-            final avatarRadius = (h * 0.18).clamp(14.0, 32.0);
+            final avatarRadius = (h * 0.22).clamp(16.0, 36.0);
+            // Text color: dark for bright zones (yellow), white for dark zones
+            final isDarkText = zoneColor == const Color(0xFFFDD835);
+            final textColor = isDarkText ? Colors.black87 : Colors.white;
+            final subTextColor = isDarkText ? Colors.black54 : Colors.white70;
+
             return Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(6),
@@ -529,26 +534,11 @@ class _DashboardScreenState extends State<DashboardScreen>
                 children: [
                   // Card content
                   Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: w * 0.05, vertical: h * 0.05),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    padding: EdgeInsets.fromLTRB(w * 0.06, h * 0.07, w * 0.06, h * 0.32),
+                    child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // Athlete name (top)
-                        Text(
-                          athlete?.name ?? '',
-                          style: TextStyle(
-                            fontSize: nameFontSize,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                        ),
-
-                        // Avatar photo or heart icon (centre-top)
+                        // LEFT: athlete photo
                         CircleAvatar(
                           radius: avatarRadius,
                           backgroundColor: Colors.white24,
@@ -557,65 +547,99 @@ class _DashboardScreenState extends State<DashboardScreen>
                               : null,
                           child: athlete?.photoPath == null
                               ? Icon(Icons.favorite,
-                                  color: Colors.white70, size: avatarRadius)
+                                  color: subTextColor, size: avatarRadius * 0.9)
                               : null,
                         ),
-
-                        // BPM value
-                        FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                            device.currentHeartRate?.toString() ?? '--',
-                            style: TextStyle(
-                              fontSize: bpmFontSize,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              height: 1.0,
-                            ),
-                          ),
-                        ),
-
-                        // Zone name + battery
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              _getTrainingZoneName(device.currentHeartRate),
-                              style: TextStyle(
-                                fontSize: labelFontSize,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            if (device.batteryLevel != null)
+                        SizedBox(width: w * 0.06),
+                        // RIGHT: name + BPM
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
                               Text(
-                                '🔋${device.batteryLevel}%',
+                                athlete?.name ?? '—',
                                 style: TextStyle(
-                                    fontSize: labelFontSize,
-                                    color: Colors.white70),
+                                  fontSize: nameFontSize,
+                                  color: textColor,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                          ],
+                              FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  device.currentHeartRate?.toString() ?? '--',
+                                  style: TextStyle(
+                                    fontSize: bpmFontSize,
+                                    fontWeight: FontWeight.bold,
+                                    color: textColor,
+                                    height: 1.0,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                'bpm',
+                                style: TextStyle(
+                                  fontSize: labelFontSize,
+                                  color: subTextColor,
+                                  height: 1.0,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
                   ),
 
-                  // Assign button — bottom-right corner
+                  // Bottom strip: zone name + battery + assign button
                   Positioned(
-                    bottom: 4, right: 4,
-                    child: GestureDetector(
-                      onTap: () => _showSensorAssignmentDialog(context, device, athlete),
-                      child: Container(
-                        padding: const EdgeInsets.all(3),
-                        decoration: BoxDecoration(
-                          color: Colors.white24,
-                          borderRadius: BorderRadius.circular(4),
+                    left: 0, right: 0, bottom: 0,
+                    child: Container(
+                      height: h * 0.28,
+                      decoration: BoxDecoration(
+                        color: Colors.black26,
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(6),
+                          bottomRight: Radius.circular(6),
                         ),
-                        child: Icon(
-                          athlete == null ? Icons.person_add : Icons.swap_horiz,
-                          color: Colors.white70,
-                          size: (h * 0.1).clamp(10.0, 18.0),
-                        ),
+                      ),
+                      padding: EdgeInsets.symmetric(horizontal: w * 0.06),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            _getTrainingZoneName(device.currentHeartRate),
+                            style: TextStyle(
+                              fontSize: labelFontSize,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              if (device.batteryLevel != null)
+                                Text(
+                                  '🔋${device.batteryLevel}%',
+                                  style: TextStyle(
+                                      fontSize: labelFontSize,
+                                      color: Colors.white70),
+                                ),
+                              SizedBox(width: w * 0.02),
+                              GestureDetector(
+                                onTap: () => _showSensorAssignmentDialog(context, device, athlete),
+                                child: Icon(
+                                  athlete == null ? Icons.person_add : Icons.swap_horiz,
+                                  color: Colors.white70,
+                                  size: (h * 0.12).clamp(10.0, 18.0),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -635,13 +659,14 @@ class _DashboardScreenState extends State<DashboardScreen>
   /// Zone 3 (Tempo): 150-170 bpm - Yellow/Orange
   /// Zone 4 (Threshold): 170-190 bpm - Orange
   /// Zone 5 (Anaerobic): >= 190 bpm - Red
+  // Standard 5-zone colors (Polar/Garmin convention)
   Color _getHeartRateColorByTrainingZone(int? heartRate) {
-    if (heartRate == null) return Colors.grey[600]!;
-    if (heartRate < 120) return const Color(0xFF1E88E5); // Light blue - Recovery
-    if (heartRate < 150) return const Color(0xFF43A047); // Green - Aerobic
-    if (heartRate < 170) return const Color(0xFFFFB300); // Amber - Tempo
-    if (heartRate < 190) return const Color(0xFFF4511E); // Deep Orange - Threshold
-    return const Color(0xFFE53935); // Red - Anaerobic
+    if (heartRate == null) return const Color(0xFF757575); // grey — no data
+    if (heartRate < 120) return const Color(0xFF4FC3F7); // Z1 light blue — Recovery
+    if (heartRate < 150) return const Color(0xFF66BB6A); // Z2 green — Aerobic
+    if (heartRate < 170) return const Color(0xFFFDD835); // Z3 yellow — Tempo
+    if (heartRate < 190) return const Color(0xFFFF7043); // Z4 orange — Threshold
+    return const Color(0xFFE53935);                       // Z5 red — Anaerobic
   }
 
   String _getTrainingZoneName(int? heartRate) {
