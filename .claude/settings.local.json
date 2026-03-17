@@ -35,7 +35,9 @@
       "Bash(npm run:*)",
       "Bash(grep -r \"Push\\\\|notification\\\\|Strava\\\\|Garmin\\\\|GPX\\\\|TCX\\\\|FIT\\\\|offline\\\\|recovery\\\\|training load\\\\|VO2\\\\|EPOC\" d:/github/linglong/web_app/src --include=*.js --include=*.jsx)",
       "Bash(grep -r \"export\\\\|download\\\\|csv\\\\|json\\\\|file\" d:/github/linglong/web_app/src --include=*.jsx --include=*.js)",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Bash(grep -r \"pages.dev\\\\|cloudflare\" d:/github/linglong --include=*.json --include=*.toml --include=*.yml --include=*.yaml --include=*.md -l)",
+      "Bash(grep -r \"pages.dev\\\\|cloudflare\\\\|linglong\" d:/github/linglong --include=*.md -h)"
     ],
     "additionalDirectories": [
       "d:\\github\\linglong\\docs\\superpowers",
