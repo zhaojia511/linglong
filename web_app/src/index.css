@@ -89,43 +89,37 @@ body {
   color: white;
 }
 
-/* New layout with top header and left tabs */
+/* ── App layout ───────────────────────────────────────────── */
 .app-layout {
   display: flex;
-  flex-direction: column;
   min-height: 100vh;
 }
 
 .main-content {
-  display: flex;
   flex: 1;
-  margin-top: 60px;
-  margin-left: 280px;
-  padding: 24px 20px;
-  overflow: auto;
+  margin-left: 220px;
+  padding: 28px 32px;
+  min-width: 0;
+  max-width: 1200px;
 }
 
 /* Hide old sidebar and header */
-.sidebar {
-  display: none !important;
-}
+.sidebar  { display: none !important; }
+.header   { display: none !important; }
 
-.header {
-  display: none !important;
-}
-
-/* Responsive: adjust main-content for smaller screens */
+/* ── Responsive ───────────────────────────────────────────── */
 @media (max-width: 1024px) {
   .main-content {
-    margin-left: 240px;
+    padding: 24px 20px;
   }
 }
 
 @media (max-width: 768px) {
   .main-content {
     margin-left: 0;
-    margin-top: 120px;
-    padding: 16px;
+    margin-top: 0;
+    padding: 16px 14px;
+    padding-bottom: 72px; /* space for bottom nav */
   }
 }
 
