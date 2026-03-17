@@ -26,29 +26,35 @@ class DashboardScreen extends StatefulWidget {
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class _DashboardScreenState extends State<DashboardScreen>
+    with WidgetsBindingObserver {
   TrainingSession? _activeSession;
   Timer? _recordTimer;
   bool _isSyncing = false;
   bool _bleEnabled = true;
-  late Timer _bleCheckTimer;
+  Timer? _bleCheckTimer;
+  bool _hasAttemptedReconnect = false;
   final Map<String, List<HeartRateDataPoint>> _heartRateHistoryByDevice = {};
 
   @override
   void initState() {
     super.initState();
-    // Attempt to restore previously connected devices instead of resetting
+    WidgetsBinding.instance.addObserver(this);
+
     final bleService = Provider.of<BLEService>(context, listen: false);
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
-        // Restore previously connected devices
-        await bleService.autoReconnectToSavedDevices();
-        
+        // Only attempt reconnect once per app session, not on every tab switch
+        if (!_hasAttemptedReconnect) {
+          _hasAttemptedReconnect = true;
+          await bleService.autoReconnectToSavedDevices();
+        }
+
         await _checkBluetoothStatus();
         final updatedBleService = Provider.of<BLEService>(context, listen: false);
-        await updatedBleService.checkPermissions(); // Check permissions on startup
-        
+        await updatedBleService.checkPermissions();
+
         // Only start scanning if permissions are granted and no devices already connected
         if (updatedBleService.permissionsGranted) {
           if (updatedBleService.connectedDevices.isEmpty) {
@@ -70,13 +76,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
         debugPrint('Error in dashboard init: $e');
       }
     });
-    
-    // Check Bluetooth status every 2 seconds
-    _bleCheckTimer = Timer.periodic(const Duration(seconds: 2), (_) {
-      if (mounted) {
-        _checkBluetoothStatus();
-      }
+
+    _startBleCheckTimer();
+  }
+
+  void _startBleCheckTimer() {
+    _bleCheckTimer?.cancel();
+    // Check BLE status every 30s — it rarely changes, no need to poll aggressively
+    _bleCheckTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (mounted) _checkBluetoothStatus();
     });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
+      // App went to background — stop polling and scanning to save battery
+      _bleCheckTimer?.cancel();
+      _bleCheckTimer = null;
+      final bleService = Provider.of<BLEService>(context, listen: false);
+      if (bleService.isScanning) bleService.stopScan();
+    } else if (state == AppLifecycleState.resumed) {
+      // App came back to foreground — resume polling and check BLE status
+      _startBleCheckTimer();
+      _checkBluetoothStatus();
+    }
   }
 
   Future<void> _checkBluetoothStatus() async {
@@ -100,8 +125,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _recordTimer?.cancel();
-    _bleCheckTimer.cancel();
+    _bleCheckTimer?.cancel();
     super.dispose();
   }
 
