@@ -518,7 +518,6 @@ class _DashboardScreenState extends State<DashboardScreen>
             final nameFontSize = (h * 0.09).clamp(8.0, 16.0);
             final bpmFontSize = (h * 0.38).clamp(24.0, 80.0);
             final labelFontSize = (h * 0.07).clamp(7.0, 14.0);
-            final iconSize = (h * 0.14).clamp(12.0, 30.0);
 
             final avatarRadius = (h * 0.18).clamp(14.0, 32.0);
             return Container(
@@ -629,17 +628,6 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  Color _getColorForMember(int memberNumber) {
-    final colors = [
-      Colors.blue,
-      Colors.purple,
-      Colors.orange,
-      Colors.teal,
-      Colors.pink,
-      Colors.indigo
-    ];
-    return colors[(memberNumber - 1) % colors.length];
-  }
 
   /// Gets color based on training zones (more detailed than basic HR color)
   /// Zone 1 (Recovery): < 120 bpm - Light blue
