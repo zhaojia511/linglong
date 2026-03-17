@@ -289,7 +289,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     return Scaffold(
       appBar: AppBar(
         title: null,
-        toolbarHeight: 28,
+        toolbarHeight: 36,
         leading: Consumer<BLEService>(
           builder: (context, bleService, _) {
             final count = bleService.connectedDevices.where((d) => d.isConnected).length;
@@ -421,12 +421,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                     final rows = isLandscape ? 4 : 5;
                     final totalSlots = cols * rows;
 
-                    // Card size = 75% of available space, keeping square
-                    final availW = constraints.maxWidth - outerPad * 2 - (cols - 1) * gap;
-                    final availH = constraints.maxHeight - outerPad * 2 - (rows - 1) * gap;
-                    final cellSize = ((availW / cols).clamp(0.0, availH / rows)) * 0.75;
-                    final aspectRatio = cellSize / (availH / rows);
-
                     return GridView.builder(
                       padding: const EdgeInsets.all(outerPad),
                       physics: const NeverScrollableScrollPhysics(),
@@ -434,7 +428,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                         crossAxisCount: cols,
                         crossAxisSpacing: gap,
                         mainAxisSpacing: gap,
-                        childAspectRatio: aspectRatio,
+                        childAspectRatio: 1.0, // square cards
                       ),
                       itemCount: totalSlots,
                       itemBuilder: (context, index) {
