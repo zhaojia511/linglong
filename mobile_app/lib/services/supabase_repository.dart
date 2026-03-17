@@ -38,6 +38,9 @@ class SupabaseRepository {
     int? maxHeartRate,
     int? restingHeartRate,
     String? id,
+    String? role,
+    String? category,
+    String? group,
   }) async {
     final userId = _client.auth.currentUser?.id;
     if (userId == null) throw Exception('Not authenticated');
@@ -51,6 +54,9 @@ class SupabaseRepository {
       'height': height,
       'max_heart_rate': maxHeartRate,
       'resting_heart_rate': restingHeartRate,
+      'role': role,
+      'category': category,
+      'group': group,
     }..removeWhere((_, v) => v == null);
     await _client.from('persons').upsert(payload);
   }
@@ -173,6 +179,35 @@ class SupabaseRepository {
     }
   }
 
+  // User Settings (categories + groups)
+
+  /// Fetch user settings (categories, groups) from Supabase.
+  /// Table: user_settings (user_id text PK, categories jsonb, groups jsonb, updated_at timestamptz)
+  Future<Map<String, dynamic>?> fetchUserSettings() async {
+    final userId = _client.auth.currentUser?.id;
+    if (userId == null) return null;
+    final res = await _client
+        .from('user_settings')
+        .select()
+        .eq('user_id', userId)
+        .maybeSingle();
+    return res;
+  }
+
+  Future<void> upsertUserSettings({
+    required List<String> categories,
+    required List<String> groups,
+  }) async {
+    final userId = _client.auth.currentUser?.id;
+    if (userId == null) throw Exception('Not authenticated');
+    await _client.from('user_settings').upsert({
+      'user_id': userId,
+      'categories': categories,
+      'groups': groups,
+      'updated_at': DateTime.now().toIso8601String(),
+    }, onConflict: 'user_id');
+  }
+
   /// Fetch unsynced sessions from local database
   Future<List<Map<String, dynamic>>> getUnsyncedSessions() async {
     try {
@@ -186,6 +221,41 @@ class SupabaseRepository {
       debugPrint('Error fetching unsynced sessions: $e');
       return [];
     }
+  }
+
+  // App version
+  // Table: app_versions (platform text PK, version text, build_number int,
+  //   release_notes text, min_supported_version text, updated_at timestamptz)
+  // RLS: public SELECT allowed (no auth required)
+  Future<Map<String, dynamic>?> fetchLatestVersion(String platform) async {
+    try {
+      final res = await _client
+          .from('app_versions')
+          .select()
+          .eq('platform', platform)
+          .maybeSingle();
+      return res;
+    } catch (e) {
+      debugPrint('[UpdateCheck] fetchLatestVersion error: $e');
+      return null;
+    }
+  }
+
+  Future<void> upsertAppVersion({
+    required String platform,
+    required String version,
+    required int buildNumber,
+    required String releaseNotes,
+    required String minSupportedVersion,
+  }) async {
+    await _client.from('app_versions').upsert({
+      'platform': platform,
+      'version': version,
+      'build_number': buildNumber,
+      'release_notes': releaseNotes,
+      'min_supported_version': minSupportedVersion,
+      'updated_at': DateTime.now().toIso8601String(),
+    }, onConflict: 'platform');
   }
 
   double _estimateCalories(int avgHr, int durationSec, double weightKg, int age, String gender) {

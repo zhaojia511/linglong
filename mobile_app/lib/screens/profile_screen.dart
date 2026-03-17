@@ -232,6 +232,9 @@ class _PersonDetailScreenState extends State<PersonDetailScreen> {
             maxHeartRate: newPerson.maxHeartRate,
             restingHeartRate: newPerson.restingHeartRate,
             id: newPerson.id,
+            role: newPerson.role,
+            category: newPerson.category,
+            group: newPerson.group,
           );
         } else {
           // Update existing person
@@ -261,6 +264,9 @@ class _PersonDetailScreenState extends State<PersonDetailScreen> {
             maxHeartRate: widget.person!.maxHeartRate,
             restingHeartRate: widget.person!.restingHeartRate,
             id: widget.person!.id,
+            role: widget.person!.role,
+            category: widget.person!.category,
+            group: widget.person!.group,
           );
         }
 
@@ -369,7 +375,7 @@ class _PersonDetailScreenState extends State<PersonDetailScreen> {
                 builder: (context, settings, child) {
                   final categories = settings.getCategories();
                   return DropdownButtonFormField<String>(
-                    value: _categoryController.text.isEmpty ? null : _categoryController.text,
+                    initialValue: _categoryController.text.isEmpty ? null : _categoryController.text,
                     decoration: const InputDecoration(
                       labelText: 'Category',
                       border: OutlineInputBorder(),
@@ -398,7 +404,7 @@ class _PersonDetailScreenState extends State<PersonDetailScreen> {
                 builder: (context, settings, child) {
                   final groups = settings.getGroups();
                   return DropdownButtonFormField<String>(
-                    value: _groupController.text.isEmpty ? null : _groupController.text,
+                    initialValue: _groupController.text.isEmpty ? null : _groupController.text,
                     decoration: const InputDecoration(
                       labelText: 'Group',
                       border: OutlineInputBorder(),

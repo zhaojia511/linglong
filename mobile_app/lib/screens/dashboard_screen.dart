@@ -268,9 +268,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
       appBar: AppBar(
         title: null,
         toolbarHeight: 48,
-        leading: IconButton(
-          icon: const Icon(Icons.bluetooth, size: 20),
-          onPressed: () => _showDeviceDialog(context),
+        leading: Consumer<BLEService>(
+          builder: (context, bleService, _) {
+            final count = bleService.connectedDevices.where((d) => d.isConnected).length;
+            return InkWell(
+              onTap: () => _showDeviceDialog(context),
+              borderRadius: BorderRadius.circular(8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.bluetooth, size: 20),
+                    if (count > 0) ...[
+                      const SizedBox(width: 3),
+                      Text(
+                        '$count',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            );
+          },
         ),
         actions: [
           IconButton(
@@ -354,113 +379,53 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ],
               ),
             ),
-          // Main content
+          // Main content — full-screen grid
           Expanded(
             child: Consumer<BLEService>(
               builder: (context, bleService, child) {
-                final connectedDevices = bleService.connectedDevices;
+                final connected = bleService.connectedDevices
+                    .where((d) => d.isConnected)
+                    .toList();
 
-                return SingleChildScrollView(
-                  padding: const EdgeInsets.all(8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                // Team Overview Card - Compact
-                Card(
-                  color: Colors.blue.shade50,
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Connected',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              '${connectedDevices.where((d) => d.isConnected).length}',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.blue[700],
-                              ),
-                            ),
-                          ],
-                        ),
-                        Icon(
-                          Icons.devices_other,
-                          color: Colors.blue[300],
-                          size: 32,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
+                // Portrait: 4 cols × 5 rows | Landscape: 5 cols × 4 rows = 20 slots
+                // Cards are always square (childAspectRatio = 1.0)
+                const gap = 4.0;
+                const outerPad = 4.0;
 
-                // Grid of Device Cards
-                if (connectedDevices.where((d) => d.isConnected).isEmpty)
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(32),
-                      child: Column(
-                        children: [
-                          Icon(
-                            Icons.bluetooth_disabled,
-                            size: 64,
-                            color: Colors.grey[400],
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'No devices connected',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Tap the Bluetooth icon to scan for devices',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[500],
-                            ),
-                          ),
-                        ],
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isLandscape = constraints.maxWidth > constraints.maxHeight;
+                    final cols = isLandscape ? 5 : 4;
+                    final rows = isLandscape ? 4 : 5;
+                    final totalSlots = cols * rows;
+
+                    // Card size = whichever axis is the limiting one, keeping square
+                    final availW = constraints.maxWidth - outerPad * 2 - (cols - 1) * gap;
+                    final availH = constraints.maxHeight - outerPad * 2 - (rows - 1) * gap;
+                    final cellSize = (availW / cols).clamp(0.0, availH / rows);
+                    final aspectRatio = cellSize / (availH / rows);
+
+                    return GridView.builder(
+                      padding: const EdgeInsets.all(outerPad),
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: cols,
+                        crossAxisSpacing: gap,
+                        mainAxisSpacing: gap,
+                        childAspectRatio: aspectRatio,
                       ),
-                    ),
-                  )
-                else
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 8,
-                      childAspectRatio:
-                          0.95, // Original sizing for smaller cards
-                    ),
-                    itemCount: connectedDevices.where((d) => d.isConnected).length,
-                    itemBuilder: (context, index) {
-                      final connectedOnly = connectedDevices.where((d) => d.isConnected).toList();
-                      final device = connectedOnly[index];
-                      final athlete = DatabaseService.instance.getAthleteForSensor(device.id);
-                      return _buildSquareDeviceCard(device, index + 1, athlete);
-                    },
-                  ),
-
-                const SizedBox(height: 80), // Space for FAB
-                    ],
-                  ),
+                      itemCount: totalSlots,
+                      itemBuilder: (context, index) {
+                        if (index < connected.length) {
+                          final device = connected[index];
+                          final athlete = DatabaseService.instance
+                              .getAthleteForSensor(device.id);
+                          return _buildSquareDeviceCard(device, index + 1, athlete);
+                        }
+                        return _buildEmptySlot(index + 1);
+                      },
+                    );
+                  },
                 );
               },
             ),
@@ -500,110 +465,148 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildSquareDeviceCard(HRDevice device, int memberNumber, Person? athlete) {
+  Widget _buildEmptySlot(int slotNumber) {
     return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              _getColorForMember(memberNumber).withOpacity(0.12),
-              _getColorForMember(memberNumber).withOpacity(0.04),
-            ],
+      elevation: 0,
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+      color: Colors.grey.withValues(alpha: 0.08),
+      child: Center(
+        child: Text(
+          '$slotNumber',
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey.withValues(alpha: 0.3),
+            fontWeight: FontWeight.w500,
           ),
         ),
-        child: InkWell(
-          onTap: () => _showSensorAssignmentDialog(context, device, athlete),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // Top: Athlete name or Member ID
-                Text(
-                  athlete?.name ?? 'Tap to assign',
-                  style: TextStyle(
-                    fontSize: athlete != null ? 9 : 7,
-                    color: athlete != null ? Colors.blue[700] : Colors.grey[500],
-                    fontWeight: athlete != null ? FontWeight.w600 : FontWeight.w500,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 2),
+      ),
+    );
+  }
 
-                // Main: Large Heart Rate Display (fills most space)
-                Expanded(
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: _getHeartRateColorByTrainingZone(device.currentHeartRate)
-                          .withOpacity(0.95),
-                      borderRadius: BorderRadius.circular(6),
+  Widget _buildSquareDeviceCard(HRDevice device, int memberNumber, Person? athlete) {
+    final zoneColor = _getHeartRateColorByTrainingZone(device.currentHeartRate);
+    final accentColor = _getColorForMember(memberNumber);
+
+    return Card(
+      elevation: 2,
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(6),
+        onTap: () => _showSensorAssignmentDialog(context, device, athlete),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final h = constraints.maxHeight;
+            final w = constraints.maxWidth;
+            // Scale fonts relative to card size
+            final nameFontSize = (h * 0.09).clamp(8.0, 16.0);
+            final bpmFontSize = (h * 0.38).clamp(24.0, 80.0);
+            final labelFontSize = (h * 0.07).clamp(7.0, 14.0);
+            final iconSize = (h * 0.14).clamp(12.0, 30.0);
+
+            return Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(6),
+                color: zoneColor,
+              ),
+              child: Stack(
+                children: [
+                  // Subtle accent tint top-left corner
+                  Positioned(
+                    top: 0, left: 0,
+                    child: Container(
+                      width: w * 0.4,
+                      height: h * 0.3,
+                      decoration: BoxDecoration(
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(6),
+                          bottomRight: Radius.circular(40),
+                        ),
+                        color: accentColor.withValues(alpha: 0.25),
+                      ),
                     ),
+                  ),
+                  // Card content
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: w * 0.05, vertical: h * 0.05),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const Icon(
-                          Icons.favorite,
-                          color: Colors.white,
-                          size: 24,
-                        ),
-                        const SizedBox(height: 4),
+                        // Athlete name / assign prompt
                         Text(
-                          device.currentHeartRate?.toString() ?? '--',
-                          style: const TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            height: 1.0,
-                          ),
-                        ),
-                        const Text(
-                          'bpm',
+                          athlete?.name ?? 'Tap to assign',
                           style: TextStyle(
-                            fontSize: 10,
-                            color: Colors.white70,
-                            height: 1.0,
+                            fontSize: nameFontSize,
+                            color: athlete != null
+                                ? Colors.white
+                                : Colors.white60,
+                            fontWeight: FontWeight.w600,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          _getTrainingZoneName(device.currentHeartRate),
-                          style: const TextStyle(
-                            fontSize: 8,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
-                            height: 1.0,
-                          ),
+
+                        // BPM value — centre, dominant
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.favorite,
+                                color: Colors.white70, size: iconSize),
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                device.currentHeartRate?.toString() ?? '--',
+                                style: TextStyle(
+                                  fontSize: bpmFontSize,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  height: 1.0,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              'bpm',
+                              style: TextStyle(
+                                fontSize: labelFontSize,
+                                color: Colors.white70,
+                                height: 1.0,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        // Zone name + battery
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              _getTrainingZoneName(device.currentHeartRate),
+                              style: TextStyle(
+                                fontSize: labelFontSize,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            if (device.batteryLevel != null)
+                              Text(
+                                '🔋${device.batteryLevel}%',
+                                style: TextStyle(
+                                    fontSize: labelFontSize,
+                                    color: Colors.white70),
+                              ),
+                          ],
                         ),
                       ],
                     ),
                   ),
-                ),
-                const SizedBox(height: 3),
-
-                // Bottom: Battery indicator (if available)
-                if (device.batteryLevel != null)
-                  Text(
-                    '🔋 ${device.batteryLevel}%',
-                    style: TextStyle(
-                      fontSize: 8,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w500,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-              ],
-            ),
-          ),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );

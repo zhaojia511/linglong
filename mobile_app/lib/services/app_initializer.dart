@@ -37,6 +37,9 @@ class AppInitializer {
       await SettingsService.instance.init();
 
       _completer.complete();
+
+      // Non-blocking version check after init
+      SettingsService.instance.checkForUpdate().ignore();
     } catch (e, st) {
       error = e;
       if (!_completer.isCompleted) _completer.completeError(e, st);

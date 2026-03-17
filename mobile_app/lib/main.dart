@@ -114,7 +114,7 @@ class MyApp extends StatelessWidget {
 }
 
 class _InitializerScreen extends StatelessWidget {
-  const _InitializerScreen({Key? key}) : super(key: key);
+  const _InitializerScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -123,11 +123,11 @@ class _InitializerScreen extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // Show a lightweight loading UI while services initialize
-          return Scaffold(
+          return const Scaffold(
             body: Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                children: const [
+                children: [
                   CircularProgressIndicator(),
                   SizedBox(height: 12),
                   Text('Starting...'),
