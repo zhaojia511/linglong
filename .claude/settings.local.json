@@ -34,10 +34,12 @@
       "Bash(supabase migration:*)",
       "Bash(npm run:*)",
       "Bash(grep -r \"Push\\\\|notification\\\\|Strava\\\\|Garmin\\\\|GPX\\\\|TCX\\\\|FIT\\\\|offline\\\\|recovery\\\\|training load\\\\|VO2\\\\|EPOC\" d:/github/linglong/web_app/src --include=*.js --include=*.jsx)",
-      "Bash(grep -r \"export\\\\|download\\\\|csv\\\\|json\\\\|file\" d:/github/linglong/web_app/src --include=*.jsx --include=*.js)"
+      "Bash(grep -r \"export\\\\|download\\\\|csv\\\\|json\\\\|file\" d:/github/linglong/web_app/src --include=*.jsx --include=*.js)",
+      "Read(//tmp/**)"
     ],
     "additionalDirectories": [
-      "d:\\github\\linglong\\docs\\superpowers"
+      "d:\\github\\linglong\\docs\\superpowers",
+      "\\tmp"
     ]
   }
 }
