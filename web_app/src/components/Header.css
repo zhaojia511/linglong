@@ -1,5 +1,9 @@
-/* Header is only visible on mobile — desktop uses the sidebar */
+/* Header only visible on mobile — desktop uses the sidebar */
 .top-header {
+  display: none;
+}
+
+.header-spacer {
   display: none;
 }
 
