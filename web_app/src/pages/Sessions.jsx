@@ -24,6 +24,8 @@ function exportSessionsToCSV(sessions) {
   URL.revokeObjectURL(url)
 }
 
+const PAGE_SIZE = 20
+
 function Sessions() {
   const [sessions, setSessions] = useState([])
   const [loading, setLoading] = useState(true)
@@ -32,20 +34,27 @@ function Sessions() {
     startDate: '',
     endDate: '',
   })
+  const [page, setPage] = useState(0)
+  const [total, setTotal] = useState(0)
+
+  useEffect(() => {
+    setPage(0)
+  }, [filter])
 
   useEffect(() => {
     loadSessions()
-  }, [filter])
+  }, [filter, page])
 
   const loadSessions = async () => {
     setLoading(true)
     setError('')
     try {
-      const data = await sessionService.getSessions(filter)
+      const data = await sessionService.getSessions({ ...filter, limit: PAGE_SIZE, offset: page * PAGE_SIZE })
       setSessions(data.data ?? [])
+      setTotal(data.count != null ? data.count : (data.data ?? []).length)
     } catch (error) {
       console.error('Error loading sessions:', error)
-      setError('Failed to load sessions. Is the backend running?')
+      setError('Failed to load sessions. Check your connection and try again.')
     } finally {
       setLoading(false)
     }
@@ -168,6 +177,11 @@ function Sessions() {
               ))}
             </ul>
           )}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '16px' }}>
+            <button className="btn" onClick={() => setPage(p => p - 1)} disabled={page === 0}>Previous</button>
+            <span style={{ padding: '8px 16px' }}>Page {page + 1}</span>
+            <button className="btn btn-primary" onClick={() => setPage(p => p + 1)} disabled={sessions.length < PAGE_SIZE}>Next</button>
+          </div>
         </div>
       </div>
     </div>

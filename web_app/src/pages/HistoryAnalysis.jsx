@@ -61,6 +61,14 @@ const HistoryAnalysis = () => {
     })
   }
 
+  const applyPreset = (days) => {
+    const end = new Date()
+    const start = new Date()
+    start.setDate(start.getDate() - days)
+    handleFilterChange('startDate', start.toISOString().split('T')[0])
+    handleFilterChange('endDate', end.toISOString().split('T')[0])
+  }
+
   // Prepare chart data
   const prepareHeartRateData = () => {
     const filteredSessions = sessions
@@ -154,6 +162,22 @@ const HistoryAnalysis = () => {
                   <option key={person.id} value={person.id}>{person.name}</option>
                 ))}
               </select>
+            </div>
+
+            <div className="md:col-span-4">
+              <div style={{ marginBottom: '12px' }}>
+                <span style={{ fontSize: 13, color: '#666', marginRight: 8 }}>Quick:</span>
+                {[7, 30, 90].map(days => (
+                  <button key={days} className="btn" onClick={() => applyPreset(days)}
+                    style={{ marginRight: 6, padding: '4px 10px', fontSize: 12 }}>
+                    Last {days} days
+                  </button>
+                ))}
+                <button className="btn" onClick={() => { handleFilterChange('startDate', ''); handleFilterChange('endDate', '') }}
+                  style={{ padding: '4px 10px', fontSize: 12 }}>
+                  All time
+                </button>
+              </div>
             </div>
 
             <div>

@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { personService } from '../services/api'
 
+const inputStyle = { width: '100%', padding: '8px 10px', border: '1px solid #ddd', borderRadius: 4, fontSize: 14, boxSizing: 'border-box' }
+const labelStyle = { display: 'block', marginBottom: 4, fontWeight: 500, fontSize: 14 }
+const thStyle = { textAlign: 'left', padding: '10px 12px', borderBottom: '2px solid #eee', fontSize: 13, color: '#666' }
+const tdStyle = { padding: '10px 12px', borderBottom: '1px solid #eee', fontSize: 14 }
+
 const PersonsManagement = () => {
   const [persons, setPersons] = useState([])
   const [loading, setLoading] = useState(true)
@@ -41,8 +46,8 @@ const PersonsManagement = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (!formData.name.trim()) { setError('Name is required'); return }
     try {
-
       // Build payload and only include numeric fields when provided
       const data = { ...formData }
       if (formData.age === '' || formData.age == null) {
@@ -129,229 +134,188 @@ const PersonsManagement = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="text-lg">Loading persons...</div>
-      </div>
+      <div style={{ textAlign: 'center', padding: 40 }}>Loading...</div>
     )
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Athlete Management</h1>
-        <button
-          onClick={() => setShowForm(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-        >
-          Add Athlete
-        </button>
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <h1 style={{ margin: 0 }}>Athlete Management</h1>
+        <button className="btn btn-primary" onClick={() => setShowForm(true)}>Add Athlete</button>
       </div>
 
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          {error}
-        </div>
+        <div className="error">{error}</div>
       )}
 
       {/* Person Form */}
       {showForm && (
-        <div className="bg-white shadow-md rounded-lg p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">
+        <div className="card" style={{ marginBottom: 24 }}>
+          <h2 style={{ marginTop: 0, marginBottom: 16 }}>
             {editingPerson ? 'Edit Person' : 'Add New Person'}
           </h2>
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
-              <input
-                type="text"
-                required
-                value={formData.name}
-                onChange={(e) => setFormData({...formData, name: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+          <form onSubmit={handleSubmit}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
+              <div>
+                <label style={labelStyle}>Name *</label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  style={inputStyle}
+                />
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Age</label>
-              <input
-                type="number"
-                value={formData.age}
-                onChange={(e) => setFormData({...formData, age: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+              <div>
+                <label style={labelStyle}>Age</label>
+                <input
+                  type="number"
+                  value={formData.age}
+                  onChange={(e) => setFormData({...formData, age: e.target.value})}
+                  style={inputStyle}
+                />
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
-              <select
-                value={formData.gender}
-                onChange={(e) => setFormData({...formData, gender: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select Gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
+              <div>
+                <label style={labelStyle}>Gender</label>
+                <select
+                  value={formData.gender}
+                  onChange={(e) => setFormData({...formData, gender: e.target.value})}
+                  style={inputStyle}
+                >
+                  <option value="">Select Gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Height (cm)</label>
-              <input
-                type="number"
-                step="0.1"
-                value={formData.height}
-                onChange={(e) => setFormData({...formData, height: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+              <div>
+                <label style={labelStyle}>Height (cm)</label>
+                <input
+                  type="number"
+                  step="0.1"
+                  value={formData.height}
+                  onChange={(e) => setFormData({...formData, height: e.target.value})}
+                  style={inputStyle}
+                />
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Weight (kg)</label>
-              <input
-                type="number"
-                step="0.1"
-                value={formData.weight}
-                onChange={(e) => setFormData({...formData, weight: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+              <div>
+                <label style={labelStyle}>Weight (kg)</label>
+                <input
+                  type="number"
+                  step="0.1"
+                  value={formData.weight}
+                  onChange={(e) => setFormData({...formData, weight: e.target.value})}
+                  style={inputStyle}
+                />
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-              <select
-                value={formData.role}
-                onChange={(e) => setFormData({...formData, role: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="athlete">Athlete</option>
-                <option value="coach">Coach</option>
-              </select>
-            </div>
+              <div>
+                <label style={labelStyle}>Role</label>
+                <select
+                  value={formData.role}
+                  onChange={(e) => setFormData({...formData, role: e.target.value})}
+                  style={inputStyle}
+                >
+                  <option value="athlete">Athlete</option>
+                  <option value="coach">Coach</option>
+                </select>
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Max Heart Rate (bpm)</label>
-              <input
-                type="number"
-                value={formData.maxHeartRate}
-                onChange={(e) => setFormData({...formData, maxHeartRate: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+              <div>
+                <label style={labelStyle}>Max Heart Rate (bpm)</label>
+                <input
+                  type="number"
+                  value={formData.maxHeartRate}
+                  onChange={(e) => setFormData({...formData, maxHeartRate: e.target.value})}
+                  style={inputStyle}
+                />
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Resting Heart Rate (bpm)</label>
-              <input
-                type="number"
-                value={formData.restingHeartRate}
-                onChange={(e) => setFormData({...formData, restingHeartRate: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+              <div>
+                <label style={labelStyle}>Resting Heart Rate (bpm)</label>
+                <input
+                  type="number"
+                  value={formData.restingHeartRate}
+                  onChange={(e) => setFormData({...formData, restingHeartRate: e.target.value})}
+                  style={inputStyle}
+                />
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Fitness Level</label>
-              <select
-                value={formData.fitness_level}
-                onChange={(e) => setFormData({...formData, fitness_level: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select Level</option>
-                <option value="beginner">Beginner</option>
-                <option value="intermediate">Intermediate</option>
-                <option value="advanced">Advanced</option>
-                <option value="elite">Elite</option>
-              </select>
-            </div>
+              <div>
+                <label style={labelStyle}>Fitness Level</label>
+                <select
+                  value={formData.fitness_level}
+                  onChange={(e) => setFormData({...formData, fitness_level: e.target.value})}
+                  style={inputStyle}
+                >
+                  <option value="">Select Level</option>
+                  <option value="beginner">Beginner</option>
+                  <option value="intermediate">Intermediate</option>
+                  <option value="advanced">Advanced</option>
+                  <option value="elite">Elite</option>
+                </select>
+              </div>
 
-            <div className="md:col-span-2 flex gap-4">
-              <button
-                type="submit"
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-              >
-                {editingPerson ? 'Update Person' : 'Add Person'}
-              </button>
-              <button
-                type="button"
-                onClick={handleCancel}
-                className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
-              >
-                Cancel
-              </button>
+              <div style={{ gridColumn: 'span 2', display: 'flex', gap: 12, marginTop: 4 }}>
+                <button type="submit" className="btn btn-primary">
+                  {editingPerson ? 'Update Person' : 'Add Person'}
+                </button>
+                <button type="button" className="btn" style={{ background: '#6c757d', color: 'white' }} onClick={handleCancel}>
+                  Cancel
+                </button>
+              </div>
             </div>
           </form>
         </div>
       )}
 
       {/* Persons List */}
-      <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-xl font-semibold">Athletes ({persons.length})</h2>
+      <div className="card" style={{ padding: 0 }}>
+        <div style={{ padding: '14px 20px', borderBottom: '1px solid #eee' }}>
+          <h2 style={{ margin: 0 }}>Athletes ({persons.length})</h2>
         </div>
 
         {persons.length === 0 ? (
-          <div className="p-6 text-center text-gray-500">
-            No athletes found. Add your first athlete to get started.
-          </div>
+          <p style={{ textAlign: 'center', color: '#999', padding: 40 }}>No athletes found. Add your first athlete to get started.</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Name
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Age
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Role
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Max HR
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Rest HR
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Sport
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
+                  <th style={thStyle}>Name</th>
+                  <th style={thStyle}>Age</th>
+                  <th style={thStyle}>Role</th>
+                  <th style={thStyle}>Max HR</th>
+                  <th style={thStyle}>Rest HR</th>
+                  <th style={thStyle}>Sport</th>
+                  <th style={thStyle}>Actions</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody>
                 {persons.map((person) => (
-                  <tr key={person.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {person.name}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {person.age || '-'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">
-                      {person.role || 'athlete'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {person.maxHeartRate ? `${person.maxHeartRate} bpm` : '-'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {person.restingHeartRate ? `${person.restingHeartRate} bpm` : '-'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {person.sport_type || '-'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <tr key={person.id}>
+                    <td style={tdStyle}>{person.name}</td>
+                    <td style={tdStyle}>{person.age || '-'}</td>
+                    <td style={{ ...tdStyle, textTransform: 'capitalize' }}>{person.role || 'athlete'}</td>
+                    <td style={tdStyle}>{person.maxHeartRate ? `${person.maxHeartRate} bpm` : '-'}</td>
+                    <td style={tdStyle}>{person.restingHeartRate ? `${person.restingHeartRate} bpm` : '-'}</td>
+                    <td style={tdStyle}>{person.sport_type || '-'}</td>
+                    <td style={tdStyle}>
                       <button
+                        className="btn"
+                        style={{ marginRight: 8, padding: '4px 10px', fontSize: 13 }}
                         onClick={() => handleEdit(person)}
-                        className="text-blue-600 hover:text-blue-900 mr-4"
                       >
                         Edit
                       </button>
                       <button
+                        className="btn"
+                        style={{ background: '#dc3545', color: 'white', padding: '4px 10px', fontSize: 13 }}
                         onClick={() => handleDelete(person.id)}
-                        className="text-red-600 hover:text-red-900"
                       >
                         Delete
                       </button>

@@ -17,6 +17,7 @@ function toSession(row) {
     minHeartRate: row.min_heart_rate,
     calories: row.calories,
     heartRateData: row.heart_rate_data ?? [],
+    rrIntervals: row.rr_intervals ?? [],
     notes: row.notes,
     createdAt: row.created_at,
   }
@@ -38,6 +39,7 @@ function fromSession(session) {
   if (session.minHeartRate !== undefined) row.min_heart_rate = session.minHeartRate
   if (session.calories !== undefined) row.calories = session.calories
   if (session.heartRateData !== undefined) row.heart_rate_data = session.heartRateData
+  if (session.rrIntervals !== undefined) row.rr_intervals = session.rrIntervals
   if (session.notes !== undefined) row.notes = session.notes
   return row
 }

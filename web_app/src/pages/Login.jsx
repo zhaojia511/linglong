@@ -26,8 +26,8 @@ function Login({ onLogin }) {
         setIsForgotPassword(false)
       } else if (isRegister) {
         await authService.register(email, password, name)
-        onLogin()
-        navigate('/')
+        setSuccess('Registration successful! Please check your email to verify your account, then log in.')
+        setIsRegister(false)
       } else {
         await authService.login(email, password)
         onLogin()

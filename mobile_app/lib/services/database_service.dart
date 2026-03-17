@@ -56,6 +56,7 @@ class DatabaseService extends ChangeNotifier {
     int? restingHeartRate,
     String? category,
     String? group,
+    String? photoPath,
   }) async {
     final person = Person(
       id: const Uuid().v4(),
@@ -68,6 +69,7 @@ class DatabaseService extends ChangeNotifier {
       restingHeartRate: restingHeartRate,
       category: category,
       group: group,
+      photoPath: photoPath,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );

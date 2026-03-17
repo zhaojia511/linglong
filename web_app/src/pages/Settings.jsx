@@ -136,6 +136,31 @@ function AppVersionManager() {
 
 function Settings() {
   const navigate = useNavigate()
+  const [profileForm, setProfileForm] = useState({ newPassword: '', confirmPassword: '' })
+  const [profileMsg, setProfileMsg] = useState(null)
+  const [profileSaving, setProfileSaving] = useState(false)
+
+  const handlePasswordChange = async (e) => {
+    e.preventDefault()
+    if (profileForm.newPassword.length < 6) {
+      setProfileMsg({ type: 'error', text: 'Password must be at least 6 characters' })
+      return
+    }
+    if (profileForm.newPassword !== profileForm.confirmPassword) {
+      setProfileMsg({ type: 'error', text: 'Passwords do not match' })
+      return
+    }
+    setProfileSaving(true)
+    const { error } = await supabase.auth.updateUser({ password: profileForm.newPassword })
+    setProfileSaving(false)
+    if (error) {
+      setProfileMsg({ type: 'error', text: error.message })
+    } else {
+      setProfileMsg({ type: 'success', text: 'Password updated successfully' })
+      setProfileForm({ newPassword: '', confirmPassword: '' })
+    }
+  }
+
   const [settings, setSettings] = useState({
     theme: 'light',
     notifications: true,
@@ -256,6 +281,29 @@ function Settings() {
           ✓ Settings saved successfully
         </div>
       )}
+
+      <div className="settings-card">
+        <h2 className="settings-section">👤 User Profile</h2>
+        <form onSubmit={handlePasswordChange}>
+          <div className="form-group">
+            <label>New Password</label>
+            <input type="password" value={profileForm.newPassword}
+              onChange={e => setProfileForm({...profileForm, newPassword: e.target.value})}
+              placeholder="At least 6 characters"
+              style={{ width: '100%', padding: '8px 10px', border: '1px solid #ddd', borderRadius: 4, fontSize: 14 }} />
+          </div>
+          <div className="form-group">
+            <label>Confirm Password</label>
+            <input type="password" value={profileForm.confirmPassword}
+              onChange={e => setProfileForm({...profileForm, confirmPassword: e.target.value})}
+              style={{ width: '100%', padding: '8px 10px', border: '1px solid #ddd', borderRadius: 4, fontSize: 14 }} />
+          </div>
+          {profileMsg && <div className={profileMsg.type === 'error' ? 'error' : 'success'}>{profileMsg.text}</div>}
+          <button type="submit" className="btn btn-primary" disabled={profileSaving}>
+            {profileSaving ? 'Saving...' : 'Update Password'}
+          </button>
+        </form>
+      </div>
 
       <AppVersionManager />
     </div>

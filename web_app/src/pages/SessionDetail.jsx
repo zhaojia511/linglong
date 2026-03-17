@@ -19,6 +19,8 @@ function SessionDetail() {
   const [noiseFilter, setNoiseFilter] = useState(false)
   const [warmupSec, setWarmupSec] = useState(0)
   const [cooldownSec, setCooldownSec] = useState(0)
+  const [editing, setEditing] = useState(false)
+  const [editForm, setEditForm] = useState({ title: '', trainingType: '', notes: '' })
 
   useEffect(() => {
     loadSession()
@@ -40,6 +42,21 @@ function SessionDetail() {
       console.error('Error loading session:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleEdit = () => {
+    setEditForm({ title: session.title || '', trainingType: session.trainingType || '', notes: session.notes || '' })
+    setEditing(true)
+  }
+
+  const handleSave = async () => {
+    try {
+      await sessionService.upsertSession({ ...session, ...editForm })
+      setSession({ ...session, ...editForm })
+      setEditing(false)
+    } catch (err) {
+      console.error('Failed to save session:', err)
     }
   }
 
@@ -156,6 +173,9 @@ function SessionDetail() {
               </p>
             </div>
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              <button onClick={handleEdit} className="btn" style={{ background: '#6c757d', color: 'white' }}>
+                Edit
+              </button>
               <button onClick={() => exportTCX(session, person?.name)} className="btn" style={{ background: '#28a745', color: 'white' }}>
                 Export TCX
               </button>
@@ -168,6 +188,52 @@ function SessionDetail() {
             </div>
           </div>
         </div>
+
+        {editing && (
+          <div className="card" style={{ marginTop: '20px' }}>
+            <h2>Edit Session</h2>
+            <div style={{ marginTop: '15px' }}>
+              <div className="form-group" style={{ marginBottom: '15px' }}>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600' }}>Title</label>
+                <input
+                  type="text"
+                  value={editForm.title}
+                  onChange={e => setEditForm({ ...editForm, title: e.target.value })}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box' }}
+                />
+              </div>
+              <div className="form-group" style={{ marginBottom: '15px' }}>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600' }}>Training Type</label>
+                <select
+                  value={editForm.trainingType}
+                  onChange={e => setEditForm({ ...editForm, trainingType: e.target.value })}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box' }}
+                >
+                  <option value="">-- select --</option>
+                  <option value="running">Running</option>
+                  <option value="cycling">Cycling</option>
+                  <option value="swimming">Swimming</option>
+                  <option value="gym">Gym</option>
+                  <option value="general">General</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div className="form-group" style={{ marginBottom: '15px' }}>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600' }}>Notes</label>
+                <textarea
+                  value={editForm.notes}
+                  onChange={e => setEditForm({ ...editForm, notes: e.target.value })}
+                  rows={4}
+                  style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box', resize: 'vertical' }}
+                />
+              </div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button onClick={handleSave} className="btn btn-primary">Save</button>
+                <button onClick={() => setEditing(false)} className="btn" style={{ background: '#6c757d', color: 'white' }}>Cancel</button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="stats-grid">
           <div className="stat-card">
