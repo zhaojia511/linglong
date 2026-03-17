@@ -17,29 +17,41 @@ class DatabaseService extends ChangeNotifier {
   DatabaseService._internal();
 
   Future<void> init() async {
+    // Register adapters before opening boxes
+    if (!Hive.isAdapterRegistered(PersonAdapter().typeId)) {
+      Hive.registerAdapter(PersonAdapter());
+    }
+    if (!Hive.isAdapterRegistered(TrainingSessionAdapter().typeId)) {
+      Hive.registerAdapter(TrainingSessionAdapter());
+    }
+    if (!Hive.isAdapterRegistered(HeartRateDataAdapter().typeId)) {
+      Hive.registerAdapter(HeartRateDataAdapter());
+    }
+
+    // Open persons box — delete and recreate if schema has changed (type cast errors)
     try {
-      // Register adapters before opening boxes
-      if (!Hive.isAdapterRegistered(PersonAdapter().typeId)) {
-        Hive.registerAdapter(PersonAdapter());
-      }
-      if (!Hive.isAdapterRegistered(TrainingSessionAdapter().typeId)) {
-        Hive.registerAdapter(TrainingSessionAdapter());
-      }
-      if (!Hive.isAdapterRegistered(HeartRateDataAdapter().typeId)) {
-        Hive.registerAdapter(HeartRateDataAdapter());
-      }
-      
-      // Open boxes
       _personBox = await Hive.openBox<Person>('persons');
-      _sessionBox = await Hive.openBox<TrainingSession>('training_sessions');
-      
-      // Load current person if exists
-      if (_personBox!.isNotEmpty) {
-        _currentPerson = _personBox!.values.first;
-      }
+      // Validate by reading all entries — triggers type cast if schema mismatch
+      _personBox!.values.toList();
     } catch (e) {
-      debugPrint('Error initializing DatabaseService: $e');
-      rethrow;
+      debugPrint('persons box schema mismatch, clearing: $e');
+      await Hive.deleteBoxFromDisk('persons');
+      _personBox = await Hive.openBox<Person>('persons');
+    }
+
+    // Open sessions box — same recovery pattern
+    try {
+      _sessionBox = await Hive.openBox<TrainingSession>('training_sessions');
+      _sessionBox!.values.toList();
+    } catch (e) {
+      debugPrint('training_sessions box schema mismatch, clearing: $e');
+      await Hive.deleteBoxFromDisk('training_sessions');
+      _sessionBox = await Hive.openBox<TrainingSession>('training_sessions');
+    }
+
+    // Load current person if exists
+    if (_personBox!.isNotEmpty) {
+      _currentPerson = _personBox!.values.first;
     }
   }
 
