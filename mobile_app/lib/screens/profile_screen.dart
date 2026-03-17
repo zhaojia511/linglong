@@ -395,6 +395,11 @@ class _PersonDetailScreenState extends State<PersonDetailScreen> {
       appBar: AppBar(
         title: null,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.check),
+            onPressed: _savePerson,
+            tooltip: 'Save',
+          ),
           if (widget.person != null)
             IconButton(
               icon: const Icon(Icons.delete),
