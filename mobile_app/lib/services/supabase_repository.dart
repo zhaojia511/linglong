@@ -54,7 +54,6 @@ class SupabaseRepository {
       'height': height,
       'max_heart_rate': maxHeartRate,
       'resting_heart_rate': restingHeartRate,
-      'role': role,
       'category': category,
       'group': group,
     }..removeWhere((_, v) => v == null);
