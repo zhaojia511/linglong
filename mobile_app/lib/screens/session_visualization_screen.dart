@@ -3,6 +3,9 @@ import 'package:fl_chart/fl_chart.dart';
 import '../models/training_session.dart';
 import '../utils/hr_data_processing.dart';
 import '../utils/hrv_analysis.dart';
+import '../utils/training_load.dart';
+import '../models/person.dart';
+import '../services/database_service.dart';
 
 class SessionVisualizationScreen extends StatefulWidget {
   final TrainingSession session;
@@ -18,6 +21,7 @@ class _SessionVisualizationScreenState extends State<SessionVisualizationScreen>
   bool _noiseFilter = false;
   int _warmupSec = 0;
   int _cooldownSec = 0;
+  Person? _person;
 
   TrainingSession get session => widget.session;
 
@@ -39,6 +43,7 @@ class _SessionVisualizationScreenState extends State<SessionVisualizationScreen>
       _warmupSec = HrDataProcessing.detectWarmup(session.heartRateData);
       _cooldownSec = HrDataProcessing.detectCooldown(session.heartRateData);
     }
+    _person = DatabaseService.instance.getPersonById(session.personId);
   }
 
   @override
@@ -156,6 +161,9 @@ class _SessionVisualizationScreenState extends State<SessionVisualizationScreen>
 
               const SizedBox(height: 16),
 
+              // Training Load Card
+              _buildTrainingLoadCard(),
+
               // HRV Analysis Card
               _buildHrvCard(),
 
@@ -219,6 +227,58 @@ class _SessionVisualizationScreenState extends State<SessionVisualizationScreen>
           onChanged: onChanged,
         ),
       ],
+    );
+  }
+
+  Widget _buildTrainingLoadCard() {
+    if (session.avgHeartRate == null) return const SizedBox.shrink();
+    final p = _person;
+    final maxHR = p?.maxHeartRate ?? 190;
+    final restHR = p?.restingHeartRate ?? 60;
+    final gender = p?.gender ?? 'male';
+
+    final trimpVal = TrainingLoad.trimp(
+      avgHR: session.avgHeartRate!,
+      durationSeconds: session.duration,
+      maxHR: maxHR,
+      restingHR: restHR,
+      gender: gender,
+    );
+    final intensity = TrainingLoad.intensity(trimpVal);
+    final recovery = TrainingLoad.recoveryHours(trimpVal);
+    final vo2max = TrainingLoad.estimateVO2Max(p?.maxHeartRate, p?.restingHeartRate);
+    final vo2cat = vo2max != null && p != null
+        ? TrainingLoad.vo2MaxCategory(vo2max, p.age, p.gender)
+        : null;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Training Load',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 12),
+              Row(children: [
+                _buildHrvMetric('TRIMP', trimpVal.toStringAsFixed(1)),
+                _buildHrvMetric('Intensity', intensity),
+                _buildHrvMetric('Recovery', '${recovery}h'),
+              ]),
+              if (vo2max != null) ...[
+                const SizedBox(height: 8),
+                Row(children: [
+                  _buildHrvMetric('VO2 Max', '${vo2max.toStringAsFixed(1)} ml/kg/min'),
+                  if (vo2cat != null) _buildHrvMetric('Fitness', vo2cat),
+                  const Expanded(child: SizedBox()),
+                ]),
+              ],
+            ],
+          ),
+        ),
+      ),
     );
   }
 

@@ -6,6 +6,8 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { format } from 'date-fns'
 import { trimHRData, detectWarmup, detectCooldown, filterNoise, calcStats } from '../lib/hrDataProcessing'
 import { analyzeHRV } from '../lib/hrvAnalysis'
+import { calcTRIMP, estimateRecoveryHours, sessionIntensity, estimateVO2Max, vo2MaxCategory } from '../lib/trainingLoad'
+import { exportTCX, exportGPX } from '../lib/exportFormats'
 
 function SessionDetail() {
   const { id } = useParams()
@@ -103,6 +105,26 @@ function SessionDetail() {
     return analyzeHRV(session.rrIntervals)
   }, [session?.rrIntervals])
 
+  // Training load analysis
+  const loadData = useMemo(() => {
+    if (!session?.avgHeartRate || !person) return null
+    const trimp = calcTRIMP({
+      avgHR: session.avgHeartRate,
+      durationSeconds: session.duration,
+      maxHR: person.maxHeartRate ?? 190,
+      restingHR: person.restingHeartRate ?? 60,
+      gender: person.gender ?? 'male',
+    })
+    const vo2max = estimateVO2Max(person.maxHeartRate, person.restingHeartRate)
+    return {
+      trimp: Math.round(trimp * 10) / 10,
+      intensity: sessionIntensity(trimp),
+      recoveryHours: estimateRecoveryHours(trimp),
+      vo2max: vo2max ? Math.round(vo2max * 10) / 10 : null,
+      vo2maxCategory: vo2MaxCategory(vo2max, person.age, person.gender ?? 'male'),
+    }
+  }, [session, person])
+
   // Prepare chart data - sample every 10th point if there's too much data
   const chartData = processedData
     .filter((_, index) => processedData.length > 100 ? index % 10 === 0 : true)
@@ -133,13 +155,17 @@ function SessionDetail() {
                 {new Date(session.startTime).toLocaleString()}
               </p>
             </div>
-            <button
-              onClick={handleDelete}
-              className="btn"
-              style={{ background: '#dc3545', color: 'white' }}
-            >
-              Delete Session
-            </button>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              <button onClick={() => exportTCX(session, person?.name)} className="btn" style={{ background: '#28a745', color: 'white' }}>
+                Export TCX
+              </button>
+              <button onClick={() => exportGPX(session, person?.name)} className="btn" style={{ background: '#17a2b8', color: 'white' }}>
+                Export GPX
+              </button>
+              <button onClick={handleDelete} className="btn" style={{ background: '#dc3545', color: 'white' }}>
+                Delete Session
+              </button>
+            </div>
           </div>
         </div>
 
@@ -175,6 +201,36 @@ function SessionDetail() {
             <div className="stat-value" style={{ fontSize: '24px' }}>{session.trainingType}</div>
           </div>
         </div>
+
+        {/* Training Load Card */}
+        {loadData && (
+          <div className="card" style={{ marginTop: '20px' }}>
+            <h2>Training Load</h2>
+            <div className="stats-grid" style={{ marginTop: '15px' }}>
+              <div className="stat-card">
+                <div className="stat-label">TRIMP</div>
+                <div className="stat-value">{loadData.trimp}</div>
+                <div className="stat-label">score</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-label">Intensity</div>
+                <div className="stat-value" style={{ fontSize: '22px' }}>{loadData.intensity}</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-label">Recovery</div>
+                <div className="stat-value">{loadData.recoveryHours}</div>
+                <div className="stat-label">hours</div>
+              </div>
+              {loadData.vo2max && (
+                <div className="stat-card">
+                  <div className="stat-label">VO2 Max</div>
+                  <div className="stat-value">{loadData.vo2max}</div>
+                  <div className="stat-label">ml/kg/min · {loadData.vo2maxCategory}</div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Data Processing Controls */}
         {session.heartRateData && session.heartRateData.length > 0 && (
