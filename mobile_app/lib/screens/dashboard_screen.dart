@@ -502,7 +502,6 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   Widget _buildSquareDeviceCard(HRDevice device, int memberNumber, Person? athlete) {
     final zoneColor = _getHeartRateColorByTrainingZone(device.currentHeartRate);
-    final accentColor = _getColorForMember(memberNumber);
 
     return Card(
       elevation: 2,
@@ -521,6 +520,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             final labelFontSize = (h * 0.07).clamp(7.0, 14.0);
             final iconSize = (h * 0.14).clamp(12.0, 30.0);
 
+            final avatarRadius = (h * 0.18).clamp(14.0, 32.0);
             return Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(6),
@@ -528,21 +528,6 @@ class _DashboardScreenState extends State<DashboardScreen>
               ),
               child: Stack(
                 children: [
-                  // Subtle accent tint top-left corner
-                  Positioned(
-                    top: 0, left: 0,
-                    child: Container(
-                      width: w * 0.4,
-                      height: h * 0.3,
-                      decoration: BoxDecoration(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(6),
-                          bottomRight: Radius.circular(40),
-                        ),
-                        color: accentColor.withValues(alpha: 0.25),
-                      ),
-                    ),
-                  ),
                   // Card content
                   Padding(
                     padding: EdgeInsets.symmetric(
@@ -551,14 +536,12 @@ class _DashboardScreenState extends State<DashboardScreen>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // Athlete name / assign prompt
+                        // Athlete name (top)
                         Text(
-                          athlete?.name ?? 'Tap to assign',
+                          athlete?.name ?? '',
                           style: TextStyle(
                             fontSize: nameFontSize,
-                            color: athlete != null
-                                ? Colors.white
-                                : Colors.white60,
+                            color: Colors.white,
                             fontWeight: FontWeight.w600,
                           ),
                           maxLines: 1,
@@ -566,33 +549,31 @@ class _DashboardScreenState extends State<DashboardScreen>
                           textAlign: TextAlign.center,
                         ),
 
-                        // BPM value — centre, dominant
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.favorite,
-                                color: Colors.white70, size: iconSize),
-                            FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                device.currentHeartRate?.toString() ?? '--',
-                                style: TextStyle(
-                                  fontSize: bpmFontSize,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  height: 1.0,
-                                ),
-                              ),
+                        // Avatar photo or heart icon (centre-top)
+                        CircleAvatar(
+                          radius: avatarRadius,
+                          backgroundColor: Colors.white24,
+                          backgroundImage: athlete?.photoPath != null
+                              ? AssetImage(athlete!.photoPath!)
+                              : null,
+                          child: athlete?.photoPath == null
+                              ? Icon(Icons.favorite,
+                                  color: Colors.white70, size: avatarRadius)
+                              : null,
+                        ),
+
+                        // BPM value
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            device.currentHeartRate?.toString() ?? '--',
+                            style: TextStyle(
+                              fontSize: bpmFontSize,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              height: 1.0,
                             ),
-                            Text(
-                              'bpm',
-                              style: TextStyle(
-                                fontSize: labelFontSize,
-                                color: Colors.white70,
-                                height: 1.0,
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
 
                         // Zone name + battery
@@ -617,6 +598,26 @@ class _DashboardScreenState extends State<DashboardScreen>
                           ],
                         ),
                       ],
+                    ),
+                  ),
+
+                  // Assign button — bottom-right corner
+                  Positioned(
+                    bottom: 4, right: 4,
+                    child: GestureDetector(
+                      onTap: () => _showSensorAssignmentDialog(context, device, athlete),
+                      child: Container(
+                        padding: const EdgeInsets.all(3),
+                        decoration: BoxDecoration(
+                          color: Colors.white24,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Icon(
+                          athlete == null ? Icons.person_add : Icons.swap_horiz,
+                          color: Colors.white70,
+                          size: (h * 0.1).clamp(10.0, 18.0),
+                        ),
+                      ),
                     ),
                   ),
                 ],
