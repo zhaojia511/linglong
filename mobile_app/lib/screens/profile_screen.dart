@@ -5,6 +5,7 @@ import '../services/database_service.dart';
 import '../services/supabase_repository.dart';
 import '../services/settings_service.dart';
 import '../services/sync_service.dart';
+import 'readiness_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -232,9 +233,6 @@ class _PersonDetailScreenState extends State<PersonDetailScreen> {
             maxHeartRate: newPerson.maxHeartRate,
             restingHeartRate: newPerson.restingHeartRate,
             id: newPerson.id,
-            role: newPerson.role,
-            category: newPerson.category,
-            group: newPerson.group,
           );
         } else {
           // Update existing person
@@ -264,9 +262,6 @@ class _PersonDetailScreenState extends State<PersonDetailScreen> {
             maxHeartRate: widget.person!.maxHeartRate,
             restingHeartRate: widget.person!.restingHeartRate,
             id: widget.person!.id,
-            role: widget.person!.role,
-            category: widget.person!.category,
-            group: widget.person!.group,
           );
         }
 
@@ -560,6 +555,22 @@ class _PersonDetailScreenState extends State<PersonDetailScreen> {
                 ],
               ),
               const SizedBox(height: 24),
+              if (widget.person != null)
+                OutlinedButton.icon(
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          ReadinessScreen(initialAthlete: widget.person),
+                    ),
+                  ),
+                  icon: const Icon(Icons.monitor_heart),
+                  label: const Text('Measure Readiness'),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.all(16),
+                  ),
+                ),
+              const SizedBox(height: 12),
               ElevatedButton(
                 onPressed: _savePerson,
                 style: ElevatedButton.styleFrom(

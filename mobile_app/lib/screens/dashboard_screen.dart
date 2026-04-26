@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:async';
+import 'dart:io' show Platform;
+import 'package:permission_handler/permission_handler.dart';
 import '../services/ble_service.dart';
 import '../services/database_service.dart';
 import '../services/supabase_repository.dart';
 import '../models/training_session.dart';
 import '../models/hr_device.dart';
+import '../models/core_temp_device.dart';
 import '../models/person.dart';
+import '../services/core_temp_service.dart';
+import '../services/hrv_service.dart';
+import 'team_readiness_screen.dart';
 
 // Data point for heart rate with timestamp
 class HeartRateDataPoint {
@@ -42,9 +48,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
     
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
-        // Restore previously connected devices
+        // Restore previously connected devices (HR + CoreTemp)
         await bleService.autoReconnectToSavedDevices();
-        
+        final coreTempService =
+            Provider.of<CoreTempService>(context, listen: false);
+        await coreTempService.autoReconnect();
+
         await _checkBluetoothStatus();
         final updatedBleService = Provider.of<BLEService>(context, listen: false);
         await updatedBleService.checkPermissions(); // Check permissions on startup
@@ -117,6 +126,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       );
       debugPrint('Session created: ${session.id}');
 
+      HrvService.instance.clearSessionData();
+
       setState(() {
         _activeSession = session;
         _heartRateHistoryByDevice.clear();
@@ -137,6 +148,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
             );
 
             _activeSession!.heartRateData.add(hrData);
+
+            // Accumulate RR intervals for HRV analysis
+            if (device.rrIntervals != null && device.rrIntervals!.isNotEmpty) {
+              HrvService.instance.addRRIntervals(device.id, device.rrIntervals!);
+            }
 
             // Store in device-specific history
             _heartRateHistoryByDevice.putIfAbsent(device.id, () => []);
@@ -183,7 +199,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     if (_activeSession != null) {
       final dbService = Provider.of<DatabaseService>(context, listen: false);
+      final bleService = Provider.of<BLEService>(context, listen: false);
       await dbService.endSession(_activeSession!.id);
+
+      // Save HRV snapshot for each assigned athlete
+      for (final device in bleService.connectedDevices) {
+        final athlete = DatabaseService.instance.getAthleteForSensor(device.id);
+        if (athlete != null) {
+          await HrvService.instance.saveSessionHrv(
+            athlete.id,
+            device.id,
+            device.currentHeartRate,
+          );
+        }
+      }
+      HrvService.instance.clearSessionData();
 
       // Sync session to Supabase in background
       _syncSessionToCloud(_activeSession!);
@@ -319,7 +349,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Bluetooth permissions required. On iOS, you must enable Bluetooth permissions in Settings > Privacy & Security > Bluetooth.',
+                          Platform.isAndroid
+                              ? 'Bluetooth permissions required.'
+                              : 'Bluetooth permissions required. Enable in Settings > Privacy & Security > Bluetooth.',
                           style: TextStyle(
                             fontSize: 13,
                             color: Colors.orange.shade700,
@@ -329,17 +361,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                       TextButton(
                         onPressed: () async {
-                          debugPrint('Grant button pressed');
-                          // On iOS, open settings directly since permissions can't be requested programmatically
-                          // For now, just show the guidance message
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Please go to Settings > Privacy & Security > Bluetooth and enable permissions for Linglong HR Monitor.'),
-                                backgroundColor: Colors.blue,
-                                duration: Duration(seconds: 8),
-                              ),
-                            );
+                          if (Platform.isAndroid) {
+                            final granted = await bleService.requestPermissions();
+                            if (!granted && mounted) {
+                              // Permanently denied — open app settings
+                              await openAppSettings();
+                            }
+                          } else {
+                            await openAppSettings();
                           }
                         },
                         child: Text(
@@ -379,11 +408,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ],
               ),
             ),
+          // Team readiness banner
+          _TeamReadinessBanner(),
           // Main content — full-screen grid
           Expanded(
-            child: Consumer<BLEService>(
-              builder: (context, bleService, child) {
-                final connected = bleService.connectedDevices
+            child: Consumer2<BLEService, CoreTempService>(
+              builder: (context, bleService, coreTempService, child) {
+                final hrDevices = bleService.connectedDevices
+                    .where((d) => d.isConnected)
+                    .toList();
+                final tempDevices = coreTempService.connectedDevices
                     .where((d) => d.isConnected)
                     .toList();
 
@@ -416,11 +450,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                       itemCount: totalSlots,
                       itemBuilder: (context, index) {
-                        if (index < connected.length) {
-                          final device = connected[index];
+                        if (index < hrDevices.length) {
+                          final device = hrDevices[index];
                           final athlete = DatabaseService.instance
                               .getAthleteForSensor(device.id);
                           return _buildSquareDeviceCard(device, index + 1, athlete);
+                        }
+                        final tempIndex = index - hrDevices.length;
+                        if (tempIndex < tempDevices.length) {
+                          final device = tempDevices[tempIndex];
+                          final athlete = DatabaseService.instance
+                              .getAthleteForSensor(device.id);
+                          return _buildCoreTempCard(device, index + 1, athlete);
                         }
                         return _buildEmptySlot(index + 1);
                       },
@@ -484,9 +525,250 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+  Widget _buildCoreTempCard(CoreTempDevice device, int slotNumber, Person? athlete) {
+    final bgColor = _getCoreTempColor(device.coreTemperature);
+    final accentColor = _getColorForMember(slotNumber);
+
+    return Card(
+      elevation: 2,
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(6),
+        onTap: () => _showSensorAssignmentDialogForCoreTemp(context, device, athlete),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final h = constraints.maxHeight;
+            final w = constraints.maxWidth;
+            final nameFontSize = (h * 0.09).clamp(8.0, 16.0);
+            final valueFontSize = (h * 0.30).clamp(20.0, 64.0);
+            final labelFontSize = (h * 0.07).clamp(7.0, 14.0);
+            final iconSize = (h * 0.14).clamp(12.0, 28.0);
+
+            return Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(6),
+                color: bgColor,
+              ),
+              child: Stack(
+                children: [
+                  Positioned(
+                    top: 0, left: 0,
+                    child: Container(
+                      width: w * 0.4,
+                      height: h * 0.3,
+                      decoration: BoxDecoration(
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(6),
+                          bottomRight: Radius.circular(40),
+                        ),
+                        color: accentColor.withValues(alpha: 0.25),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: w * 0.05, vertical: h * 0.05),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          athlete?.name ?? 'Tap to assign',
+                          style: TextStyle(
+                            fontSize: nameFontSize,
+                            color: athlete != null ? Colors.white : Colors.white60,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                        ),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.sensors,
+                                color: Colors.white70, size: iconSize),
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                device.coreTemperature != null
+                                    ? device.coreTemperature!.toStringAsFixed(1)
+                                    : '--',
+                                style: TextStyle(
+                                  fontSize: valueFontSize,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  height: 1.0,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              '°C core',
+                              style: TextStyle(
+                                fontSize: labelFontSize,
+                                color: Colors.white70,
+                                height: 1.0,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              device.skinTemperature != null
+                                  ? 'skin ${device.skinTemperature!.toStringAsFixed(1)}°'
+                                  : device.qualityLabel,
+                              style: TextStyle(
+                                fontSize: labelFontSize,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            if (device.batteryLevel != null)
+                              Text(
+                                '🔋${device.batteryLevel}%',
+                                style: TextStyle(
+                                    fontSize: labelFontSize,
+                                    color: Colors.white70),
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Color _getCoreTempColor(double? temp) {
+    if (temp == null) return Colors.grey[600]!;
+    if (temp < 37.2) return const Color(0xFF1E88E5); // normal — blue
+    if (temp < 38.0) return const Color(0xFFFFB300); // elevated — amber
+    return const Color(0xFFE53935);                   // high — red
+  }
+
+  void _showSensorAssignmentDialogForCoreTemp(
+      BuildContext context, CoreTempDevice device, Person? currentAthlete) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Assign CoreTemp Sensor'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Sensor: ${device.name}',
+                style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+            const SizedBox(height: 8),
+            if (currentAthlete != null)
+              Text('Currently assigned to: ${currentAthlete.name}',
+                  style: const TextStyle(
+                      fontSize: 12, fontWeight: FontWeight.w500)),
+            const SizedBox(height: 16),
+            const Text('Assign to:',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            _buildAthleteListForDevice(device.id),
+          ],
+        ),
+        actions: [
+          if (currentAthlete != null)
+            TextButton(
+              onPressed: () async {
+                await DatabaseService.instance.unassignSensor(device.id);
+                if (context.mounted) Navigator.pop(context);
+                setState(() {});
+              },
+              child: const Text('Unassign', style: TextStyle(color: Colors.red)),
+            ),
+          TextButton(
+            onPressed: () async {
+              final coreTempService =
+                  Provider.of<CoreTempService>(context, listen: false);
+              final msg = await coreTempService.clearPairedHRMs(device);
+              if (context.mounted) {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(msg)),
+                );
+              }
+            },
+            child: const Text('Clear HRMs',
+                style: TextStyle(color: Colors.orange)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAthleteListForDevice(String deviceId) {
+    final athletes = DatabaseService.instance.getAthletes();
+    if (athletes.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Text(
+          'No athletes found. Add athletes in the Team Members tab.',
+          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+        ),
+      );
+    }
+    return Container(
+      constraints: const BoxConstraints(maxHeight: 300),
+      child: SingleChildScrollView(
+        child: Column(
+          children: athletes.map((athlete) {
+            final isAssigned = athlete.hasSensorAssigned(deviceId);
+            return ListTile(
+              dense: true,
+              leading: CircleAvatar(
+                radius: 16,
+                backgroundColor: _getColorForAthlete(athlete),
+                child: Text(athlete.name[0].toUpperCase(),
+                    style: const TextStyle(color: Colors.white, fontSize: 14)),
+              ),
+              title: Text(athlete.name,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight:
+                        isAssigned ? FontWeight.bold : FontWeight.normal,
+                  )),
+              subtitle: Text('${athlete.age}y, ${athlete.gender}',
+                  style: const TextStyle(fontSize: 11)),
+              trailing: isAssigned
+                  ? const Icon(Icons.check_circle,
+                      color: Colors.green, size: 20)
+                  : null,
+              onTap: () async {
+                await DatabaseService.instance
+                    .assignSensorToAthlete(deviceId, athlete.id);
+                if (context.mounted) Navigator.pop(context);
+                setState(() {});
+              },
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+
   Widget _buildSquareDeviceCard(HRDevice device, int memberNumber, Person? athlete) {
     final zoneColor = _getHeartRateColorByTrainingZone(device.currentHeartRate);
     final accentColor = _getColorForMember(memberNumber);
+    final liveRmssd = HrvService.instance.getLiveRmssd(device.id);
+    final readiness = athlete != null
+        ? HrvService.instance.getReadiness(athlete.id, currentRmssd: liveRmssd)
+        : null;
 
     return Card(
       elevation: 2,
@@ -535,19 +817,37 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // Athlete name / assign prompt
-                        Text(
-                          athlete?.name ?? 'Tap to assign',
-                          style: TextStyle(
-                            fontSize: nameFontSize,
-                            color: athlete != null
-                                ? Colors.white
-                                : Colors.white60,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
+                        // Athlete name / assign prompt (with readiness dot)
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (readiness != null) ...[
+                              Container(
+                                width: (labelFontSize * 0.8).clamp(5.0, 9.0),
+                                height: (labelFontSize * 0.8).clamp(5.0, 9.0),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: readiness.color,
+                                ),
+                              ),
+                              const SizedBox(width: 3),
+                            ],
+                            Flexible(
+                              child: Text(
+                                athlete?.name ?? 'Tap to assign',
+                                style: TextStyle(
+                                  fontSize: nameFontSize,
+                                  color: athlete != null
+                                      ? Colors.white
+                                      : Colors.white60,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ],
                         ),
 
                         // BPM value — centre, dominant
@@ -579,16 +879,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ],
                         ),
 
-                        // Zone name + battery
+                        // Zone / RMSSD + battery
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              _getTrainingZoneName(device.currentHeartRate),
-                              style: TextStyle(
-                                fontSize: labelFontSize,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500,
+                            Flexible(
+                              child: Text(
+                                liveRmssd != null
+                                    ? 'RMSSD ${liveRmssd.toStringAsFixed(0)}ms'
+                                    : _getTrainingZoneName(
+                                        device.currentHeartRate),
+                                style: TextStyle(
+                                  fontSize: labelFontSize,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                             if (device.batteryLevel != null)
@@ -775,6 +1081,138 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 }
 
+// ── Team readiness banner ─────────────────────────────────────────────────────
+
+class _TeamReadinessBanner extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final athletes = DatabaseService.instance.getAthletes();
+    if (athletes.isEmpty) return const SizedBox.shrink();
+
+    final hrv = HrvService.instance;
+    final ids = athletes.map((a) => a.id).toList();
+    final teamAvg = hrv.getTeamAvgReadiness(ids);
+    if (teamAvg == null) return const SizedBox.shrink(); // no baselines yet
+
+    // Team-level acute / chronic fatigue
+    FatigueScore? teamFatigue(int days) {
+      final scores = athletes
+          .map((a) => hrv.getFatigue(a.id, days: days))
+          .whereType<FatigueScore>()
+          .toList();
+      if (scores.isEmpty) return null;
+      final avgR = scores.map((s) => s.windowAvgRmssd).reduce((a, b) => a + b) /
+          scores.length;
+      final avgB =
+          scores.map((s) => s.baseline).reduce((a, b) => a + b) / scores.length;
+      final pct = (avgR / avgB * 100).clamp(0.0, 150.0);
+      final level = pct >= 90
+          ? FatigueLevel.low
+          : pct >= 75
+              ? FatigueLevel.elevated
+              : pct >= 60
+                  ? FatigueLevel.high
+                  : FatigueLevel.veryHigh;
+      return FatigueScore(
+          level: level, windowAvgRmssd: avgR, baseline: avgB, days: days);
+    }
+
+    final acute = teamFatigue(7);
+    final chronic = teamFatigue(28);
+
+    final readiness = ReadinessScore(
+      percent: teamAvg,
+      baseline: 100,
+      currentRmssd: teamAvg,
+    );
+
+    return InkWell(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const TeamReadinessScreen()),
+      ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+          border: Border(
+            bottom: BorderSide(color: Colors.grey.withValues(alpha: 0.15)),
+          ),
+        ),
+        child: Row(
+          children: [
+            // Readiness % pill
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: readiness.color.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: readiness.color.withValues(alpha: 0.4)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'READINESS',
+                    style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.5,
+                        color: readiness.color),
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    '${teamAvg.toStringAsFixed(0)}%',
+                    style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: readiness.color),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 10),
+            // Fatigue chips
+            if (acute != null)
+              _FatigueChip('Acute', acute),
+            if (acute != null && chronic != null)
+              const SizedBox(width: 6),
+            if (chronic != null)
+              _FatigueChip('Chronic', chronic),
+            const Spacer(),
+            Icon(Icons.chevron_right,
+                size: 16, color: Colors.grey[500]),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _FatigueChip extends StatelessWidget {
+  final String label;
+  final FatigueScore score;
+  const _FatigueChip(this.label, this.score);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text('$label: ',
+            style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+        Text(score.label,
+            style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: score.color)),
+      ],
+    );
+  }
+}
+
+// ── Device dialog ─────────────────────────────────────────────────────────────
+
 class DeviceDialog extends StatefulWidget {
   const DeviceDialog({super.key});
 
@@ -786,25 +1224,20 @@ class _DeviceDialogState extends State<DeviceDialog> {
   final Set<String> _connectingDevices = {};
   bool _bleAvailable = true;
   bool _hasScanned = false;
+  int _selectedTab = 0; // 0 = Heart Rate, 1 = Core Temp
 
   @override
   void initState() {
     super.initState();
-    
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      // Don't reset BLE service - preserve connected devices
       final bleService = Provider.of<BLEService>(context, listen: false);
-      
       await _checkBluetoothAvailability();
-      await bleService.checkPermissions(); // Check permissions on startup
+      await bleService.checkPermissions();
       final error = await bleService.startScan();
       if (error != null && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(error),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 3),
-          ),
+          SnackBar(content: Text(error), backgroundColor: Colors.red,
+              duration: const Duration(seconds: 3)),
         );
       }
     });
@@ -813,26 +1246,31 @@ class _DeviceDialogState extends State<DeviceDialog> {
   Future<void> _checkBluetoothAvailability() async {
     final bleService = Provider.of<BLEService>(context, listen: false);
     final available = await bleService.isBluetoothAvailable();
-    setState(() {
-      _bleAvailable = available;
-    });
+    if (mounted) setState(() => _bleAvailable = available);
   }
 
   Future<void> _handleRescan() async {
-    final bleService = Provider.of<BLEService>(context, listen: false);
-    final error = await bleService.startScan();
-    if (error != null && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(error),
-          backgroundColor: Colors.red,
-          duration: const Duration(seconds: 3),
-        ),
-      );
+    setState(() => _hasScanned = true);
+    if (_selectedTab == 0) {
+      final bleService = Provider.of<BLEService>(context, listen: false);
+      final error = await bleService.startScan();
+      if (error != null && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error), backgroundColor: Colors.red,
+              duration: const Duration(seconds: 3)),
+        );
+      }
+    } else {
+      final coreTempService =
+          Provider.of<CoreTempService>(context, listen: false);
+      final error = await coreTempService.startScan();
+      if (error != null && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error), backgroundColor: Colors.red,
+              duration: const Duration(seconds: 3)),
+        );
+      }
     }
-    setState(() {
-      _hasScanned = true;
-    });
   }
 
   @override
@@ -841,247 +1279,77 @@ class _DeviceDialogState extends State<DeviceDialog> {
       title: const Text('Bluetooth Devices'),
       content: SizedBox(
         width: double.maxFinite,
-        child: Consumer<BLEService>(
-          builder: (context, bleService, child) {
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Bluetooth availability warning
-                if (!_bleAvailable)
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    margin: const EdgeInsets.only(bottom: 12),
-                    decoration: BoxDecoration(
-                      color: Colors.red.shade50,
-                      border: Border.all(color: Colors.red.shade300),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.error_outline, color: Colors.red.shade700),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Bluetooth is not enabled. Please enable Bluetooth in device settings.',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.red.shade700,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Bluetooth warning
+            if (!_bleAvailable)
+              Container(
+                padding: const EdgeInsets.all(12),
+                margin: const EdgeInsets.only(bottom: 8),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  border: Border.all(color: Colors.red.shade300),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
                   children: [
-                    Text(
-                      'Connected: ${bleService.connectedDevices.length}/10',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
+                    Icon(Icons.error_outline, color: Colors.red.shade700),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Bluetooth is not enabled.',
+                        style: TextStyle(fontSize: 12, color: Colors.red.shade700),
                       ),
                     ),
-                    if (bleService.isScanning)
-                      const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    else
-                      TextButton(
-                        onPressed: _handleRescan,
-                        child: Text(_hasScanned ? 'Rescan' : 'Scan'),
-                      ),
                   ],
                 ),
-                const SizedBox(height: 12),
-                if (bleService.isScanning)
-                  const LinearProgressIndicator()
-                else
-                  const SizedBox(height: 4),
-                const SizedBox(height: 12),
-                Flexible(
-                  child: Column(
-                    children: [
-                      // Discovered devices list
-                      Expanded(
-                        child: bleService.discoveredDevices.isEmpty
-                            ? Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.bluetooth_disabled,
-                                      size: 48,
-                                      color: Colors.grey[400],
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Text(
-                                      bleService.isScanning
-                                          ? 'Scanning for devices...'
-                                          : _bleAvailable
-                                              ? 'No devices found'
-                                              : 'Bluetooth is disabled',
-                                      style: TextStyle(
-                                        color: Colors.grey[600],
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: bleService.discoveredDevices.length,
-                                itemBuilder: (context, index) {
-                                  final device = bleService.discoveredDevices[index];
-                            final isConnected = device.isConnected;
-                            final isConnecting =
-                                _connectingDevices.contains(device.id);
-
-                            return ListTile(
-                              leading: const Icon(Icons.bluetooth),
-                              title: Text(device.name),
-                              subtitle:
-                                  Text('Signal: ${device.rssi} dBm'),
-                              trailing: isConnected
-                                  ? const Icon(Icons.check, color: Colors.green)
-                                  : bleService.connectedDevices.length >= 10
-                                      ? const Tooltip(
-                                          message: 'Max devices connected',
-                                          child: Icon(Icons.lock, color: Colors.grey),
-                                        )
-                                      : Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            ElevatedButton(
-                                              onPressed: isConnecting
-                                                  ? null
-                                                  : () async {
-                                                      setState(() {
-                                                        _connectingDevices.add(device.id);
-                                                      });
-
-                                                      try {
-                                                        final success = await bleService.connectDevice(device);
-                                                        if (mounted) {
-                                                          if (success) {
-                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                              SnackBar(content: Text('Connected to ${device.name}')),
-                                                            );
-                                                          } else {
-                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                              SnackBar(
-                                                                content: Text('Failed to connect to ${device.name}'),
-                                                                backgroundColor: Colors.red,
-                                                              ),
-                                                            );
-                                                          }
-                                                        }
-                                                      } finally {
-                                                        setState(() {
-                                                          _connectingDevices.remove(device.id);
-                                                        });
-                                                      }
-                                                    },
-                                              child: isConnecting
-                                                  ? const SizedBox(
-                                                      height: 16,
-                                                      width: 16,
-                                                      child: CircularProgressIndicator(strokeWidth: 2),
-                                                    )
-                                                  : const Text('Connect'),
-                                            ),
-                                            const SizedBox(width: 0),
-                                          ],
-                                        ),
-                            );
-                                },
-                              ),
-                      ),
-
-                      const SizedBox(height: 8),
-                      // Saved devices (previously connected) - useful when sensor doesn't advertise
-                      FutureBuilder<List<HRDevice>>(
-                        future: Provider.of<BLEService>(context, listen: false).getSavedConnectedDevices(),
-                        builder: (context, snap) {
-                          if (!snap.hasData || snap.data!.isEmpty) return const SizedBox.shrink();
-                          
-                          // Filter out devices that are already discovered or connected
-                          final savedDevices = snap.data!
-                              .where((sd) => !bleService.discoveredDevices.any((d) => d.id == sd.id) &&
-                                            !bleService.connectedDevices.any((d) => d.id == sd.id))
-                              .toList();
-                          
-                          if (savedDevices.isEmpty) return const SizedBox.shrink();
-                          
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('Saved Devices', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey)),
-                              const SizedBox(height: 6),
-                              SizedBox(
-                                height: (savedDevices.length * 56).toDouble().clamp(0, 200),
-                                child: ListView.builder(
-                                  itemCount: savedDevices.length,
-                                  itemBuilder: (context, i) {
-                                    final sd = savedDevices[i];
-                                    final isConnecting = _connectingDevices.contains(sd.id);
-                                    return ListTile(
-                                      leading: const Icon(Icons.history, color: Colors.grey),
-                                      title: Text(sd.name, style: const TextStyle(fontSize: 12)),
-                                      subtitle: Text(sd.id, style: const TextStyle(fontSize: 10)),
-                                      trailing: ElevatedButton(
-                                        onPressed: isConnecting
-                                            ? null
-                                            : () async {
-                                                setState(() { _connectingDevices.add(sd.id); });
-                                                try {
-                                                  final success = await Provider.of<BLEService>(context, listen: false).connectDevice(sd);
-                                                  if (mounted) {
-                                                    if (success) {
-                                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Restored ${sd.name}')));
-                                                    } else {
-                                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to restore ${sd.name}'), backgroundColor: Colors.red));
-                                                    }
-                                                  }
-                                                } finally {
-                                                  setState(() { _connectingDevices.remove(sd.id); });
-                                                }
-                                              },
-                                        child: isConnecting ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('Restore', style: TextStyle(fontSize: 11)),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ],
-                  ),
+              ),
+            // Tab selector
+            SegmentedButton<int>(
+              segments: const [
+                ButtonSegment(
+                  value: 0,
+                  icon: Icon(Icons.favorite, size: 16),
+                  label: Text('Heart Rate'),
+                ),
+                ButtonSegment(
+                  value: 1,
+                  icon: Icon(Icons.sensors, size: 16),
+                  label: Text('Core Temp'),
                 ),
               ],
-            );
-          },
+              selected: {_selectedTab},
+              onSelectionChanged: (s) {
+                setState(() {
+                  _selectedTab = s.first;
+                  _hasScanned = false;
+                });
+              },
+            ),
+            const SizedBox(height: 8),
+            // Scan row + progress
+            if (_selectedTab == 0)
+              _buildHRPanel()
+            else
+              _buildCoreTempPanel(),
+          ],
         ),
       ),
       actions: [
-        Consumer<BLEService>(
-          builder: (context, bleService, child) {
+        Consumer2<BLEService, CoreTempService>(
+          builder: (context, bleService, coreTempService, child) {
+            final total = bleService.connectedDevices.length +
+                coreTempService.connectedDevices.length;
             return TextButton(
-              onPressed: bleService.connectedDevices.isEmpty
+              onPressed: total == 0
                   ? null
                   : () {
                       showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
-                          title: const Text('Disconnect All Devices?'),
-                          content: Text(
-                            'This will disconnect ${bleService.connectedDevices.length} device(s).',
-                          ),
+                          title: const Text('Disconnect All?'),
+                          content: Text('Disconnect $total device(s)?'),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(context),
@@ -1090,6 +1358,7 @@ class _DeviceDialogState extends State<DeviceDialog> {
                             TextButton(
                               onPressed: () {
                                 bleService.disconnectAllDevices();
+                                coreTempService.disconnectAll();
                                 Navigator.pop(context);
                               },
                               child: const Text('Disconnect All',
@@ -1108,6 +1377,329 @@ class _DeviceDialogState extends State<DeviceDialog> {
           child: const Text('Close'),
         ),
       ],
+    );
+  }
+
+  Widget _buildHRPanel() {
+    return Consumer<BLEService>(
+      builder: (context, bleService, _) {
+        final connected = bleService.connectedDevices.where((d) => d.isConnected).toList();
+        final available = bleService.discoveredDevices
+            .where((d) => !connected.any((c) => c.id == d.id))
+            .toList();
+
+        return Flexible(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ── Connected section ──────────────────────────────────────
+                if (connected.isNotEmpty) ...[
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Text('Connected (${connected.length})',
+                        style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey[600])),
+                  ),
+                  ...connected.map((device) {
+                    final isDisconnecting = _connectingDevices.contains('dc:${device.id}');
+                    return ListTile(
+                      dense: true,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+                      leading: Icon(Icons.favorite, color: Colors.green[600], size: 20),
+                      title: Text(device.name, style: const TextStyle(fontSize: 13)),
+                      subtitle: device.currentHeartRate != null
+                          ? Text('${device.currentHeartRate} bpm',
+                              style: const TextStyle(fontSize: 11))
+                          : null,
+                      trailing: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.red,
+                          side: const BorderSide(color: Colors.red),
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          minimumSize: const Size(0, 30),
+                        ),
+                        onPressed: isDisconnecting
+                            ? null
+                            : () async {
+                                setState(() =>
+                                    _connectingDevices.add('dc:${device.id}'));
+                                try {
+                                  await bleService.disconnectDevice(device);
+                                } finally {
+                                  if (mounted) {
+                                    setState(() => _connectingDevices
+                                        .remove('dc:${device.id}'));
+                                  }
+                                }
+                              },
+                        child: isDisconnecting
+                            ? const SizedBox(
+                                height: 14, width: 14,
+                                child: CircularProgressIndicator(strokeWidth: 2))
+                            : const Text('Disconnect',
+                                style: TextStyle(fontSize: 12)),
+                      ),
+                    );
+                  }),
+                  const Divider(height: 16),
+                ],
+                // ── Available / scan section ───────────────────────────────
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Available',
+                        style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey[600])),
+                    bleService.isScanning
+                        ? const SizedBox(
+                            height: 18, width: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2))
+                        : TextButton(
+                            onPressed: _handleRescan,
+                            child: Text(_hasScanned ? 'Rescan' : 'Scan',
+                                style: const TextStyle(fontSize: 12))),
+                  ],
+                ),
+                if (bleService.isScanning)
+                  const LinearProgressIndicator()
+                else
+                  const SizedBox(height: 2),
+                if (available.isEmpty)
+                  _emptyState(bleService.isScanning)
+                else
+                  ...available.map((device) {
+                    final isConnecting = _connectingDevices.contains(device.id);
+                    return ListTile(
+                      dense: true,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+                      leading: const Icon(Icons.favorite_border, size: 20),
+                      title: Text(device.name, style: const TextStyle(fontSize: 13)),
+                      subtitle: Text('${device.rssi} dBm',
+                          style: const TextStyle(fontSize: 11)),
+                      trailing: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          minimumSize: const Size(0, 30),
+                        ),
+                        onPressed: isConnecting
+                            ? null
+                            : () async {
+                                setState(() =>
+                                    _connectingDevices.add(device.id));
+                                try {
+                                  final ok =
+                                      await bleService.connectDevice(device);
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(SnackBar(
+                                      content: Text(ok
+                                          ? 'Connected to ${device.name}'
+                                          : 'Failed to connect'),
+                                      backgroundColor:
+                                          ok ? null : Colors.red,
+                                    ));
+                                  }
+                                } finally {
+                                  if (mounted) {
+                                    setState(() => _connectingDevices
+                                        .remove(device.id));
+                                  }
+                                }
+                              },
+                        child: isConnecting
+                            ? const SizedBox(
+                                height: 14, width: 14,
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2))
+                            : const Text('Connect',
+                                style: TextStyle(fontSize: 12)),
+                      ),
+                    );
+                  }),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildCoreTempPanel() {
+    return Consumer<CoreTempService>(
+      builder: (context, coreTempService, _) {
+        final connected = coreTempService.connectedDevices.where((d) => d.isConnected).toList();
+        final available = coreTempService.discoveredDevices
+            .where((d) => !connected.any((c) => c.id == d.id))
+            .toList();
+
+        return Flexible(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ── Connected section ──────────────────────────────────────
+                if (connected.isNotEmpty) ...[
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Text('Connected (${connected.length})',
+                        style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey[600])),
+                  ),
+                  ...connected.map((device) {
+                    final isDisconnecting =
+                        _connectingDevices.contains('dc:${device.id}');
+                    return ListTile(
+                      dense: true,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+                      leading: Icon(Icons.sensors, color: Colors.green[600], size: 20),
+                      title: Text(device.name, style: const TextStyle(fontSize: 13)),
+                      subtitle: device.coreTemperature != null
+                          ? Text(
+                              '${device.coreTemperature!.toStringAsFixed(1)}°C core',
+                              style: const TextStyle(fontSize: 11))
+                          : null,
+                      trailing: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.red,
+                          side: const BorderSide(color: Colors.red),
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          minimumSize: const Size(0, 30),
+                        ),
+                        onPressed: isDisconnecting
+                            ? null
+                            : () async {
+                                setState(() => _connectingDevices
+                                    .add('dc:${device.id}'));
+                                try {
+                                  await coreTempService.disconnectDevice(device);
+                                } finally {
+                                  if (mounted) {
+                                    setState(() => _connectingDevices
+                                        .remove('dc:${device.id}'));
+                                  }
+                                }
+                              },
+                        child: isDisconnecting
+                            ? const SizedBox(
+                                height: 14, width: 14,
+                                child: CircularProgressIndicator(strokeWidth: 2))
+                            : const Text('Disconnect',
+                                style: TextStyle(fontSize: 12)),
+                      ),
+                    );
+                  }),
+                  const Divider(height: 16),
+                ],
+                // ── Available / scan section ───────────────────────────────
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Available',
+                        style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey[600])),
+                    coreTempService.isScanning
+                        ? const SizedBox(
+                            height: 18, width: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2))
+                        : TextButton(
+                            onPressed: _handleRescan,
+                            child: Text(_hasScanned ? 'Rescan' : 'Scan',
+                                style: const TextStyle(fontSize: 12))),
+                  ],
+                ),
+                if (coreTempService.isScanning)
+                  const LinearProgressIndicator()
+                else
+                  const SizedBox(height: 2),
+                if (available.isEmpty)
+                  _emptyState(coreTempService.isScanning)
+                else
+                  ...available.map((device) {
+                    final isConnecting = _connectingDevices.contains(device.id);
+                    return ListTile(
+                      dense: true,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+                      leading: const Icon(Icons.sensors_off, size: 20),
+                      title: Text(device.name, style: const TextStyle(fontSize: 13)),
+                      subtitle: Text('${device.rssi} dBm',
+                          style: const TextStyle(fontSize: 11)),
+                      trailing: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          minimumSize: const Size(0, 30),
+                        ),
+                        onPressed: isConnecting
+                            ? null
+                            : () async {
+                                setState(() =>
+                                    _connectingDevices.add(device.id));
+                                try {
+                                  final ok = await coreTempService
+                                      .connectDevice(device);
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(SnackBar(
+                                      content: Text(ok
+                                          ? 'Connected to ${device.name}'
+                                          : 'Failed to connect'),
+                                      backgroundColor:
+                                          ok ? null : Colors.red,
+                                    ));
+                                  }
+                                } finally {
+                                  if (mounted) {
+                                    setState(() => _connectingDevices
+                                        .remove(device.id));
+                                  }
+                                }
+                              },
+                        child: isConnecting
+                            ? const SizedBox(
+                                height: 14, width: 14,
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2))
+                            : const Text('Connect',
+                                style: TextStyle(fontSize: 12)),
+                      ),
+                    );
+                  }),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _emptyState(bool isScanning) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.bluetooth_disabled, size: 48, color: Colors.grey[400]),
+          const SizedBox(height: 12),
+          Text(
+            isScanning
+                ? 'Scanning for devices...'
+                : _bleAvailable
+                    ? 'No devices found. Tap Scan to search.'
+                    : 'Bluetooth is disabled',
+            style: TextStyle(color: Colors.grey[600], fontSize: 14),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 }
