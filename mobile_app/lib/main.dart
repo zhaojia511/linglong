@@ -6,12 +6,15 @@ import 'screens/dashboard_screen.dart';
 import 'screens/training_history_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/settings_screen.dart';
+import 'screens/readiness_screen.dart';
 import 'screens/auth_gate.dart';
 import 'services/ble_service.dart';
 import 'services/database_service.dart';
 import 'services/settings_service.dart';
 import 'services/sync_service.dart';
 import 'services/auth_service.dart';
+import 'services/core_temp_service.dart';
+import 'services/hrv_service.dart';
 import 'supabase/supabase_client.dart';
 import 'services/app_initializer.dart';
 
@@ -84,21 +87,31 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthService()),
         ChangeNotifierProvider(create: (_) => BLEService()),
+        ChangeNotifierProvider(create: (_) => CoreTempService()),
         ChangeNotifierProvider(create: (_) => DatabaseService.instance),
         ChangeNotifierProvider(create: (_) => SyncService()),
         ChangeNotifierProvider(create: (_) => SettingsService.instance),
+        ChangeNotifierProvider(create: (_) => HrvService.instance),
       ],
       child: MaterialApp(
         title: 'Linglong HR Monitor',
         theme: ThemeData(
-          primarySwatch: Colors.blue,
           useMaterial3: true,
-          brightness: Brightness.light,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color(0xFF0D2B5E), // navy
+            primary: const Color(0xFF0D2B5E),
+            secondary: const Color(0xFF00897B), // teal accent
+            brightness: Brightness.light,
+          ),
         ),
         darkTheme: ThemeData(
-          primarySwatch: Colors.blue,
           useMaterial3: true,
-          brightness: Brightness.dark,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color(0xFF0D2B5E),
+            primary: const Color(0xFF4A7FC1),   // lighter navy for dark bg
+            secondary: const Color(0xFF26A69A), // teal lighter for dark
+            brightness: Brightness.dark,
+          ),
         ),
         home: const AuthGate(child: _InitializerScreen()),
         routes: {
@@ -107,6 +120,7 @@ class MyApp extends StatelessWidget {
           '/history': (context) => const TrainingHistoryScreen(),
           '/profile': (context) => const ProfileScreen(),
           '/settings': (context) => const SettingsScreen(),
+          '/readiness': (context) => const ReadinessScreen(),
         },
       ),
     );

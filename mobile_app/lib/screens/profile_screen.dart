@@ -22,6 +22,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: null,
         actions: [
           IconButton(
+            icon: const Icon(Icons.monitor_heart),
+            tooltip: 'Measure Readiness',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ReadinessScreen()),
+            ),
+          ),
+          IconButton(
             icon: const Icon(Icons.sync),
             onPressed: () => _showSyncDialog(context),
           ),
