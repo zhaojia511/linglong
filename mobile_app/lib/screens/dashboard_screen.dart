@@ -13,6 +13,7 @@ import '../models/person.dart';
 import '../services/core_temp_service.dart';
 import '../services/hrv_service.dart';
 import 'team_readiness_screen.dart';
+import 'readiness_screen.dart';
 
 // Data point for heart rate with timestamp
 class HeartRateDataPoint {
@@ -33,7 +34,9 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  TrainingSession? _activeSession;
+  // Active sessions keyed by athleteId — one session per worn, paired sensor.
+  final Map<String, TrainingSession> _activeSessions = {};
+  bool _isRecording = false;
   Timer? _recordTimer;
   bool _isSyncing = false;
   bool _bleEnabled = true;
@@ -118,70 +121,118 @@ class _DashboardScreenState extends State<DashboardScreen> {
     debugPrint('=== _startRecording called ===');
     try {
       final dbService = Provider.of<DatabaseService>(context, listen: false);
-      debugPrint('DatabaseService obtained');
-
-      final session = await dbService.createSession(
-        title: 'Training Session ${DateTime.now().toString().substring(0, 16)}',
-        trainingType: 'general',
-      );
-      debugPrint('Session created: ${session.id}');
+      final bleService = Provider.of<BLEService>(context, listen: false);
 
       HrvService.instance.clearSessionData();
 
+      // Create one session per worn, paired device. Sensors that are paired
+      // but not producing HR (i.e. not currently worn) are skipped — they'll
+      // be picked up mid-session by the timer below if HR appears.
+      final timestamp = DateTime.now().toString().substring(0, 16);
+      int created = 0;
+      for (final device in bleService.connectedDevices) {
+        if (device.currentHeartRate == null) continue;
+        final athlete =
+            DatabaseService.instance.getAthleteForSensor(device.id);
+        if (athlete == null) continue;
+        if (_activeSessions.containsKey(athlete.id)) continue;
+
+        final session = await dbService.createSession(
+          title: 'Training Session $timestamp',
+          trainingType: 'general',
+          personId: athlete.id,
+        );
+        _activeSessions[athlete.id] = session;
+        created++;
+        debugPrint('Session ${session.id} created for ${athlete.name}');
+      }
+
+      if (created == 0) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                  'No worn paired sensors detected. Put on chest straps and try again.'),
+              backgroundColor: Colors.orange,
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+        return;
+      }
+
       setState(() {
-        _activeSession = session;
+        _isRecording = true;
         _heartRateHistoryByDevice.clear();
       });
-      debugPrint('State updated, activeSession set');
 
-      // Record heart rate every second
-      _recordTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      // Record heart rate every second.
+      // Mid-session: if a paired sensor starts producing HR (athlete puts strap
+      // on late, or strap reconnects), spin up a session for that athlete.
+      _recordTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
         final bleService = Provider.of<BLEService>(context, listen: false);
 
-        // Record data for each connected device
-        for (var device in bleService.connectedDevices) {
-          if (device.currentHeartRate != null) {
-            final hrData = HeartRateData(
-              timestamp: DateTime.now(),
-              heartRate: device.currentHeartRate!,
-              deviceId: device.id,
-            );
+        for (final device in bleService.connectedDevices) {
+          if (device.currentHeartRate == null) continue;
 
-            _activeSession!.heartRateData.add(hrData);
+          final athlete =
+              DatabaseService.instance.getAthleteForSensor(device.id);
+          if (athlete == null) continue;
 
-            // Accumulate RR intervals for HRV analysis
-            if (device.rrIntervals != null && device.rrIntervals!.isNotEmpty) {
-              HrvService.instance.addRRIntervals(device.id, device.rrIntervals!);
+          // Lazily create a session for any newly-worn paired sensor.
+          var session = _activeSessions[athlete.id];
+          if (session == null) {
+            try {
+              session = await dbService.createSession(
+                title: 'Training Session $timestamp',
+                trainingType: 'general',
+                personId: athlete.id,
+              );
+              _activeSessions[athlete.id] = session;
+              debugPrint(
+                  'Late-join session ${session.id} created for ${athlete.name}');
+            } catch (e) {
+              debugPrint('Failed to create late-join session: $e');
+              continue;
             }
-
-            // Store in device-specific history
-            _heartRateHistoryByDevice.putIfAbsent(device.id, () => []);
-            _heartRateHistoryByDevice[device.id]!.add(
-              HeartRateDataPoint(
-                timestamp: DateTime.now(),
-                value: device.currentHeartRate!.toDouble(),
-              ),
-            );
-
-            setState(() {});
           }
+
+          final now = DateTime.now();
+          session.heartRateData.add(HeartRateData(
+            timestamp: now,
+            heartRate: device.currentHeartRate!,
+            deviceId: device.id,
+          ));
+
+          if (device.rrIntervals != null && device.rrIntervals!.isNotEmpty) {
+            HrvService.instance.addRRIntervals(device.id, device.rrIntervals!);
+          }
+
+          _heartRateHistoryByDevice.putIfAbsent(device.id, () => []);
+          _heartRateHistoryByDevice[device.id]!.add(
+            HeartRateDataPoint(
+              timestamp: now,
+              value: device.currentHeartRate!.toDouble(),
+            ),
+          );
         }
+        if (mounted) setState(() {});
       });
-      debugPrint('Timer started');
-      
+      debugPrint('Timer started; $created session(s) active');
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Training session started'),
+          SnackBar(
+            content: Text('Recording $created athlete${created == 1 ? "" : "s"}'),
             backgroundColor: Colors.green,
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
           ),
         );
       }
     } catch (e, stackTrace) {
       debugPrint('ERROR in _startRecording: $e');
       debugPrint('Stack trace: $stackTrace');
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -196,41 +247,61 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void _stopRecording() async {
     _recordTimer?.cancel();
+    _recordTimer = null;
 
-    if (_activeSession != null) {
-      final dbService = Provider.of<DatabaseService>(context, listen: false);
-      final bleService = Provider.of<BLEService>(context, listen: false);
-      await dbService.endSession(_activeSession!.id);
+    if (_activeSessions.isEmpty) {
+      setState(() => _isRecording = false);
+      return;
+    }
 
-      // Save HRV snapshot for each assigned athlete
-      for (final device in bleService.connectedDevices) {
-        final athlete = DatabaseService.instance.getAthleteForSensor(device.id);
-        if (athlete != null) {
-          await HrvService.instance.saveSessionHrv(
-            athlete.id,
-            device.id,
-            device.currentHeartRate,
-          );
-        }
-      }
-      HrvService.instance.clearSessionData();
+    final dbService = Provider.of<DatabaseService>(context, listen: false);
+    final bleService = Provider.of<BLEService>(context, listen: false);
 
-      // Sync session to Supabase in background
-      _syncSessionToCloud(_activeSession!);
+    final sessionsSnapshot = _activeSessions.values.toList(growable: false);
+    final athleteCount = sessionsSnapshot.length;
 
-      setState(() {
-        _activeSession = null;
-        _heartRateHistoryByDevice.clear();
-      });
+    // Finalize each session (computes stats, persists endTime).
+    for (final session in sessionsSnapshot) {
+      await dbService.endSession(session.id);
+    }
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Training session saved and syncing to cloud...'),
-            duration: Duration(seconds: 2),
-          ),
+    // Save HRV snapshot for each assigned athlete with a worn strap.
+    for (final device in bleService.connectedDevices) {
+      final athlete = DatabaseService.instance.getAthleteForSensor(device.id);
+      if (athlete != null) {
+        await HrvService.instance.saveSessionHrv(
+          athlete.id,
+          device.id,
+          device.currentHeartRate,
         );
       }
+    }
+    HrvService.instance.clearSessionData();
+
+    // Kick off cloud sync per session in background.
+    for (final session in sessionsSnapshot) {
+      // Re-fetch the persisted session so endTime/stats are present.
+      final stored = dbService.getAllSessions().firstWhere(
+            (s) => s.id == session.id,
+            orElse: () => session,
+          );
+      _syncSessionToCloud(stored);
+    }
+
+    setState(() {
+      _isRecording = false;
+      _activeSessions.clear();
+      _heartRateHistoryByDevice.clear();
+    });
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              'Saved $athleteCount athlete session${athleteCount == 1 ? "" : "s"}, syncing to cloud...'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
     }
   }
 
@@ -475,16 +546,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
       floatingActionButton: Consumer<BLEService>(
         builder: (context, bleService, child) {
-          final connectedDevices = bleService.connectedDevices.where((d) => d.isConnected).toList();
-          debugPrint('FAB check: _activeSession=${_activeSession != null}, connectedCount=${connectedDevices.length}');
-          
+          final connectedDevices =
+              bleService.connectedDevices.where((d) => d.isConnected).toList();
+          debugPrint(
+              'FAB check: recording=$_isRecording, activeSessions=${_activeSessions.length}, connectedCount=${connectedDevices.length}');
+
           VoidCallback? onPressed;
-          if (_activeSession == null && connectedDevices.isNotEmpty) {
+          if (!_isRecording && connectedDevices.isNotEmpty) {
             onPressed = () {
               debugPrint('Starting recording...');
               _startRecording();
             };
-          } else if (_activeSession != null) {
+          } else if (_isRecording) {
             onPressed = () {
               debugPrint('Stopping recording...');
               _stopRecording();
@@ -492,14 +565,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
           } else {
             debugPrint('FAB disabled: no connected devices');
           }
-          
+
           return FloatingActionButton.extended(
             heroTag: 'dashboard_fab',
             onPressed: onPressed,
-            icon: Icon(_activeSession == null ? Icons.play_arrow : Icons.stop),
-            label: Text(
-                _activeSession == null ? 'Start Training' : 'Stop Training'),
-            backgroundColor: _activeSession == null ? Colors.green : Colors.red,
+            icon: Icon(_isRecording ? Icons.stop : Icons.play_arrow),
+            label: Text(_isRecording
+                ? 'Stop Training (${_activeSessions.length})'
+                : 'Start Training'),
+            backgroundColor: _isRecording ? Colors.red : Colors.green,
           );
         },
       ),
@@ -776,7 +850,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
       child: InkWell(
         borderRadius: BorderRadius.circular(6),
-        onTap: () => _showSensorAssignmentDialog(context, device, athlete),
+        onTap: () {
+          // Daily action: tap → start readiness measurement for this athlete.
+          // If the sensor isn't paired yet, fall back to the assignment dialog.
+          if (athlete == null) {
+            _showSensorAssignmentDialog(context, device, athlete);
+            return;
+          }
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ReadinessScreen(initialAthlete: athlete),
+            ),
+          );
+        },
+        // Long-press = setup action: re-assign or unassign the sensor.
+        onLongPress: () =>
+            _showSensorAssignmentDialog(context, device, athlete),
         child: LayoutBuilder(
           builder: (context, constraints) {
             final h = constraints.maxHeight;

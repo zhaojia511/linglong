@@ -150,21 +150,27 @@ class DatabaseService extends ChangeNotifier {
   Future<TrainingSession> createSession({
     required String title,
     required String trainingType,
+    String? personId,
     String? notes,
   }) async {
-    // Ensure a person is selected - auto-select first one if none selected
-    if (_currentPerson == null) {
-      final persons = getAllPersons();
-      if (persons.isEmpty) {
-        throw Exception('Please create a person profile first');
+    // Resolve target person: explicit param wins, else fall back to _currentPerson,
+    // else auto-select the first person in the box.
+    String? targetPersonId = personId;
+    if (targetPersonId == null) {
+      if (_currentPerson == null) {
+        final persons = getAllPersons();
+        if (persons.isEmpty) {
+          throw Exception('Please create a person profile first');
+        }
+        _currentPerson = persons.first;
+        debugPrint('Auto-selected person: ${_currentPerson!.name}');
       }
-      _currentPerson = persons.first;
-      debugPrint('Auto-selected person: ${_currentPerson!.name}');
+      targetPersonId = _currentPerson!.id;
     }
 
     final session = TrainingSession(
       id: const Uuid().v4(),
-      personId: _currentPerson!.id,
+      personId: targetPersonId,
       title: title,
       startTime: DateTime.now(),
       duration: 0,
@@ -173,7 +179,7 @@ class DatabaseService extends ChangeNotifier {
       synced: false,
       notes: notes,
     );
-    
+
     await _sessionBox!.put(session.id, session);
     notifyListeners();
     return session;
@@ -196,15 +202,17 @@ class DatabaseService extends ChangeNotifier {
         session.avgHeartRate = heartRates.reduce((a, b) => a + b) ~/ heartRates.length;
         session.maxHeartRate = heartRates.reduce((a, b) => a > b ? a : b);
         session.minHeartRate = heartRates.reduce((a, b) => a < b ? a : b);
-        
-        // Simple calorie calculation (can be improved)
-        if (_currentPerson != null) {
+
+        // Calorie calc uses the session's own person (not _currentPerson)
+        // so multi-athlete recordings get correct per-person calories.
+        final sessionPerson = _personBox?.get(session.personId) ?? _currentPerson;
+        if (sessionPerson != null) {
           session.calories = _calculateCalories(
             avgHeartRate: session.avgHeartRate!,
             duration: session.duration,
-            weight: _currentPerson!.weight,
-            age: _currentPerson!.age,
-            gender: _currentPerson!.gender,
+            weight: sessionPerson.weight,
+            age: sessionPerson.age,
+            gender: sessionPerson.gender,
           );
         }
       }
