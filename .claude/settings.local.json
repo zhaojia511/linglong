@@ -32,7 +32,27 @@
       "Bash(curl -s -X POST \"https://krbobzpwgzxhnqssgwoy.supabase.co/rest/v1/rpc/query\" -H \"apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtyYm9ienB3Z3p4aG5xc3Nnd295Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NzI0MzU5MSwiZXhwIjoyMDgyODE5NTkxfQ.yLYlvkSBm-fxW-Octl-ROvB6Q35OWbdmXps0JlKlYGU\" -H \"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtyYm9ienB3Z3p4aG5xc3Nnd295Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NzI0MzU5MSwiZXhwIjoyMDgyODE5NTkxfQ.yLYlvkSBm-fxW-Octl-ROvB6Q35OWbdmXps0JlKlYGU\" -H \"Content-Type: application/json\" -d '{\"\"query\"\": \"\"SELECT 1\"\"}')",
       "Bash(supabase db:*)",
       "Bash(supabase migration:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(flutter devices *)",
+      "Bash(flutter run *)",
+      "Bash(flutter build *)",
+      "Bash(./android/gradlew assembleDebug --info)",
+      "Bash(/usr/libexec/java_home -V)",
+      "Bash(curl -I https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-build-tools-impl/2.0.21/kotlin-build-tools-impl-2.0.21.pom)",
+      "Bash(./android/gradlew assembleDebug --offline)",
+      "Bash(./gradlew assembleDebug --offline)",
+      "Bash(/usr/libexec/java_home -v 21)",
+      "Bash(export JAVA_HOME=$\\(/usr/libexec/java_home -v 21\\))",
+      "Bash(./gradlew assembleDebug)",
+      "Read(//opt/homebrew/share/android-commandlinetools/cmdline-tools/latest/bin/**)",
+      "Read(//opt/homebrew/share/android-commandlinetools/tools/bin/**)",
+      "Read(//opt/homebrew/share/android-commandlinetools/**)",
+      "Bash(/opt/homebrew/share/android-commandlinetools/cmdline-tools/latest/bin/sdkmanager \"ndk;28.2.13676358\")",
+      "Bash(curl -s https://dl.google.com/android/repository/repository2-3.xml)",
+      "Read(//Users/zhaojia/Downloads/**)",
+      "Bash(flutter --version)",
+      "Bash(curl -sI --max-time 10 https://repo.maven.apache.org/maven2/)",
+      "Bash(curl -sI --max-time 10 https://maven.aliyun.com/repository/public/)"
     ],
     "additionalDirectories": [
       "d:\\github\\linglong\\docs\\superpowers"

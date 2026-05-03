@@ -208,7 +208,7 @@ class _ReadinessScreenState extends State<ReadinessScreen> {
               style: TextStyle(color: Colors.grey))
         else
           DropdownButtonFormField<Person>(
-            value: _selectedAthlete,
+            initialValue: _selectedAthlete,
             decoration: const InputDecoration(
               border: OutlineInputBorder(),
               contentPadding:
@@ -236,10 +236,10 @@ class _ReadinessScreenState extends State<ReadinessScreen> {
               border: Border.all(color: Colors.orange),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Row(children: [
-              const Icon(Icons.warning_amber, color: Colors.orange, size: 18),
-              const SizedBox(width: 8),
-              const Expanded(
+            child: const Row(children: [
+              Icon(Icons.warning_amber, color: Colors.orange, size: 18),
+              SizedBox(width: 8),
+              Expanded(
                 child: Text(
                   'No sensors connected. Connect a chest strap in the Dashboard.',
                   style: TextStyle(fontSize: 13),
@@ -249,7 +249,7 @@ class _ReadinessScreenState extends State<ReadinessScreen> {
           )
         else
           DropdownButtonFormField<HRDevice>(
-            value: _selectedSensor != null &&
+            initialValue: _selectedSensor != null &&
                     connectedSensors.any((d) => d.id == _selectedSensor!.id)
                 ? connectedSensors
                     .firstWhere((d) => d.id == _selectedSensor!.id)
@@ -439,7 +439,7 @@ class _ReadinessScreenState extends State<ReadinessScreen> {
                     style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 4),
                 Text(
-                  '${_durationMinutes} min measurement · ${r.validIntervals} RR intervals',
+                  '$_durationMinutes min measurement · ${r.validIntervals} RR intervals',
                   style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                 ),
                 if (readinessPct != null) ...[
