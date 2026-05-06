@@ -5,11 +5,13 @@ import 'dart:async';
 import 'dart:math' as math;
 import '../services/ble_service.dart';
 import '../services/database_service.dart';
+import '../services/hrv_service.dart';
 import '../services/supabase_repository.dart';
 import '../models/training_session.dart';
 import '../models/hr_device.dart';
 import '../models/person.dart';
 import 'athlete_detail_screen.dart';
+import 'readiness_screen.dart';
 
 // Data point for heart rate with timestamp
 class HeartRateDataPoint {
@@ -31,7 +33,8 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen>
     with WidgetsBindingObserver {
-  TrainingSession? _activeSession;
+  final Map<String, TrainingSession> _activeSessions = {};
+  bool _isRecording = false;
   Timer? _recordTimer;
   bool _isSyncing = false;
   bool _bleEnabled = true;
@@ -222,63 +225,123 @@ class _DashboardScreenState extends State<DashboardScreen>
     debugPrint('=== _startRecording called ===');
     try {
       final dbService = Provider.of<DatabaseService>(context, listen: false);
-      debugPrint('DatabaseService obtained');
+      final bleService = Provider.of<BLEService>(context, listen: false);
 
-      final session = await dbService.createSession(
-        title: 'Training Session ${DateTime.now().toString().substring(0, 16)}',
-        trainingType: 'general',
-      );
-      debugPrint('Session created: ${session.id}');
+      HrvService.instance.clearSessionData();
+
+      final timestamp = DateTime.now().toString().substring(0, 16);
+      int created = 0;
+
+      for (final device in bleService.connectedDevices) {
+        if (!device.isConnected || device.currentHeartRate == null) {
+          continue;
+        }
+
+        final athlete = dbService.getAthleteForSensor(device.id);
+        if (athlete == null || _activeSessions.containsKey(athlete.id)) {
+          continue;
+        }
+
+        final session = await dbService.createSession(
+          title: 'Training Session $timestamp',
+          trainingType: 'general',
+          personId: athlete.id,
+        );
+        _activeSessions[athlete.id] = session;
+        created++;
+        debugPrint('Session created: ${session.id} for ${athlete.name}');
+      }
+
+      if (created == 0) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                  'No worn paired sensors detected. Put on chest straps and try again.'),
+              backgroundColor: Colors.orange,
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+        return;
+      }
 
       setState(() {
-        _activeSession = session;
+        _isRecording = true;
         _heartRateHistoryByDevice.clear();
+        _zoneSecondsByDevice.clear();
+        _sessionMarkers.clear();
       });
-      debugPrint('State updated, activeSession set');
+      debugPrint('State updated, activeSessions=${_activeSessions.length}');
 
-      // Record heart rate every second
-      _recordTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      _recordTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
         final bleService = Provider.of<BLEService>(context, listen: false);
 
-        // Record data for each connected device
-        for (var device in bleService.connectedDevices) {
-          if (device.currentHeartRate != null) {
-            final hrData = HeartRateData(
-              timestamp: DateTime.now(),
-              heartRate: device.currentHeartRate!,
-              deviceId: device.id,
-            );
-
-            _activeSession!.heartRateData.add(hrData);
-
-            // Store in device-specific history (cap at 60 points for sparkline)
-            _heartRateHistoryByDevice.putIfAbsent(device.id, () => []);
-            final history = _heartRateHistoryByDevice[device.id]!;
-            history.add(HeartRateDataPoint(
-              timestamp: DateTime.now(),
-              value: device.currentHeartRate!.toDouble(),
-            ));
-            if (history.length > 60) history.removeAt(0);
-
-            // Increment time-in-zone counter
-            _zoneSecondsByDevice.putIfAbsent(device.id, () => [0, 0, 0, 0, 0]);
-            final zoneIdx = _getZoneIndex(device.currentHeartRate!);
-            _zoneSecondsByDevice[device.id]![zoneIdx]++;
-
-            setState(() {});
-
-            _checkAlerts(device);
+        for (final device in bleService.connectedDevices) {
+          if (!device.isConnected || device.currentHeartRate == null) {
+            continue;
           }
+
+          final athlete = dbService.getAthleteForSensor(device.id);
+          if (athlete == null) {
+            continue;
+          }
+
+          var session = _activeSessions[athlete.id];
+          if (session == null) {
+            try {
+              session = await dbService.createSession(
+                title: 'Training Session $timestamp',
+                trainingType: 'general',
+                personId: athlete.id,
+              );
+              _activeSessions[athlete.id] = session;
+              debugPrint(
+                  'Late-join session created: ${session.id} for ${athlete.name}');
+            } catch (e) {
+              debugPrint('Failed to create late-join session: $e');
+              continue;
+            }
+          }
+
+          final now = DateTime.now();
+          session.heartRateData.add(HeartRateData(
+            timestamp: now,
+            heartRate: device.currentHeartRate!,
+            deviceId: device.id,
+          ));
+
+          if (device.rrIntervals != null && device.rrIntervals!.isNotEmpty) {
+            HrvService.instance.addRRIntervals(device.id, device.rrIntervals!);
+          }
+
+          _heartRateHistoryByDevice.putIfAbsent(device.id, () => []);
+          final history = _heartRateHistoryByDevice[device.id]!;
+          history.add(HeartRateDataPoint(
+            timestamp: now,
+            value: device.currentHeartRate!.toDouble(),
+          ));
+          if (history.length > 60) history.removeAt(0);
+
+          _zoneSecondsByDevice.putIfAbsent(device.id, () => [0, 0, 0, 0, 0]);
+          final zoneIdx = _getZoneIndex(device.currentHeartRate!);
+          _zoneSecondsByDevice[device.id]![zoneIdx]++;
+
+          _checkAlerts(device);
+        }
+
+        if (mounted) {
+          setState(() {});
         }
       });
-      debugPrint('Timer started');
+      debugPrint('Timer started; activeSessions=${_activeSessions.length}');
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Training session started'),
+          SnackBar(
+            content: Text('Recording $created athlete${created == 1 ? '' : 's'}'),
             backgroundColor: Colors.green,
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
           ),
         );
       }
@@ -300,33 +363,58 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   void _stopRecording() async {
     _recordTimer?.cancel();
+    _recordTimer = null;
 
-    if (_activeSession != null) {
-      final dbService = Provider.of<DatabaseService>(context, listen: false);
-      await dbService.endSession(_activeSession!.id);
-
-      // Sync session to Supabase in background
-      _syncSessionToCloud(_activeSession!);
-
+    if (_activeSessions.isEmpty) {
       setState(() {
-        _activeSession = null;
-        _heartRateHistoryByDevice.clear();
-        _zoneSecondsByDevice.clear();
-        _sessionMarkers.clear();
+        _isRecording = false;
       });
+      return;
+    }
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Training session saved and syncing to cloud...'),
-            duration: Duration(seconds: 2),
-          ),
+    final dbService = Provider.of<DatabaseService>(context, listen: false);
+    final bleService = Provider.of<BLEService>(context, listen: false);
+    final sessionsSnapshot = _activeSessions.values.toList(growable: false);
+    final athleteCount = sessionsSnapshot.length;
+
+    for (final session in sessionsSnapshot) {
+      await dbService.endSession(session.id);
+    }
+
+    for (final device in bleService.connectedDevices) {
+      final athlete = dbService.getAthleteForSensor(device.id);
+      if (athlete != null) {
+        await HrvService.instance.saveSessionHrv(
+          athlete.id,
+          device.id,
+          device.currentHeartRate,
         );
       }
     }
+    HrvService.instance.clearSessionData();
+
+    setState(() {
+      _isRecording = false;
+      _activeSessions.clear();
+      _heartRateHistoryByDevice.clear();
+      _zoneSecondsByDevice.clear();
+      _sessionMarkers.clear();
+    });
+
+    _syncSessionsToCloud(sessionsSnapshot);
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              'Saved $athleteCount session${athleteCount == 1 ? '' : 's'} and syncing to cloud...'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
-  Future<void> _syncSessionToCloud(TrainingSession session) async {
+  Future<void> _syncSessionsToCloud(List<TrainingSession> sessions) async {
     if (_isSyncing) return;
 
     setState(() {
@@ -337,25 +425,32 @@ class _DashboardScreenState extends State<DashboardScreen>
       final dbService = Provider.of<DatabaseService>(context, listen: false);
       final supabaseRepository = SupabaseRepository();
 
-      final success =
-          await dbService.syncSessionToCloud(session, supabaseRepository);
+      int successCount = 0;
+      for (final session in sessions) {
+        final success =
+            await dbService.syncSessionToCloud(session, supabaseRepository);
+        if (success) {
+          successCount++;
+        }
+      }
 
       if (mounted) {
-        if (success) {
+        if (successCount == sessions.length) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Session synced to cloud successfully'),
+            SnackBar(
+              content: Text(
+                  'Synced $successCount session${successCount == 1 ? '' : 's'} to cloud successfully'),
               backgroundColor: Colors.green,
-              duration: Duration(seconds: 2),
+              duration: const Duration(seconds: 2),
             ),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
+            SnackBar(
               content: Text(
-                  'Session saved locally (sync will retry later)'),
+                  'Saved ${sessions.length} locally; $successCount synced, others will retry later'),
               backgroundColor: Colors.orange,
-              duration: Duration(seconds: 2),
+              duration: const Duration(seconds: 2),
             ),
           );
         }
@@ -538,15 +633,15 @@ class _DashboardScreenState extends State<DashboardScreen>
       floatingActionButton: Consumer<BLEService>(
         builder: (context, bleService, child) {
           final connectedDevices = bleService.connectedDevices.where((d) => d.isConnected).toList();
-          debugPrint('FAB check: _activeSession=${_activeSession != null}, connectedCount=${connectedDevices.length}');
+          debugPrint('FAB check: recording=$_isRecording, activeSessions=${_activeSessions.length}, connectedCount=${connectedDevices.length}');
           
           VoidCallback? onPressed;
-          if (_activeSession == null && connectedDevices.isNotEmpty) {
+          if (!_isRecording && connectedDevices.isNotEmpty) {
             onPressed = () {
               debugPrint('Starting recording...');
               _startRecording();
             };
-          } else if (_activeSession != null) {
+          } else if (_isRecording) {
             onPressed = () {
               debugPrint('Stopping recording...');
               _stopRecording();
@@ -558,7 +653,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           return Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (_activeSession != null) ...[
+              if (_isRecording) ...[
                 FloatingActionButton(
                   heroTag: 'dashboard_fab_lap',
                   onPressed: _markLap,
@@ -571,10 +666,10 @@ class _DashboardScreenState extends State<DashboardScreen>
               FloatingActionButton.extended(
                 heroTag: 'dashboard_fab',
                 onPressed: onPressed,
-                icon: Icon(_activeSession == null ? Icons.play_arrow : Icons.stop),
+                icon: Icon(_isRecording ? Icons.stop : Icons.play_arrow),
                 label: Text(
-                    _activeSession == null ? 'Start Training' : 'Stop Training'),
-                backgroundColor: _activeSession == null ? Colors.green : Colors.red,
+                    _isRecording ? 'Stop Training (${_activeSessions.length})' : 'Start Training'),
+                backgroundColor: _isRecording ? Colors.red : Colors.green,
               ),
             ],
           );
@@ -612,7 +707,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       child: InkWell(
         borderRadius: BorderRadius.circular(6),
         onTap: () {
-          if (_activeSession != null) {
+          if (_isRecording) {
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -627,10 +722,20 @@ class _DashboardScreenState extends State<DashboardScreen>
                 ),
               ),
             );
+          } else if (athlete != null) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ReadinessScreen(initialAthlete: athlete),
+              ),
+            );
           } else {
             _showSensorAssignmentDialog(context, device, athlete);
           }
         },
+        onLongPress: _isRecording
+            ? null
+            : () => _showSensorAssignmentDialog(context, device, athlete),
         child: LayoutBuilder(
           builder: (context, constraints) {
             final h = constraints.maxHeight;
