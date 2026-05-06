@@ -280,7 +280,7 @@ class HrvService extends ChangeNotifier {
           rrIntervals: (row['rr_intervals'] as List<dynamic>? ?? const [])
               .map((v) => (v as num).toInt())
               .toList(),
-          rmssd: (row['rmssd'] as num).toDouble(),
+          rmssd: (row['rmssd'] as num?)?.toDouble() ?? 0,
           sdnn: (row['sdnn'] as num?)?.toDouble() ?? 0,
           pnn50: (row['pnn50'] as num?)?.toDouble() ?? 0,
           meanRR: (row['mean_rr'] as num?)?.toDouble() ?? 0,
