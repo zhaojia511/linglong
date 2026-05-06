@@ -140,6 +140,59 @@ export const sessionService = {
   },
 }
 
+// snake_case → camelCase for readiness measurement objects
+function toReadiness(row) {
+  if (!row) return null
+  return {
+    id: row.id,
+    personId: row.person_id,
+    deviceId: row.device_id,
+    measuredAt: row.measured_at,
+    durationSec: row.duration_sec,
+    rrIntervals: row.rr_intervals ?? [],
+    rmssd: row.rmssd,
+    sdnn: row.sdnn,
+    pnn50: row.pnn50,
+    meanRR: row.mean_rr,
+    sd1: row.sd1,
+    sd2: row.sd2,
+    restingHR: row.resting_hr,
+    qualityPct: row.quality_pct,
+    readinessPct: row.readiness_pct,
+    feeling: row.feeling,
+    createdAt: row.created_at,
+  }
+}
+
+// --- readinessService ---
+
+export const readinessService = {
+  async getMeasurements({ personId, days } = {}) {
+    let query = supabase
+      .from('readiness_measurements')
+      .select('*')
+      .order('measured_at', { ascending: false })
+    if (personId) query = query.eq('person_id', personId)
+    if (days) {
+      const since = new Date()
+      since.setDate(since.getDate() - days)
+      query = query.gte('measured_at', since.toISOString())
+    }
+    const { data, error } = await query
+    if (error) throw error
+    return { data: (data ?? []).map(toReadiness) }
+  },
+
+  async deleteMeasurement(id) {
+    const { error } = await supabase
+      .from('readiness_measurements')
+      .delete()
+      .eq('id', id)
+    if (error) throw error
+    return { data: { success: true } }
+  },
+}
+
 // --- personService (matches existing export name in api.js) ---
 
 export const personService = {

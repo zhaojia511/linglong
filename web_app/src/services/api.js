@@ -1,5 +1,5 @@
 import { supabase } from './supabaseClient'
-export { sessionService, personService } from './db'
+export { sessionService, personService, readinessService } from './db'
 
 export const authService = {
   login: async (email, password) => {

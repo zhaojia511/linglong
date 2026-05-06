@@ -9,6 +9,7 @@ import Sessions from './pages/Sessions'
 import SessionDetail from './pages/SessionDetail'
 import PersonsManagement from './pages/PersonsManagement'
 import HistoryAnalysis from './pages/HistoryAnalysis'
+import ReadinessHistory from './pages/ReadinessHistory'
 import Settings from './pages/Settings'
 import { authService } from './services/api'
 import { supabase } from './services/supabaseClient'
@@ -67,6 +68,7 @@ function App() {
             <Route path="/sessions/:id" element={<PrivateRoute><SessionDetail /></PrivateRoute>} />
             <Route path="/persons" element={<PrivateRoute><PersonsManagement /></PrivateRoute>} />
             <Route path="/analysis" element={<PrivateRoute><HistoryAnalysis /></PrivateRoute>} />
+            <Route path="/readiness" element={<PrivateRoute><ReadinessHistory /></PrivateRoute>} />
             <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
             <Route path="*" element={<Navigate to="/" />} />
           </Route>

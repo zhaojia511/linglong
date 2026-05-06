@@ -8,6 +8,7 @@ const NAV_LINKS = [
   { to: '/persons',    icon: '👥', label: 'Athletes' },
   { to: '/sessions',   icon: '📝', label: 'Sessions' },
   { to: '/analysis',   icon: '📈', label: 'Analysis' },
+  { to: '/readiness',  icon: '💓', label: 'Readiness' },
   { to: '/settings',   icon: '⚙️',  label: 'Settings' },
 ]
 

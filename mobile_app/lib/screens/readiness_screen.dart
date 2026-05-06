@@ -434,138 +434,162 @@ class _ReadinessScreenState extends State<ReadinessScreen> {
         ? (r.rmssd / baseline * 100).clamp(0.0, 150.0)
         : null;
 
-    return ListView(
-      padding: const EdgeInsets.all(20),
+    return Column(
       children: [
-        // Header card
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                Text(_selectedAthlete!.name,
-                    style: Theme.of(context).textTheme.titleMedium),
-                const SizedBox(height: 4),
-                Text(
-                  '$_durationMinutes min measurement · ${r.validIntervals} RR intervals',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                ),
-                if (readinessPct != null) ...[
-                  const SizedBox(height: 12),
-                  _ReadinessBadge(readinessPct),
-                ],
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 12),
-
-        // HRV metrics grid
-        GridView.count(
-          crossAxisCount: 2,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-          childAspectRatio: 2.2,
-          children: [
-            _MetricCard(
-                label: 'RMSSD',
-                value: '${r.rmssd.toStringAsFixed(1)} ms',
-                subtitle: 'Parasympathetic activity'),
-            _MetricCard(
-                label: 'SDNN',
-                value: '${r.sdnn.toStringAsFixed(1)} ms',
-                subtitle: 'Overall HRV'),
-            _MetricCard(
-                label: 'pNN50',
-                value: '${r.pnn50.toStringAsFixed(1)}%',
-                subtitle: 'Vagal tone'),
-            _MetricCard(
-                label: 'Mean RR',
-                value: '${r.meanRR.toStringAsFixed(0)} ms',
-                subtitle:
-                    '≈ ${(60000 / r.meanRR).toStringAsFixed(0)} bpm rest'),
-            _MetricCard(
-                label: 'SD1',
-                value: '${r.sd1.toStringAsFixed(1)} ms',
-                subtitle: 'Short-term variability'),
-            _MetricCard(
-                label: 'Quality',
-                value: '${qualityPct.toStringAsFixed(0)}%',
-                subtitle: '${r.validIntervals} valid intervals'),
-          ],
-        ),
-        const SizedBox(height: 20),
-
-        // Feeling score
-        Text('How do you feel today?',
-            style: Theme.of(context).textTheme.labelLarge),
-        const SizedBox(height: 8),
-        Text(
-          _selectedAthlete!.name,
-          style: TextStyle(fontSize: 13, color: Colors.grey[600]),
-        ),
-        const SizedBox(height: 10),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: List.generate(5, (i) {
-            final score = i + 1;
-            final labels = ['Very Bad', 'Bad', 'OK', 'Good', 'Very Good'];
-            final emojis = ['😞', '😕', '😐', '🙂', '😄'];
-            final selected = _feelingScore == score;
-            return GestureDetector(
-              onTap: () => setState(() => _feelingScore = score),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
-                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
-                decoration: BoxDecoration(
-                  color: selected
-                      ? Theme.of(context).colorScheme.primaryContainer
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(10),
-                  border: selected
-                      ? Border.all(
-                          color: Theme.of(context).colorScheme.primary,
-                          width: 2)
-                      : Border.all(color: Colors.transparent),
-                ),
-                child: Column(
-                  children: [
-                    Text(emojis[i], style: const TextStyle(fontSize: 26)),
-                    const SizedBox(height: 2),
-                    Text(labels[i],
-                        style: TextStyle(
-                            fontSize: 10,
-                            color: selected
-                                ? Theme.of(context).colorScheme.primary
-                                : Colors.grey[600],
-                            fontWeight: selected
-                                ? FontWeight.bold
-                                : FontWeight.normal)),
-                  ],
+        // Scrollable metrics area
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+            children: [
+              // Header card
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      Text(_selectedAthlete!.name,
+                          style: Theme.of(context).textTheme.titleMedium),
+                      const SizedBox(height: 4),
+                      Text(
+                        '$_durationMinutes min measurement · ${r.validIntervals} RR intervals',
+                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                      ),
+                      if (readinessPct != null) ...[
+                        const SizedBox(height: 12),
+                        _ReadinessBadge(readinessPct),
+                      ],
+                    ],
+                  ),
                 ),
               ),
-            );
-          }),
-        ),
-        const SizedBox(height: 28),
+              const SizedBox(height: 12),
 
-        // Save button
-        FilledButton.icon(
-          onPressed: _saveResult,
-          icon: const Icon(Icons.save),
-          label: const Text('Save Result'),
-          style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
+              // HRV metrics grid
+              GridView.count(
+                crossAxisCount: 2,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 2.2,
+                children: [
+                  _MetricCard(
+                      label: 'RMSSD',
+                      value: '${r.rmssd.toStringAsFixed(1)} ms',
+                      subtitle: 'Parasympathetic activity'),
+                  _MetricCard(
+                      label: 'SDNN',
+                      value: '${r.sdnn.toStringAsFixed(1)} ms',
+                      subtitle: 'Overall HRV'),
+                  _MetricCard(
+                      label: 'pNN50',
+                      value: '${r.pnn50.toStringAsFixed(1)}%',
+                      subtitle: 'Vagal tone'),
+                  _MetricCard(
+                      label: 'Mean RR',
+                      value: '${r.meanRR.toStringAsFixed(0)} ms',
+                      subtitle:
+                          '≈ ${(60000 / r.meanRR).toStringAsFixed(0)} bpm rest'),
+                  _MetricCard(
+                      label: 'SD1',
+                      value: '${r.sd1.toStringAsFixed(1)} ms',
+                      subtitle: 'Short-term variability'),
+                  _MetricCard(
+                      label: 'Quality',
+                      value: '${qualityPct.toStringAsFixed(0)}%',
+                      subtitle: '${r.validIntervals} valid intervals'),
+                ],
+              ),
+              const SizedBox(height: 20),
+
+              // Feeling score
+              Text('How do you feel today?',
+                  style: Theme.of(context).textTheme.labelLarge),
+              const SizedBox(height: 8),
+              Text(
+                _selectedAthlete!.name,
+                style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: List.generate(5, (i) {
+                  final score = i + 1;
+                  final labels = ['Very Bad', 'Bad', 'OK', 'Good', 'Very Good'];
+                  final emojis = ['😞', '😕', '😐', '🙂', '😄'];
+                  final selected = _feelingScore == score;
+                  return GestureDetector(
+                    onTap: () => setState(() => _feelingScore = score),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 150),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 6),
+                      decoration: BoxDecoration(
+                        color: selected
+                            ? Theme.of(context).colorScheme.primaryContainer
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(10),
+                        border: selected
+                            ? Border.all(
+                                color: Theme.of(context).colorScheme.primary,
+                                width: 2)
+                            : Border.all(color: Colors.transparent),
+                      ),
+                      child: Column(
+                        children: [
+                          Text(emojis[i],
+                              style: const TextStyle(fontSize: 26)),
+                          const SizedBox(height: 2),
+                          Text(labels[i],
+                              style: TextStyle(
+                                  fontSize: 10,
+                                  color: selected
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Colors.grey[600],
+                                  fontWeight: selected
+                                      ? FontWeight.bold
+                                      : FontWeight.normal)),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            ],
+          ),
         ),
-        const SizedBox(height: 8),
-        TextButton(
-          onPressed: () => setState(() {
-            _phase = _Phase.setup;
-            _result = null;
-            _feelingScore = null;
-          }),
-          child: const Text('Measure Again'),
+
+        // Sticky bottom action bar — always visible, never scrolled away
+        Container(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+          decoration: BoxDecoration(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            border: Border(
+              top: BorderSide(color: Colors.grey.shade200),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              FilledButton.icon(
+                onPressed: _saveResult,
+                icon: const Icon(Icons.save),
+                label: const Text('Save Result'),
+                style: FilledButton.styleFrom(
+                    minimumSize: const Size.fromHeight(48)),
+              ),
+              const SizedBox(height: 6),
+              TextButton(
+                onPressed: () => setState(() {
+                  _phase = _Phase.setup;
+                  _result = null;
+                  _feelingScore = null;
+                }),
+                child:
+                    const Text('Measure Again'),
+              ),
+            ],
+          ),
         ),
       ],
     );
