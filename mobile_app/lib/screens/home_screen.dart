@@ -6,6 +6,7 @@ import '../models/training_session.dart';
 import '../screens/session_visualization_screen.dart';
 import 'dashboard_screen.dart';
 import 'profile_screen.dart';
+import 'readiness_history_screen.dart';
 import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -22,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late final List<Widget> _screens = [
     const DashboardScreen(),
     const TrainingHistoryWidget(),
+    const ReadinessHistoryScreen(),
     const ProfileScreen(),
     const SettingsScreen(),
   ];
@@ -52,6 +54,11 @@ class _HomeScreenState extends State<HomeScreen> {
           NavigationDestination(
             icon: Icon(Icons.history),
             label: 'History',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.monitor_heart_outlined),
+            selectedIcon: Icon(Icons.monitor_heart),
+            label: 'Readiness',
           ),
           NavigationDestination(
             icon: Icon(Icons.person),
