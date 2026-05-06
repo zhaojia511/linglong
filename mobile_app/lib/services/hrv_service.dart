@@ -194,9 +194,11 @@ class HrvService extends ChangeNotifier {
 
   /// Push all local readiness measurements with [synced == false] to Supabase.
   /// On success each record is updated to [synced: true]. Failures are logged
-  /// and skipped so the rest of the batch still completes.
+  /// and skipped so the rest of the batch still completes. If any record
+  /// failed, the first error is rethrown after all records have been attempted.
   Future<void> syncAllUnsyncedReadiness(SupabaseRepository repo) async {
     if (_readinessBox == null) return;
+    Object? firstError;
     for (final key in List<dynamic>.from(_readinessBox!.keys)) {
       final raw = _readinessBox!.get(key as String);
       if (raw == null) continue;
@@ -250,9 +252,11 @@ class HrvService extends ChangeNotifier {
         debugPrint('[HrvService] Synced readiness measurement ${m.id}');
       } catch (e) {
         debugPrint('[HrvService] Failed to sync readiness measurement ${m.id}: $e');
+        firstError ??= e;
       }
     }
     notifyListeners();
+    if (firstError != null) throw firstError!;
   }
 
   /// Pull readiness measurements from Supabase and insert any that are missing

@@ -752,11 +752,22 @@ class SyncDialog extends StatelessWidget {
                     ),
                     ElevatedButton(
                       onPressed: () async {
-                        await syncService.syncAll();
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Sync completed')),
-                          );
+                        try {
+                          await syncService.syncAll();
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Sync completed')),
+                            );
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Sync failed: $e'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
                         }
                       },
                       child: syncService.isSyncing
