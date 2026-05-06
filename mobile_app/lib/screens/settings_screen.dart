@@ -242,8 +242,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   children: [
                     const Icon(Icons.info_outline, size: 16),
                     const SizedBox(width: 6),
-                    Text('Version  $kAppVersion (build $kAppBuildNumber)',
-                        style: const TextStyle(fontSize: 13)),
+                    const Text('Version  $kAppVersion (build $kAppBuildNumber)',
+                        style: TextStyle(fontSize: 13)),
                     const Spacer(),
                     TextButton.icon(
                       icon: const Icon(Icons.refresh, size: 14),

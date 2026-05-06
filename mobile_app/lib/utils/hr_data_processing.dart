@@ -84,7 +84,7 @@ class HrDataProcessing {
       if (drops / (hrs.length - 1) < 0.6) {
         // This is where HR was still stable — cooldown starts after this
         return sorted.last.timestamp
-            .difference(sorted[i + windowSize].timestamp)
+            .difference(window.last.timestamp)
             .inSeconds;
       }
     }
@@ -109,8 +109,8 @@ class HrDataProcessing {
     for (int i = 0; i < sorted.length; i++) {
       final start = (i - windowSize ~/ 2).clamp(0, sorted.length - 1);
       final end = (i + windowSize ~/ 2 + 1).clamp(0, sorted.length);
-      final window =
-          sorted.sublist(start, end).map((d) => d.heartRate).toList()..sort();
+      final window = sorted.sublist(start, end).map((d) => d.heartRate).toList()
+        ..sort();
       final median = window[window.length ~/ 2];
       final deviation = (sorted[i].heartRate - median).abs() / median;
 

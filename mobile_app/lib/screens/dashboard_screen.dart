@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'dart:async';
+import 'dart:math' as math;
 import '../services/ble_service.dart';
 import '../services/database_service.dart';
+import '../services/hrv_service.dart';
 import '../services/supabase_repository.dart';
 import '../models/training_session.dart';
 import '../models/hr_device.dart';
 import '../models/person.dart';
+import 'athlete_detail_screen.dart';
+import 'readiness_screen.dart';
 
 // Data point for heart rate with timestamp
 class HeartRateDataPoint {
@@ -28,13 +33,19 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen>
     with WidgetsBindingObserver {
-  TrainingSession? _activeSession;
+  final Map<String, TrainingSession> _activeSessions = {};
+  bool _isRecording = false;
   Timer? _recordTimer;
   bool _isSyncing = false;
   bool _bleEnabled = true;
   Timer? _bleCheckTimer;
 
   final Map<String, List<HeartRateDataPoint>> _heartRateHistoryByDevice = {};
+  final Map<String, DateTime> _lastAlertTime = {};
+  // seconds spent in each zone index 0-4 per device
+  final Map<String, List<int>> _zoneSecondsByDevice = {};
+  // timestamped lap/drill markers during a session
+  final List<({DateTime time, String label})> _sessionMarkers = [];
 
   @override
   void initState() {
@@ -74,6 +85,89 @@ class _DashboardScreenState extends State<DashboardScreen>
     });
 
     _startBleCheckTimer();
+  }
+
+  Future<void> _requestBlePermission(BuildContext ctx, BLEService bleService) async {
+    // Step 1: check current status before requesting
+    final preScan = await Permission.bluetoothScan.status;
+    final preConnect = await Permission.bluetoothConnect.status;
+    final alreadyPermanentlyDenied =
+        preScan.isPermanentlyDenied || preConnect.isPermanentlyDenied;
+
+    if (alreadyPermanentlyDenied) {
+      // Skip the doomed request — go straight to settings dialog
+      if (!ctx.mounted) return;
+      _showPermissionSettingsDialog(ctx);
+      return;
+    }
+
+    // Step 2: trigger system permission dialog
+    final granted = await bleService.requestPermissions();
+    if (granted || !ctx.mounted) return;
+
+    // Step 3: denied — check if now permanently denied or just denied once
+    final postScan = await Permission.bluetoothScan.status;
+    final postConnect = await Permission.bluetoothConnect.status;
+    final permanentlyDenied =
+        postScan.isPermanentlyDenied || postConnect.isPermanentlyDenied;
+
+    if (!ctx.mounted) return;
+    if (permanentlyDenied) {
+      _showPermissionSettingsDialog(ctx);
+    } else {
+      // Denied once — show rationale and offer to try again
+      showDialog(
+        context: ctx,
+        builder: (dialogCtx) => AlertDialog(
+          title: const Text('Bluetooth Required'),
+          content: const Text(
+            'This app needs Bluetooth to connect to heart rate sensors worn by athletes.\n\n'
+            'Without it, no sensors can be detected or monitored.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogCtx),
+              child: const Text('Not Now'),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.pop(dialogCtx);
+                await bleService.requestPermissions();
+              },
+              child: const Text('Allow'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  void _showPermissionSettingsDialog(BuildContext ctx) {
+    showDialog(
+      context: ctx,
+      builder: (dialogCtx) => AlertDialog(
+        title: const Text('Bluetooth Access Blocked'),
+        content: const Text(
+          'Bluetooth permission was permanently denied. To fix this:\n\n'
+          '1. Tap "Open Settings"\n'
+          '2. Go to Permissions → Nearby devices\n'
+          '3. Set Bluetooth permissions to "Allow"',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogCtx),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(dialogCtx);
+              openAppSettings();
+            },
+            child: const Text('Open Settings'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _startBleCheckTimer() {
@@ -131,56 +225,123 @@ class _DashboardScreenState extends State<DashboardScreen>
     debugPrint('=== _startRecording called ===');
     try {
       final dbService = Provider.of<DatabaseService>(context, listen: false);
-      debugPrint('DatabaseService obtained');
+      final bleService = Provider.of<BLEService>(context, listen: false);
 
-      final session = await dbService.createSession(
-        title: 'Training Session ${DateTime.now().toString().substring(0, 16)}',
-        trainingType: 'general',
-      );
-      debugPrint('Session created: ${session.id}');
+      HrvService.instance.clearSessionData();
+
+      final timestamp = DateTime.now().toString().substring(0, 16);
+      int created = 0;
+
+      for (final device in bleService.connectedDevices) {
+        if (!device.isConnected || device.currentHeartRate == null) {
+          continue;
+        }
+
+        final athlete = dbService.getAthleteForSensor(device.id);
+        if (athlete == null || _activeSessions.containsKey(athlete.id)) {
+          continue;
+        }
+
+        final session = await dbService.createSession(
+          title: 'Training Session $timestamp',
+          trainingType: 'general',
+          personId: athlete.id,
+        );
+        _activeSessions[athlete.id] = session;
+        created++;
+        debugPrint('Session created: ${session.id} for ${athlete.name}');
+      }
+
+      if (created == 0) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                  'No worn paired sensors detected. Put on chest straps and try again.'),
+              backgroundColor: Colors.orange,
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+        return;
+      }
 
       setState(() {
-        _activeSession = session;
+        _isRecording = true;
         _heartRateHistoryByDevice.clear();
+        _zoneSecondsByDevice.clear();
+        _sessionMarkers.clear();
       });
-      debugPrint('State updated, activeSession set');
+      debugPrint('State updated, activeSessions=${_activeSessions.length}');
 
-      // Record heart rate every second
-      _recordTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      _recordTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
         final bleService = Provider.of<BLEService>(context, listen: false);
 
-        // Record data for each connected device
-        for (var device in bleService.connectedDevices) {
-          if (device.currentHeartRate != null) {
-            final hrData = HeartRateData(
-              timestamp: DateTime.now(),
-              heartRate: device.currentHeartRate!,
-              deviceId: device.id,
-            );
-
-            _activeSession!.heartRateData.add(hrData);
-
-            // Store in device-specific history
-            _heartRateHistoryByDevice.putIfAbsent(device.id, () => []);
-            _heartRateHistoryByDevice[device.id]!.add(
-              HeartRateDataPoint(
-                timestamp: DateTime.now(),
-                value: device.currentHeartRate!.toDouble(),
-              ),
-            );
-
-            setState(() {});
+        for (final device in bleService.connectedDevices) {
+          if (!device.isConnected || device.currentHeartRate == null) {
+            continue;
           }
+
+          final athlete = dbService.getAthleteForSensor(device.id);
+          if (athlete == null) {
+            continue;
+          }
+
+          var session = _activeSessions[athlete.id];
+          if (session == null) {
+            try {
+              session = await dbService.createSession(
+                title: 'Training Session $timestamp',
+                trainingType: 'general',
+                personId: athlete.id,
+              );
+              _activeSessions[athlete.id] = session;
+              debugPrint(
+                  'Late-join session created: ${session.id} for ${athlete.name}');
+            } catch (e) {
+              debugPrint('Failed to create late-join session: $e');
+              continue;
+            }
+          }
+
+          final now = DateTime.now();
+          session.heartRateData.add(HeartRateData(
+            timestamp: now,
+            heartRate: device.currentHeartRate!,
+            deviceId: device.id,
+          ));
+
+          if (device.rrIntervals != null && device.rrIntervals!.isNotEmpty) {
+            HrvService.instance.addRRIntervals(device.id, device.rrIntervals!);
+          }
+
+          _heartRateHistoryByDevice.putIfAbsent(device.id, () => []);
+          final history = _heartRateHistoryByDevice[device.id]!;
+          history.add(HeartRateDataPoint(
+            timestamp: now,
+            value: device.currentHeartRate!.toDouble(),
+          ));
+          if (history.length > 60) history.removeAt(0);
+
+          _zoneSecondsByDevice.putIfAbsent(device.id, () => [0, 0, 0, 0, 0]);
+          final zoneIdx = _getZoneIndex(device.currentHeartRate!);
+          _zoneSecondsByDevice[device.id]![zoneIdx]++;
+
+          _checkAlerts(device);
+        }
+
+        if (mounted) {
+          setState(() {});
         }
       });
-      debugPrint('Timer started');
+      debugPrint('Timer started; activeSessions=${_activeSessions.length}');
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Training session started'),
+          SnackBar(
+            content: Text('Recording $created athlete${created == 1 ? '' : 's'}'),
             backgroundColor: Colors.green,
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
           ),
         );
       }
@@ -202,31 +363,58 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   void _stopRecording() async {
     _recordTimer?.cancel();
+    _recordTimer = null;
 
-    if (_activeSession != null) {
-      final dbService = Provider.of<DatabaseService>(context, listen: false);
-      await dbService.endSession(_activeSession!.id);
-
-      // Sync session to Supabase in background
-      _syncSessionToCloud(_activeSession!);
-
+    if (_activeSessions.isEmpty) {
       setState(() {
-        _activeSession = null;
-        _heartRateHistoryByDevice.clear();
+        _isRecording = false;
       });
+      return;
+    }
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Training session saved and syncing to cloud...'),
-            duration: Duration(seconds: 2),
-          ),
+    final dbService = Provider.of<DatabaseService>(context, listen: false);
+    final bleService = Provider.of<BLEService>(context, listen: false);
+    final sessionsSnapshot = _activeSessions.values.toList(growable: false);
+    final athleteCount = sessionsSnapshot.length;
+
+    for (final session in sessionsSnapshot) {
+      await dbService.endSession(session.id);
+    }
+
+    for (final device in bleService.connectedDevices) {
+      final athlete = dbService.getAthleteForSensor(device.id);
+      if (athlete != null) {
+        await HrvService.instance.saveSessionHrv(
+          athlete.id,
+          device.id,
+          device.currentHeartRate,
         );
       }
     }
+    HrvService.instance.clearSessionData();
+
+    setState(() {
+      _isRecording = false;
+      _activeSessions.clear();
+      _heartRateHistoryByDevice.clear();
+      _zoneSecondsByDevice.clear();
+      _sessionMarkers.clear();
+    });
+
+    _syncSessionsToCloud(sessionsSnapshot);
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              'Saved $athleteCount session${athleteCount == 1 ? '' : 's'} and syncing to cloud...'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
-  Future<void> _syncSessionToCloud(TrainingSession session) async {
+  Future<void> _syncSessionsToCloud(List<TrainingSession> sessions) async {
     if (_isSyncing) return;
 
     setState(() {
@@ -237,25 +425,32 @@ class _DashboardScreenState extends State<DashboardScreen>
       final dbService = Provider.of<DatabaseService>(context, listen: false);
       final supabaseRepository = SupabaseRepository();
 
-      final success =
-          await dbService.syncSessionToCloud(session, supabaseRepository);
+      int successCount = 0;
+      for (final session in sessions) {
+        final success =
+            await dbService.syncSessionToCloud(session, supabaseRepository);
+        if (success) {
+          successCount++;
+        }
+      }
 
       if (mounted) {
-        if (success) {
+        if (successCount == sessions.length) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Session synced to cloud successfully'),
+            SnackBar(
+              content: Text(
+                  'Synced $successCount session${successCount == 1 ? '' : 's'} to cloud successfully'),
               backgroundColor: Colors.green,
-              duration: Duration(seconds: 2),
+              duration: const Duration(seconds: 2),
             ),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
+            SnackBar(
               content: Text(
-                  'Session saved locally (sync will retry later)'),
+                  'Saved ${sessions.length} locally; $successCount synced, others will retry later'),
               backgroundColor: Colors.orange,
-              duration: Duration(seconds: 2),
+              duration: const Duration(seconds: 2),
             ),
           );
         }
@@ -341,7 +536,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Bluetooth permissions required. On iOS, you must enable Bluetooth permissions in Settings > Privacy & Security > Bluetooth.',
+                          'Bluetooth permissions required.',
                           style: TextStyle(
                             fontSize: 13,
                             color: Colors.orange.shade700,
@@ -350,20 +545,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                         ),
                       ),
                       TextButton(
-                        onPressed: () async {
-                          debugPrint('Grant button pressed');
-                          // On iOS, open settings directly since permissions can't be requested programmatically
-                          // For now, just show the guidance message
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Please go to Settings > Privacy & Security > Bluetooth and enable permissions for Linglong HR Monitor.'),
-                                backgroundColor: Colors.blue,
-                                duration: Duration(seconds: 8),
-                              ),
-                            );
-                          }
-                        },
+                        onPressed: () => _requestBlePermission(context, bleService),
                         child: Text(
                           'Grant',
                           style: TextStyle(
@@ -451,15 +633,15 @@ class _DashboardScreenState extends State<DashboardScreen>
       floatingActionButton: Consumer<BLEService>(
         builder: (context, bleService, child) {
           final connectedDevices = bleService.connectedDevices.where((d) => d.isConnected).toList();
-          debugPrint('FAB check: _activeSession=${_activeSession != null}, connectedCount=${connectedDevices.length}');
+          debugPrint('FAB check: recording=$_isRecording, activeSessions=${_activeSessions.length}, connectedCount=${connectedDevices.length}');
           
           VoidCallback? onPressed;
-          if (_activeSession == null && connectedDevices.isNotEmpty) {
+          if (!_isRecording && connectedDevices.isNotEmpty) {
             onPressed = () {
               debugPrint('Starting recording...');
               _startRecording();
             };
-          } else if (_activeSession != null) {
+          } else if (_isRecording) {
             onPressed = () {
               debugPrint('Stopping recording...');
               _stopRecording();
@@ -468,13 +650,28 @@ class _DashboardScreenState extends State<DashboardScreen>
             debugPrint('FAB disabled: no connected devices');
           }
           
-          return FloatingActionButton.extended(
-            heroTag: 'dashboard_fab',
-            onPressed: onPressed,
-            icon: Icon(_activeSession == null ? Icons.play_arrow : Icons.stop),
-            label: Text(
-                _activeSession == null ? 'Start Training' : 'Stop Training'),
-            backgroundColor: _activeSession == null ? Colors.green : Colors.red,
+          return Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (_isRecording) ...[
+                FloatingActionButton(
+                  heroTag: 'dashboard_fab_lap',
+                  onPressed: _markLap,
+                  backgroundColor: Colors.blueGrey,
+                  mini: true,
+                  child: const Icon(Icons.flag, size: 20),
+                ),
+                const SizedBox(width: 12),
+              ],
+              FloatingActionButton.extended(
+                heroTag: 'dashboard_fab',
+                onPressed: onPressed,
+                icon: Icon(_isRecording ? Icons.stop : Icons.play_arrow),
+                label: Text(
+                    _isRecording ? 'Stop Training (${_activeSessions.length})' : 'Start Training'),
+                backgroundColor: _isRecording ? Colors.red : Colors.green,
+              ),
+            ],
           );
         },
       ),
@@ -509,7 +706,36 @@ class _DashboardScreenState extends State<DashboardScreen>
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
       child: InkWell(
         borderRadius: BorderRadius.circular(6),
-        onTap: () => _showSensorAssignmentDialog(context, device, athlete),
+        onTap: () {
+          if (_isRecording) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => AthleteDetailScreen(
+                  device: device,
+                  athlete: athlete,
+                  hrHistory: List.unmodifiable(
+                      _heartRateHistoryByDevice[device.id] ?? []),
+                  zoneSecs: _zoneSecondsByDevice[device.id] != null
+                      ? List.unmodifiable(_zoneSecondsByDevice[device.id]!)
+                      : null,
+                ),
+              ),
+            );
+          } else if (athlete != null) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ReadinessScreen(initialAthlete: athlete),
+              ),
+            );
+          } else {
+            _showSensorAssignmentDialog(context, device, athlete);
+          }
+        },
+        onLongPress: _isRecording
+            ? null
+            : () => _showSensorAssignmentDialog(context, device, athlete),
         child: LayoutBuilder(
           builder: (context, constraints) {
             final h = constraints.maxHeight;
@@ -525,6 +751,14 @@ class _DashboardScreenState extends State<DashboardScreen>
             final textColor = isDarkText ? Colors.black87 : Colors.white;
             final subTextColor = isDarkText ? Colors.black54 : Colors.white70;
 
+            final sparklineHistory = _heartRateHistoryByDevice[device.id] ?? [];
+            final zoneSecs = _zoneSecondsByDevice[device.id];
+            final hrvColor = _hrvTrafficLight(device);
+            final signalBars = _rssiToBars(device.rssi);
+            final stripH = h * 0.28;
+            final sparklineH = h * 0.18;
+            final zoneBarsH = h * 0.10;
+
             return Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(6),
@@ -534,7 +768,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 children: [
                   // Card content
                   Padding(
-                    padding: EdgeInsets.fromLTRB(w * 0.06, h * 0.07, w * 0.06, h * 0.32),
+                    padding: EdgeInsets.fromLTRB(w * 0.06, h * 0.07, w * 0.06, stripH + sparklineH + zoneBarsH),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -542,13 +776,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                         CircleAvatar(
                           radius: avatarRadius,
                           backgroundColor: Colors.white24,
-                          backgroundImage: athlete?.photoPath != null
-                              ? AssetImage(athlete!.photoPath!)
-                              : null,
-                          child: athlete?.photoPath == null
-                              ? Icon(Icons.favorite,
-                                  color: subTextColor, size: avatarRadius * 0.9)
-                              : null,
+                          child: Icon(Icons.favorite,
+                              color: subTextColor, size: avatarRadius * 0.9),
                         ),
                         SizedBox(width: w * 0.06),
                         // RIGHT: name + BPM
@@ -595,14 +824,55 @@ class _DashboardScreenState extends State<DashboardScreen>
                     ),
                   ),
 
-                  // Bottom strip: zone name + battery + assign button
+                  // HRV traffic light dot — top-right corner
+                  if (hrvColor != null)
+                    Positioned(
+                      top: h * 0.06,
+                      right: w * 0.06,
+                      child: Container(
+                        width: (h * 0.08).clamp(6.0, 12.0),
+                        height: (h * 0.08).clamp(6.0, 12.0),
+                        decoration: BoxDecoration(
+                          color: hrvColor,
+                          shape: BoxShape.circle,
+                          boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 2)],
+                        ),
+                      ),
+                    ),
+
+                  // Zone bars — sits between sparkline and bottom strip
+                  if (zoneSecs != null)
+                    Positioned(
+                      left: w * 0.04, right: w * 0.04,
+                      bottom: stripH,
+                      height: zoneBarsH,
+                      child: _ZoneBars(zoneSecs: zoneSecs, height: zoneBarsH),
+                    ),
+
+                  // Sparkline — sits just above the zone bars (or strip if no session)
+                  if (sparklineHistory.length >= 2)
+                    Positioned(
+                      left: 0, right: 0,
+                      bottom: stripH + (zoneSecs != null ? zoneBarsH : 0),
+                      height: sparklineH,
+                      child: ClipRect(
+                        child: CustomPaint(
+                          painter: _SparklinePainter(
+                            points: sparklineHistory,
+                            color: Colors.white.withValues(alpha: 0.7),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                  // Bottom strip: zone name + signal + battery + assign button
                   Positioned(
                     left: 0, right: 0, bottom: 0,
                     child: Container(
-                      height: h * 0.28,
-                      decoration: BoxDecoration(
+                      height: stripH,
+                      decoration: const BoxDecoration(
                         color: Colors.black26,
-                        borderRadius: const BorderRadius.only(
+                        borderRadius: BorderRadius.only(
                           bottomLeft: Radius.circular(6),
                           bottomRight: Radius.circular(6),
                         ),
@@ -621,6 +891,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                           ),
                           Row(
                             children: [
+                              // RSSI signal bars
+                              _SignalIcon(bars: signalBars, size: (h * 0.11).clamp(8.0, 16.0)),
+                              SizedBox(width: w * 0.02),
                               if (device.batteryLevel != null)
                                 Text(
                                   '🔋${device.batteryLevel}%',
@@ -669,6 +942,14 @@ class _DashboardScreenState extends State<DashboardScreen>
     return const Color(0xFFE53935);                       // Z5 red — Anaerobic
   }
 
+  int _getZoneIndex(int heartRate) {
+    if (heartRate < 120) return 0;
+    if (heartRate < 150) return 1;
+    if (heartRate < 170) return 2;
+    if (heartRate < 190) return 3;
+    return 4;
+  }
+
   String _getTrainingZoneName(int? heartRate) {
     if (heartRate == null) return 'Rest';
     if (heartRate < 120) return 'Recovery';
@@ -676,6 +957,71 @@ class _DashboardScreenState extends State<DashboardScreen>
     if (heartRate < 170) return 'Tempo';
     if (heartRate < 190) return 'Threshold';
     return 'Anaerobic';
+  }
+
+  void _markLap() {
+    final lapNum = _sessionMarkers.where((m) => m.label.startsWith('Lap')).length + 1;
+    final marker = (time: DateTime.now(), label: 'Lap $lapNum');
+    setState(() => _sessionMarkers.add(marker));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Lap $lapNum marked'),
+      duration: const Duration(seconds: 2),
+      backgroundColor: Colors.blueGrey,
+    ));
+  }
+
+  void _checkAlerts(HRDevice device) {
+    final now = DateTime.now();
+    final last = _lastAlertTime[device.id];
+    if (last != null && now.difference(last).inSeconds < 60) return;
+
+    String? message;
+    if (device.currentHeartRate != null && device.currentHeartRate! >= 190) {
+      final athlete = DatabaseService.instance.getAthleteForSensor(device.id);
+      final name = athlete?.name ?? device.name;
+      message = '⚠️ $name HR ${device.currentHeartRate} bpm — Anaerobic zone!';
+    } else if (device.batteryLevel != null && device.batteryLevel! <= 10) {
+      final athlete = DatabaseService.instance.getAthleteForSensor(device.id);
+      final name = athlete?.name ?? device.name;
+      message = '🔋 $name sensor battery low (${device.batteryLevel}%)';
+    }
+
+    if (message != null && mounted) {
+      _lastAlertTime[device.id] = now;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.deepOrange,
+        duration: const Duration(seconds: 4),
+      ));
+    }
+  }
+
+  // RMSSD from the device's current RR interval list (ms). Returns null if < 2 intervals.
+  double? _computeRmssd(List<int>? rrIntervals) {
+    if (rrIntervals == null || rrIntervals.length < 2) return null;
+    double sumSq = 0;
+    for (int i = 1; i < rrIntervals.length; i++) {
+      final diff = (rrIntervals[i] - rrIntervals[i - 1]).toDouble();
+      sumSq += diff * diff;
+    }
+    return math.sqrt(sumSq / (rrIntervals.length - 1));
+  }
+
+  // Green ≥40ms, Yellow ≥20ms, Red <20ms, null = no data
+  Color? _hrvTrafficLight(HRDevice device) {
+    final rmssd = _computeRmssd(device.rrIntervals);
+    if (rmssd == null) return null;
+    if (rmssd >= 40) return Colors.greenAccent;
+    if (rmssd >= 20) return Colors.yellowAccent;
+    return Colors.redAccent;
+  }
+
+  // Maps RSSI dBm to 1–4 signal bars
+  int _rssiToBars(int rssi) {
+    if (rssi >= -60) return 4;
+    if (rssi >= -75) return 3;
+    if (rssi >= -90) return 2;
+    return 1;
   }
 
   void _showSensorAssignmentDialog(BuildContext context, HRDevice device, Person? currentAthlete) {
@@ -801,6 +1147,110 @@ class _DashboardScreenState extends State<DashboardScreen>
     showDialog(
       context: context,
       builder: (context) => const DeviceDialog(),
+    );
+  }
+}
+
+class _ZoneBars extends StatelessWidget {
+  final List<int> zoneSecs; // 5 elements, index 0-4
+  final double height;
+
+  static const _zoneColors = [
+    Color(0xFF4FC3F7), // Z1 light blue
+    Color(0xFF66BB6A), // Z2 green
+    Color(0xFFFDD835), // Z3 yellow
+    Color(0xFFFF7043), // Z4 orange
+    Color(0xFFE53935), // Z5 red
+  ];
+
+  const _ZoneBars({required this.zoneSecs, required this.height});
+
+  @override
+  Widget build(BuildContext context) {
+    final total = zoneSecs.fold(0, (a, b) => a + b);
+    if (total == 0) return const SizedBox.shrink();
+    return Row(
+      children: List.generate(5, (i) {
+        final flex = zoneSecs[i];
+        if (flex == 0) return const SizedBox.shrink();
+        return Expanded(
+          flex: flex,
+          child: Container(
+            height: height,
+            margin: const EdgeInsets.symmetric(horizontal: 0.5),
+            decoration: BoxDecoration(
+              color: _zoneColors[i].withValues(alpha: 0.85),
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        );
+      }),
+    );
+  }
+}
+
+class _SparklinePainter extends CustomPainter {
+  final List<HeartRateDataPoint> points;
+  final Color color;
+
+  _SparklinePainter({required this.points, required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (points.length < 2) return;
+    final minVal = points.map((p) => p.value).reduce(math.min);
+    final maxVal = points.map((p) => p.value).reduce(math.max);
+    final range = (maxVal - minVal).clamp(1.0, double.infinity);
+
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1.5
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    final path = Path();
+    for (int i = 0; i < points.length; i++) {
+      final x = i / (points.length - 1) * size.width;
+      final y = size.height - ((points[i].value - minVal) / range) * size.height * 0.9 - size.height * 0.05;
+      if (i == 0) {
+        path.moveTo(x, y);
+      } else {
+        path.lineTo(x, y);
+      }
+    }
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(_SparklinePainter old) => old.points != points;
+}
+
+class _SignalIcon extends StatelessWidget {
+  final int bars; // 1–4
+  final double size;
+
+  const _SignalIcon({required this.bars, required this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: List.generate(4, (i) {
+          final active = i < bars;
+          return Container(
+            width: size * 0.18,
+            height: size * (0.25 + i * 0.25),
+            decoration: BoxDecoration(
+              color: active ? Colors.white : Colors.white30,
+              borderRadius: BorderRadius.circular(1),
+            ),
+          );
+        }),
+      ),
     );
   }
 }

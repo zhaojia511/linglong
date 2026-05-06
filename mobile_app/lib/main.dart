@@ -114,7 +114,7 @@ class MyApp extends StatelessWidget {
 }
 
 class _InitializerScreen extends StatelessWidget {
-  const _InitializerScreen({super.key});
+  const _InitializerScreen();
 
   @override
   Widget build(BuildContext context) {
