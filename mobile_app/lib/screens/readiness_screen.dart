@@ -71,9 +71,9 @@ class _ReadinessScreenState extends State<ReadinessScreen> {
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       final bleService = Provider.of<BLEService>(context, listen: false);
       // Find the sensor — it may have new RR data each tick
-      final device = bleService.connectedDevices
-          .firstWhere((d) => d.id == _selectedSensor!.id,
-              orElse: () => _selectedSensor!);
+      final device = bleService.connectedDevices.firstWhere(
+          (d) => d.id == _selectedSensor!.id,
+          orElse: () => _selectedSensor!);
 
       // Accumulate new RR intervals (avoid double-counting duplicates)
       if (device.rrIntervals != null && device.rrIntervals!.isNotEmpty) {
@@ -118,17 +118,30 @@ class _ReadinessScreenState extends State<ReadinessScreen> {
   }
 
   Future<void> _saveResult() async {
-    if (_result == null || _selectedAthlete == null || _selectedSensor == null) {
+    if (_result == null ||
+        _selectedAthlete == null ||
+        _selectedSensor == null) {
       return;
     }
     // Save HRV snapshot via HrvService
-    await HrvService.instance.saveReadinessSnapshot(
+    final saved = await HrvService.instance.saveReadinessSnapshot(
       personId: _selectedAthlete!.id,
       deviceId: _selectedSensor!.id,
       rrIntervals: _accumulatedRR,
+      durationSec: _durationMinutes * 60,
       restingHR: _liveHR,
       feelingScore: _feelingScore,
     );
+    if (!saved) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'Measurement could not be saved. Try again with cleaner RR data.'),
+          backgroundColor: Colors.orange,
+        ));
+      }
+      return;
+    }
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Readiness measurement saved'),
@@ -200,8 +213,7 @@ class _ReadinessScreenState extends State<ReadinessScreen> {
         const SizedBox(height: 24),
 
         // Athlete selection
-        Text('Athlete',
-            style: Theme.of(context).textTheme.labelLarge),
+        Text('Athlete', style: Theme.of(context).textTheme.labelLarge),
         const SizedBox(height: 8),
         if (athletes.isEmpty)
           const Text('No athletes. Add athletes in the Profile tab.',
@@ -281,8 +293,7 @@ class _ReadinessScreenState extends State<ReadinessScreen> {
             ButtonSegment(value: 3, label: Text('3 min')),
           ],
           selected: {_durationMinutes},
-          onSelectionChanged: (s) =>
-              setState(() => _durationMinutes = s.first),
+          onSelectionChanged: (s) => setState(() => _durationMinutes = s.first),
         ),
         const SizedBox(height: 8),
         Text(
@@ -302,8 +313,7 @@ class _ReadinessScreenState extends State<ReadinessScreen> {
               : null,
           icon: const Icon(Icons.play_arrow),
           label: const Text('Start Measurement'),
-          style: FilledButton.styleFrom(
-              minimumSize: const Size.fromHeight(48)),
+          style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
         ),
       ],
     );
@@ -318,9 +328,7 @@ class _ReadinessScreenState extends State<ReadinessScreen> {
     final mins = _remainingSeconds ~/ 60;
     final secs = _remainingSeconds % 60;
     final rrCount = _accumulatedRR.length;
-    final liveRmssd = rrCount >= 20
-        ? HrvAnalysis.rmssd(_accumulatedRR)
-        : null;
+    final liveRmssd = rrCount >= 20 ? HrvAnalysis.rmssd(_accumulatedRR) : null;
 
     return Padding(
       padding: const EdgeInsets.all(24),
@@ -461,14 +469,23 @@ class _ReadinessScreenState extends State<ReadinessScreen> {
           mainAxisSpacing: 10,
           childAspectRatio: 2.2,
           children: [
-            _MetricCard(label: 'RMSSD', value: '${r.rmssd.toStringAsFixed(1)} ms',
+            _MetricCard(
+                label: 'RMSSD',
+                value: '${r.rmssd.toStringAsFixed(1)} ms',
                 subtitle: 'Parasympathetic activity'),
-            _MetricCard(label: 'SDNN', value: '${r.sdnn.toStringAsFixed(1)} ms',
+            _MetricCard(
+                label: 'SDNN',
+                value: '${r.sdnn.toStringAsFixed(1)} ms',
                 subtitle: 'Overall HRV'),
-            _MetricCard(label: 'pNN50', value: '${r.pnn50.toStringAsFixed(1)}%',
+            _MetricCard(
+                label: 'pNN50',
+                value: '${r.pnn50.toStringAsFixed(1)}%',
                 subtitle: 'Vagal tone'),
-            _MetricCard(label: 'Mean RR', value: '${r.meanRR.toStringAsFixed(0)} ms',
-                subtitle: '≈ ${(60000 / r.meanRR).toStringAsFixed(0)} bpm rest'),
+            _MetricCard(
+                label: 'Mean RR',
+                value: '${r.meanRR.toStringAsFixed(0)} ms',
+                subtitle:
+                    '≈ ${(60000 / r.meanRR).toStringAsFixed(0)} bpm rest'),
             _MetricCard(
                 label: 'SD1',
                 value: '${r.sd1.toStringAsFixed(1)} ms',
@@ -504,9 +521,7 @@ class _ReadinessScreenState extends State<ReadinessScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
                 decoration: BoxDecoration(
                   color: selected
-                      ? Theme.of(context)
-                          .colorScheme
-                          .primaryContainer
+                      ? Theme.of(context).colorScheme.primaryContainer
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(10),
                   border: selected
@@ -541,8 +556,7 @@ class _ReadinessScreenState extends State<ReadinessScreen> {
           onPressed: _saveResult,
           icon: const Icon(Icons.save),
           label: const Text('Save Result'),
-          style: FilledButton.styleFrom(
-              minimumSize: const Size.fromHeight(48)),
+          style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
         ),
         const SizedBox(height: 8),
         TextButton(
@@ -585,10 +599,8 @@ class _LiveStatCard extends StatelessWidget {
         Icon(icon, size: 18, color: Colors.grey[600]),
         const SizedBox(height: 4),
         Text(value,
-            style: const TextStyle(
-                fontSize: 16, fontWeight: FontWeight.bold)),
-        Text(label,
-            style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        Text(label, style: TextStyle(fontSize: 11, color: Colors.grey[600])),
       ],
     );
   }
@@ -617,8 +629,8 @@ class _MetricCard extends StatelessWidget {
                     color: Colors.grey[600],
                     fontWeight: FontWeight.w500)),
             Text(value,
-                style: const TextStyle(
-                    fontSize: 18, fontWeight: FontWeight.bold)),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             Text(subtitle,
                 style: TextStyle(fontSize: 10, color: Colors.grey[500]),
                 maxLines: 1,
@@ -664,9 +676,7 @@ class _ReadinessBadge extends StatelessWidget {
           Text(
             '${pct.toStringAsFixed(0)}%',
             style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: _color),
+                fontSize: 22, fontWeight: FontWeight.bold, color: _color),
           ),
           const SizedBox(width: 8),
           Column(

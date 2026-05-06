@@ -5,6 +5,7 @@ import '../services/database_service.dart';
 import '../services/supabase_repository.dart';
 import '../services/settings_service.dart';
 import '../services/sync_service.dart';
+import 'readiness_history_screen.dart';
 import 'readiness_screen.dart';
 
 // All athlete photos bundled in assets
@@ -28,6 +29,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         title: null,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.history),
+            tooltip: 'Readiness History',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const ReadinessHistoryScreen(),
+              ),
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.monitor_heart),
             tooltip: 'Measure Readiness',
@@ -63,7 +74,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const PersonDetailScreen(person: null),
+                          builder: (_) =>
+                              const PersonDetailScreen(person: null),
                         ),
                       );
                     },
@@ -80,7 +92,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             itemCount: persons.length,
             itemBuilder: (context, index) {
               final person = persons[index];
-              final isCurrent = dbService.currentPerson?.id == person.id;
 
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -92,7 +103,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         : null,
                     child: person.photoPath == null
                         ? Text(
-                            person.name.isNotEmpty ? person.name[0].toUpperCase() : '?',
+                            person.name.isNotEmpty
+                                ? person.name[0].toUpperCase()
+                                : '?',
                             style: const TextStyle(color: Colors.white),
                           )
                         : null,
@@ -152,9 +165,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final parts = <String>[];
     parts.add('${person.age} years');
     final gender = person.gender;
-    parts.add(gender.isNotEmpty ? '${gender[0].toUpperCase()}${gender.substring(1)}' : gender);
-    if (person.category != null && person.category!.isNotEmpty) parts.add(person.category!);
-    if (person.group != null && person.group!.isNotEmpty) parts.add(person.group!);
+    parts.add(gender.isNotEmpty
+        ? '${gender[0].toUpperCase()}${gender.substring(1)}'
+        : gender);
+    if (person.category != null && person.category!.isNotEmpty) {
+      parts.add(person.category!);
+    }
+    if (person.group != null && person.group!.isNotEmpty) {
+      parts.add(person.group!);
+    }
     return parts.join(' • ');
   }
 }
@@ -200,7 +219,8 @@ class _PersonDetailScreenState extends State<PersonDetailScreen> {
       _weightController.text = widget.person!.weight.toString();
       _heightController.text = widget.person!.height.toString();
       _maxHRController.text = widget.person!.maxHeartRate?.toString() ?? '';
-      _restingHRController.text = widget.person!.restingHeartRate?.toString() ?? '';
+      _restingHRController.text =
+          widget.person!.restingHeartRate?.toString() ?? '';
       _categoryController.text = widget.person!.category ?? '';
       _groupController.text = widget.person!.group ?? '';
       _gender = widget.person!.gender;
@@ -291,7 +311,9 @@ class _PersonDetailScreenState extends State<PersonDetailScreen> {
             restingHeartRate: _restingHRController.text.isNotEmpty
                 ? int.parse(_restingHRController.text)
                 : null,
-            category: _categoryController.text.isEmpty ? null : _categoryController.text,
+            category: _categoryController.text.isEmpty
+                ? null
+                : _categoryController.text,
             group: _groupController.text.isEmpty ? null : _groupController.text,
             photoPath: _photoPath,
           );
@@ -320,8 +342,11 @@ class _PersonDetailScreenState extends State<PersonDetailScreen> {
           widget.person!.restingHeartRate = _restingHRController.text.isNotEmpty
               ? int.parse(_restingHRController.text)
               : null;
-          widget.person!.category = _categoryController.text.isEmpty ? null : _categoryController.text;
-          widget.person!.group = _groupController.text.isEmpty ? null : _groupController.text;
+          widget.person!.category = _categoryController.text.isEmpty
+              ? null
+              : _categoryController.text;
+          widget.person!.group =
+              _groupController.text.isEmpty ? null : _groupController.text;
           widget.person!.photoPath = _photoPath;
 
           await dbService.updatePerson(widget.person!);
@@ -374,7 +399,7 @@ class _PersonDetailScreenState extends State<PersonDetailScreen> {
             onPressed: () async {
               final dbService =
                   Provider.of<DatabaseService>(context, listen: false);
-              
+
               await dbService.deletePerson(widget.person!.id);
 
               if (mounted) {
@@ -426,20 +451,23 @@ class _PersonDetailScreenState extends State<PersonDetailScreen> {
                     CircleAvatar(
                       radius: 50,
                       backgroundColor: Colors.blue.shade100,
-                      backgroundImage: _photoPath != null ? AssetImage(_photoPath!) : null,
+                      backgroundImage:
+                          _photoPath != null ? AssetImage(_photoPath!) : null,
                       child: _photoPath == null
                           ? Text(
                               _nameController.text.isNotEmpty
                                   ? _nameController.text[0].toUpperCase()
                                   : '?',
-                              style: const TextStyle(fontSize: 32, color: Colors.blue),
+                              style: const TextStyle(
+                                  fontSize: 32, color: Colors.blue),
                             )
                           : null,
                     ),
                     CircleAvatar(
                       radius: 14,
                       backgroundColor: Colors.white,
-                      child: Icon(Icons.camera_alt, size: 16, color: Colors.blue.shade700),
+                      child: Icon(Icons.camera_alt,
+                          size: 16, color: Colors.blue.shade700),
                     ),
                   ],
                 ),
@@ -465,7 +493,9 @@ class _PersonDetailScreenState extends State<PersonDetailScreen> {
                 builder: (context, settings, child) {
                   final categories = settings.getCategories();
                   return DropdownButtonFormField<String>(
-                    initialValue: _categoryController.text.isEmpty ? null : _categoryController.text,
+                    initialValue: _categoryController.text.isEmpty
+                        ? null
+                        : _categoryController.text,
                     decoration: const InputDecoration(
                       labelText: 'Category',
                       border: OutlineInputBorder(),
@@ -477,9 +507,9 @@ class _PersonDetailScreenState extends State<PersonDetailScreen> {
                         child: Text('None'),
                       ),
                       ...categories.map((cat) => DropdownMenuItem<String>(
-                        value: cat,
-                        child: Text(cat),
-                      )),
+                            value: cat,
+                            child: Text(cat),
+                          )),
                     ],
                     onChanged: (value) {
                       setState(() {
@@ -494,7 +524,9 @@ class _PersonDetailScreenState extends State<PersonDetailScreen> {
                 builder: (context, settings, child) {
                   final groups = settings.getGroups();
                   return DropdownButtonFormField<String>(
-                    initialValue: _groupController.text.isEmpty ? null : _groupController.text,
+                    initialValue: _groupController.text.isEmpty
+                        ? null
+                        : _groupController.text,
                     decoration: const InputDecoration(
                       labelText: 'Group',
                       border: OutlineInputBorder(),
@@ -506,9 +538,9 @@ class _PersonDetailScreenState extends State<PersonDetailScreen> {
                         child: Text('None'),
                       ),
                       ...groups.map((grp) => DropdownMenuItem<String>(
-                        value: grp,
-                        child: Text(grp),
-                      )),
+                            value: grp,
+                            child: Text(grp),
+                          )),
                     ],
                     onChanged: (value) {
                       setState(() {
@@ -552,7 +584,8 @@ class _PersonDetailScreenState extends State<PersonDetailScreen> {
                       ),
                       items: const [
                         DropdownMenuItem(value: 'male', child: Text('Male')),
-                        DropdownMenuItem(value: 'female', child: Text('Female')),
+                        DropdownMenuItem(
+                            value: 'female', child: Text('Female')),
                         DropdownMenuItem(value: 'other', child: Text('Other')),
                       ],
                       onChanged: (value) {
@@ -665,13 +698,30 @@ class _PersonDetailScreenState extends State<PersonDetailScreen> {
                     padding: const EdgeInsets.all(16),
                   ),
                 ),
+              if (widget.person != null) const SizedBox(height: 12),
+              if (widget.person != null)
+                OutlinedButton.icon(
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          ReadinessHistoryScreen(initialAthlete: widget.person),
+                    ),
+                  ),
+                  icon: const Icon(Icons.history),
+                  label: const Text('Readiness History'),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.all(16),
+                  ),
+                ),
               const SizedBox(height: 12),
               ElevatedButton(
                 onPressed: _savePerson,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.all(16),
                 ),
-                child: Text(widget.person == null ? 'Add Member' : 'Save Changes'),
+                child:
+                    Text(widget.person == null ? 'Add Member' : 'Save Changes'),
               ),
             ],
           ),
