@@ -8,6 +8,7 @@ import 'dashboard_screen.dart';
 import 'profile_screen.dart';
 import 'readiness_history_screen.dart';
 import 'settings_screen.dart';
+import '../utils/timezone_utils.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -107,10 +108,10 @@ class _TrainingHistoryWidgetState extends State<TrainingHistoryWidget> {
 
   Future<void> _syncAllUnsynced(BuildContext context) async {
     final dbService = Provider.of<DatabaseService>(context, listen: false);
-    
+
     // Check if there are any unsynced sessions
     final unsyncedSessions = dbService.getUnsyncedSessions();
-    
+
     if (unsyncedSessions.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -120,17 +121,17 @@ class _TrainingHistoryWidgetState extends State<TrainingHistoryWidget> {
       );
       return;
     }
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Uploading ${unsyncedSessions.length} session(s)...'),
         duration: const Duration(seconds: 2),
       ),
     );
-    
+
     try {
       final supabaseRepo = SupabaseRepository();
-      
+
       // Check if user is authenticated
       if (supabaseRepo.currentUser == null) {
         if (context.mounted) {
@@ -144,17 +145,18 @@ class _TrainingHistoryWidgetState extends State<TrainingHistoryWidget> {
         }
         return;
       }
-      
+
       // Upload unsynced sessions to cloud
-      final uploadedCount = await dbService.syncAllUnsyncedSessions(supabaseRepo);
-      
+      final uploadedCount =
+          await dbService.syncAllUnsyncedSessions(supabaseRepo);
+
       if (context.mounted) {
         // Force UI refresh to update badge count
         setState(() {});
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(uploadedCount > 0 
+            content: Text(uploadedCount > 0
                 ? 'Successfully uploaded $uploadedCount session(s)'
                 : 'No sessions to upload'),
             backgroundColor: uploadedCount > 0 ? Colors.green : Colors.blue,
@@ -176,7 +178,8 @@ class _TrainingHistoryWidgetState extends State<TrainingHistoryWidget> {
     }
   }
 
-  Future<void> _syncSingleSession(BuildContext context, TrainingSession session) async {
+  Future<void> _syncSingleSession(
+      BuildContext context, TrainingSession session) async {
     if (session.synced) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -186,21 +189,21 @@ class _TrainingHistoryWidgetState extends State<TrainingHistoryWidget> {
       );
       return;
     }
-    
+
     // Prevent double-sync
     if (_syncingSessions.contains(session.id)) {
       return;
     }
-    
+
     setState(() {
       _syncingSessions.add(session.id);
     });
-    
+
     final dbService = Provider.of<DatabaseService>(context, listen: false);
-    
+
     try {
       final supabaseRepo = SupabaseRepository();
-      
+
       // Check if user is authenticated
       if (supabaseRepo.currentUser == null) {
         if (context.mounted) {
@@ -214,14 +217,15 @@ class _TrainingHistoryWidgetState extends State<TrainingHistoryWidget> {
         }
         return;
       }
-      
+
       final success = await dbService.syncSessionToCloud(session, supabaseRepo);
-      
+
       if (context.mounted) {
         setState(() {}); // Force UI refresh
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(success ? 'Session synced successfully' : 'Sync failed'),
+            content:
+                Text(success ? 'Session synced successfully' : 'Sync failed'),
             backgroundColor: success ? Colors.green : Colors.red,
             duration: const Duration(seconds: 2),
           ),
@@ -247,7 +251,8 @@ class _TrainingHistoryWidgetState extends State<TrainingHistoryWidget> {
     }
   }
 
-  void _showDeleteConfirmation(BuildContext context, DatabaseService dbService, List<String> sessionIds, bool isMultiple) {
+  void _showDeleteConfirmation(BuildContext context, DatabaseService dbService,
+      List<String> sessionIds, bool isMultiple) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -268,12 +273,12 @@ class _TrainingHistoryWidgetState extends State<TrainingHistoryWidget> {
                 dbService.deleteSession(sessionId);
               }
               Navigator.pop(context);
-              
+
               setState(() {
                 _isMultiSelectMode = false;
                 _selectedSessions.clear();
               });
-              
+
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
@@ -371,7 +376,8 @@ class _TrainingHistoryWidgetState extends State<TrainingHistoryWidget> {
                     context: context,
                     builder: (context) => AlertDialog(
                       title: const Text('Delete Session'),
-                      content: const Text('Are you sure you want to delete this session?'),
+                      content: const Text(
+                          'Are you sure you want to delete this session?'),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.pop(context, false),
@@ -379,7 +385,8 @@ class _TrainingHistoryWidgetState extends State<TrainingHistoryWidget> {
                         ),
                         TextButton(
                           onPressed: () => Navigator.pop(context, true),
-                          child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                          child: const Text('Delete',
+                              style: TextStyle(color: Colors.red)),
                         ),
                       ],
                     ),
@@ -396,7 +403,8 @@ class _TrainingHistoryWidgetState extends State<TrainingHistoryWidget> {
                   );
                 },
                 child: Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   color: isSelected ? Colors.blue.shade50 : null,
                   child: ListTile(
                     dense: true,
@@ -425,7 +433,8 @@ class _TrainingHistoryWidgetState extends State<TrainingHistoryWidget> {
                         // Show athlete name if available
                         Consumer<DatabaseService>(
                           builder: (context, dbService, child) {
-                            final person = dbService.getPersonById(session.personId);
+                            final person =
+                                dbService.getPersonById(session.personId);
                             if (person != null) {
                               return Text(
                                 person.name,
@@ -444,7 +453,7 @@ class _TrainingHistoryWidgetState extends State<TrainingHistoryWidget> {
                       ],
                     ),
                     subtitle: Text(
-                      '${_formatDuration(session.duration)} • ${session.startTime.toString().substring(0, 16)}',
+                      '${_formatDuration(session.duration)} • ${TimezoneUtils.formatDateTime(session.startTime)}',
                       style: const TextStyle(fontSize: 11),
                     ),
                     trailing: _isMultiSelectMode
@@ -453,16 +462,25 @@ class _TrainingHistoryWidgetState extends State<TrainingHistoryWidget> {
                             ? const SizedBox(
                                 width: 20,
                                 height: 20,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
                               )
                             : IconButton(
                                 icon: Icon(
-                                  session.synced ? Icons.cloud_done : Icons.cloud_upload,
-                                  color: session.synced ? Colors.green : Colors.orange,
+                                  session.synced
+                                      ? Icons.cloud_done
+                                      : Icons.cloud_upload,
+                                  color: session.synced
+                                      ? Colors.green
+                                      : Colors.orange,
                                   size: 20,
                                 ),
-                                onPressed: session.synced ? null : () => _syncSingleSession(context, session),
-                                tooltip: session.synced ? 'Synced' : 'Tap to upload',
+                                onPressed: session.synced
+                                    ? null
+                                    : () =>
+                                        _syncSingleSession(context, session),
+                                tooltip:
+                                    session.synced ? 'Synced' : 'Tap to upload',
                               ),
                     onTap: () {
                       if (_isMultiSelectMode) {
@@ -472,7 +490,8 @@ class _TrainingHistoryWidgetState extends State<TrainingHistoryWidget> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => SessionVisualizationScreen(session: session),
+                            builder: (context) =>
+                                SessionVisualizationScreen(session: session),
                           ),
                         );
                       }

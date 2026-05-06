@@ -2,11 +2,27 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../supabase/supabase_client.dart';
+import '../utils/timezone_utils.dart';
 
 class SupabaseRepository {
   SupabaseRepository() : _client = SupabaseClientProvider.client;
 
   final SupabaseClient _client;
+
+  List<Map<String, dynamic>> _normalizeHeartRateData(
+      List<Map<String, dynamic>> data) {
+    return data.map((entry) {
+      final timestamp = entry['timestamp'];
+      final parsed = timestamp is DateTime
+          ? timestamp
+          : (timestamp is String ? DateTime.tryParse(timestamp) : null);
+
+      return {
+        ...entry,
+        if (parsed != null) 'timestamp': TimezoneUtils.toUtcIsoString(parsed),
+      };
+    }).toList();
+  }
 
   // Auth
   Future<AuthResponse> signIn(String email, String password) {
@@ -62,7 +78,10 @@ class SupabaseRepository {
 
   // Sessions
   Future<List<Map<String, dynamic>>> fetchSessions() async {
-    final res = await _client.from('training_sessions').select().order('start_time', ascending: false);
+    final res = await _client
+        .from('training_sessions')
+        .select()
+        .order('start_time', ascending: false);
     return List<Map<String, dynamic>>.from(res);
   }
 
@@ -80,18 +99,20 @@ class SupabaseRepository {
       'title': title,
       'training_type': trainingType,
       'notes': notes,
-      'start_time': DateTime.now().toIso8601String(),
+      'start_time': TimezoneUtils.toUtcIsoString(DateTime.now()),
       'heart_rate_data': jsonEncode([]),
     });
   }
 
-  Future<void> appendHeartRate(String sessionId, List<Map<String, dynamic>> data) async {
+  Future<void> appendHeartRate(
+      String sessionId, List<Map<String, dynamic>> data) async {
     await _client.from('training_sessions').update({
       'heart_rate_data': jsonEncode(data),
     }).eq('id', sessionId);
   }
 
-  Future<void> endSession(String sessionId, {
+  Future<void> endSession(
+    String sessionId, {
     required DateTime startTime,
     required List<int> heartRates,
     required double weight,
@@ -110,7 +131,7 @@ class SupabaseRepository {
       calories = _estimateCalories(avg, duration, weight, age, gender);
     }
     await _client.from('training_sessions').update({
-      'end_time': endTime.toIso8601String(),
+      'end_time': TimezoneUtils.toUtcIsoString(endTime),
       'duration': duration,
       'avg_heart_rate': avg,
       'max_heart_rate': max,
@@ -118,7 +139,7 @@ class SupabaseRepository {
       'calories': calories,
       'notes': notes,
       'synced': true,
-      'updated_at': DateTime.now().toIso8601String(),
+      'updated_at': TimezoneUtils.toUtcIsoString(DateTime.now()),
     }).eq('id', sessionId);
   }
 
@@ -141,35 +162,36 @@ class SupabaseRepository {
   }) async {
     final userId = _client.auth.currentUser?.id;
     if (userId == null) throw Exception('Not authenticated');
-    
+
     try {
       debugPrint('Upserting session $id to Supabase');
       debugPrint('  person_id: $personId');
       debugPrint('  user_id: $userId');
       debugPrint('  title: $title');
       debugPrint('  heart_rate_data points: ${heartRateData.length}');
-      
+
       final payload = {
         'id': id,
         'user_id': userId,
         'person_id': personId,
         'title': title,
         'training_type': trainingType,
-        'start_time': startTime.toIso8601String(),
-        'end_time': endTime.toIso8601String(),
+        'start_time': TimezoneUtils.toUtcIsoString(startTime),
+        'end_time': TimezoneUtils.toUtcIsoString(endTime),
         'duration': duration,
         'avg_heart_rate': avgHeartRate,
         'max_heart_rate': maxHeartRate,
         'min_heart_rate': minHeartRate,
         'calories': calories,
-        'heart_rate_data': jsonEncode(heartRateData),
+        'heart_rate_data': jsonEncode(_normalizeHeartRateData(heartRateData)),
         'notes': notes,
         'synced': true,
-        'created_at': startTime.toIso8601String(),
-        'updated_at': DateTime.now().toIso8601String(),
+        'created_at': TimezoneUtils.toUtcIsoString(startTime),
+        'updated_at': TimezoneUtils.toUtcIsoString(DateTime.now()),
       };
-      
-      final result = await _client.from('training_sessions').upsert(payload).select();
+
+      final result =
+          await _client.from('training_sessions').upsert(payload).select();
       debugPrint('Supabase upsert result: $result');
     } catch (e) {
       debugPrint('Error upserting training session: $e');
@@ -260,11 +282,20 @@ class SupabaseRepository {
   // Readiness measurements
 
   /// Upsert a readiness measurement to Supabase. Idempotent on `id`.
-  Future<void> upsertReadinessMeasurement(Map<String, dynamic> measurement) async {
+  Future<void> upsertReadinessMeasurement(
+      Map<String, dynamic> measurement) async {
     final userId = _client.auth.currentUser?.id;
     if (userId == null) throw Exception('Not authenticated');
+    final measuredAt = measurement['measured_at'];
+
     await _client.from('readiness_measurements').upsert({
       ...measurement,
+      if (measuredAt is DateTime)
+        'measured_at': TimezoneUtils.toUtcIsoString(measuredAt)
+      else if (measuredAt is String)
+        'measured_at': DateTime.tryParse(measuredAt) != null
+            ? TimezoneUtils.toUtcIsoString(DateTime.parse(measuredAt))
+            : measuredAt,
       'user_id': userId,
     }, onConflict: 'id');
   }
@@ -281,12 +312,23 @@ class SupabaseRepository {
     return List<Map<String, dynamic>>.from(res);
   }
 
-  double _estimateCalories(int avgHr, int durationSec, double weightKg, int age, String gender) {
+  double _estimateCalories(
+      int avgHr, int durationSec, double weightKg, int age, String gender) {
     final durationMin = durationSec / 60.0;
     if (gender == 'male') {
-      return ((age * 0.2017) - (weightKg * 0.09036) + (avgHr * 0.6309) - 55.0969) * durationMin / 4.184;
+      return ((age * 0.2017) -
+              (weightKg * 0.09036) +
+              (avgHr * 0.6309) -
+              55.0969) *
+          durationMin /
+          4.184;
     } else {
-      return ((age * 0.074) - (weightKg * 0.05741) + (avgHr * 0.4472) - 20.4022) * durationMin / 4.184;
+      return ((age * 0.074) -
+              (weightKg * 0.05741) +
+              (avgHr * 0.4472) -
+              20.4022) *
+          durationMin /
+          4.184;
     }
   }
 }

@@ -3,11 +3,11 @@ import { useParams, Link, useNavigate } from 'react-router-dom'
 import { sessionService, personService } from '../services/api'
 import TrainingZonesChart from '../components/TrainingZonesChart'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import { format } from 'date-fns'
 import { trimHRData, detectWarmup, detectCooldown, filterNoise, calcStats } from '../lib/hrDataProcessing'
 import { analyzeHRV } from '../lib/hrvAnalysis'
 import { calcTRIMP, estimateRecoveryHours, sessionIntensity, estimateVO2Max, vo2MaxCategory } from '../lib/trainingLoad'
 import { exportTCX, exportGPX } from '../lib/exportFormats'
+import { formatDateTimeGMT8, formatTimeGMT8 } from '../lib/dateTime'
 
 function SessionDetail() {
   const { id } = useParams()
@@ -148,7 +148,7 @@ function SessionDetail() {
     .map((data, index) => ({
       time: index,
       heartRate: data.heartRate,
-      timestamp: format(new Date(data.timestamp), 'HH:mm:ss')
+      timestamp: formatTimeGMT8(data.timestamp, { seconds: true })
     }))
 
   return (
@@ -169,7 +169,7 @@ function SessionDetail() {
             <div>
               <h2>{session.title}</h2>
               <p style={{ color: '#666', marginTop: '10px' }}>
-                {new Date(session.startTime).toLocaleString()}
+                {formatDateTimeGMT8(session.startTime, { seconds: true })}
               </p>
             </div>
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
@@ -433,7 +433,7 @@ function SessionDetail() {
             <p><strong>Session ID:</strong> {session.id}</p>
             <p><strong>Person ID:</strong> {session.personId}</p>
             <p><strong>Data Points:</strong> {session.heartRateData?.length || 0}</p>
-            <p><strong>Created:</strong> {new Date(session.createdAt).toLocaleString()}</p>
+            <p><strong>Created:</strong> {formatDateTimeGMT8(session.createdAt, { seconds: true })}</p>
           </div>
         </div>
       </div>

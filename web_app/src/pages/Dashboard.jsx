@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { authService } from '../services/api'
 import { useDashboardData } from './hooks/useDashboardData'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { formatDateGMT8 } from '../lib/dateTime'
 
 
 function Dashboard() {
@@ -128,7 +129,7 @@ function Dashboard() {
                   <div>
                     <strong>{session.title}</strong>
                     <div style={{ fontSize: '14px', color: '#666', marginTop: '5px' }}>
-                      {new Date(session.startTime).toLocaleDateString()} • {formatDuration(session.duration)}
+                      {formatDateGMT8(session.startTime)} • {formatDuration(session.duration)}
                       {session.avgHeartRate && ` • Avg HR: ${session.avgHeartRate} bpm`}
                     </div>
                   </div>

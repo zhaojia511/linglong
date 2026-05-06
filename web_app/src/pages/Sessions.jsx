@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { sessionService } from '../services/api'
+import { formatDateGMT8, formatDateTimeGMT8 } from '../lib/dateTime'
 
 function exportSessionsToCSV(sessions) {
   const headers = ['Title', 'Type', 'Date', 'Duration (min)', 'Avg HR (bpm)', 'Max HR (bpm)', 'Calories (kcal)', 'Distance (m)']
   const rows = sessions.map(s => [
     `"${(s.title || '').replace(/"/g, '""')}"`,
     s.trainingType || '',
-    s.startTime ? new Date(s.startTime).toLocaleDateString() : '',
+    s.startTime ? formatDateGMT8(s.startTime) : '',
     s.duration ? Math.round(s.duration / 60) : '',
     s.avgHeartRate || '',
     s.maxHeartRate || '',
@@ -147,7 +148,7 @@ function Sessions() {
                   <div style={{ flex: 1 }}>
                     <strong>{session.title}</strong>
                     <div style={{ fontSize: '14px', color: '#666', marginTop: '5px' }}>
-                      <div>{new Date(session.startTime).toLocaleString()}</div>
+                      <div>{formatDateTimeGMT8(session.startTime, { seconds: true })}</div>
                       <div>
                         Duration: {formatDuration(session.duration)} • Type: {session.trainingType}
                       </div>

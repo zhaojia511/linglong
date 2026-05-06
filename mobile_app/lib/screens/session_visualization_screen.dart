@@ -4,6 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 import '../models/training_session.dart';
 import '../utils/hr_data_processing.dart';
 import '../utils/hrv_analysis.dart';
+import '../utils/timezone_utils.dart';
 
 class SessionVisualizationScreen extends StatefulWidget {
   final TrainingSession session;
@@ -14,8 +15,7 @@ class SessionVisualizationScreen extends StatefulWidget {
       _SessionVisualizationScreenState();
 }
 
-class _SessionVisualizationScreenState
-    extends State<SessionVisualizationScreen>
+class _SessionVisualizationScreenState extends State<SessionVisualizationScreen>
     with SingleTickerProviderStateMixin {
   bool _trimEnabled = false;
   bool _noiseFilter = false;
@@ -60,7 +60,8 @@ class _SessionVisualizationScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(session.title.isNotEmpty ? session.title : session.trainingType,
+        title: Text(
+            session.title.isNotEmpty ? session.title : session.trainingType,
             style: const TextStyle(fontSize: 16)),
         toolbarHeight: 36,
         actions: [
@@ -102,7 +103,10 @@ class _SessionVisualizationScreenState
   Widget _buildCompactInfoCard() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+      color: Theme.of(context)
+          .colorScheme
+          .surfaceContainerHighest
+          .withValues(alpha: 0.4),
       child: Row(
         children: [
           // Left: general info
@@ -119,7 +123,8 @@ class _SessionVisualizationScreenState
             ),
           ),
           // Divider
-          Container(width: 1, height: 56, color: Colors.grey.withValues(alpha: 0.3)),
+          Container(
+              width: 1, height: 56, color: Colors.grey.withValues(alpha: 0.3)),
           const SizedBox(width: 16),
           // Right: HR stats
           Expanded(
@@ -131,12 +136,14 @@ class _SessionVisualizationScreenState
                       color: Colors.orange),
                 if (session.maxHeartRate != null) ...[
                   const SizedBox(height: 4),
-                  _infoItem(Icons.trending_up, 'Max  ${session.maxHeartRate} bpm',
+                  _infoItem(
+                      Icons.trending_up, 'Max  ${session.maxHeartRate} bpm',
                       color: Colors.red),
                 ],
                 if (session.minHeartRate != null) ...[
                   const SizedBox(height: 4),
-                  _infoItem(Icons.trending_down, 'Min  ${session.minHeartRate} bpm',
+                  _infoItem(
+                      Icons.trending_down, 'Min  ${session.minHeartRate} bpm',
                       color: Colors.blue),
                 ],
               ],
@@ -183,7 +190,8 @@ class _SessionVisualizationScreenState
                     title: const Text('Trim warmup / cooldown',
                         style: TextStyle(fontSize: 13)),
                     subtitle: _trimEnabled
-                        ? Text('Warmup ${_warmupSec}s · Cooldown ${_cooldownSec}s',
+                        ? Text(
+                            'Warmup ${_warmupSec}s · Cooldown ${_cooldownSec}s',
                             style: const TextStyle(fontSize: 11))
                         : null,
                     value: _trimEnabled,
@@ -193,11 +201,16 @@ class _SessionVisualizationScreenState
                   ),
                   if (_trimEnabled)
                     Row(children: [
-                      Expanded(child: _slider('Warmup', _warmupSec, (v) => _warmupSec = v)),
-                      Expanded(child: _slider('Cooldown', _cooldownSec, (v) => _cooldownSec = v)),
+                      Expanded(
+                          child: _slider(
+                              'Warmup', _warmupSec, (v) => _warmupSec = v)),
+                      Expanded(
+                          child: _slider('Cooldown', _cooldownSec,
+                              (v) => _cooldownSec = v)),
                     ]),
                   SwitchListTile(
-                    title: const Text('Noise filter', style: TextStyle(fontSize: 13)),
+                    title: const Text('Noise filter',
+                        style: TextStyle(fontSize: 13)),
                     value: _noiseFilter,
                     onChanged: (v) => setState(() => _noiseFilter = v),
                     contentPadding: EdgeInsets.zero,
@@ -246,7 +259,8 @@ class _SessionVisualizationScreenState
         child: Padding(
           padding: const EdgeInsets.all(32),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Icon(Icons.monitor_heart_outlined, size: 48, color: Colors.grey[400]),
+            Icon(Icons.monitor_heart_outlined,
+                size: 48, color: Colors.grey[400]),
             const SizedBox(height: 12),
             Text('Not enough data for HRV analysis\n(need ≥10 HR samples)',
                 textAlign: TextAlign.center,
@@ -257,7 +271,8 @@ class _SessionVisualizationScreenState
     }
 
     final hrv = HrvAnalysis.analyze(rr);
-    final rolling = HrvAnalysis.rollingRmssd(rr, windowSize: min(30, rr.length ~/ 3));
+    final rolling =
+        HrvAnalysis.rollingRmssd(rr, windowSize: min(30, rr.length ~/ 3));
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(12),
@@ -292,23 +307,18 @@ class _SessionVisualizationScreenState
           const SizedBox(height: 10),
           Row(children: [
             _hrvMetricTile('RMSSD', hrv.rmssd, 'ms',
-                low: 20, mid: 40, high: 60,
-                note: 'Parasympathetic tone'),
+                low: 20, mid: 40, high: 60, note: 'Parasympathetic tone'),
             _hrvMetricTile('SDNN', hrv.sdnn, 'ms',
-                low: 20, mid: 50, high: 100,
-                note: 'Overall variability'),
+                low: 20, mid: 50, high: 100, note: 'Overall variability'),
             _hrvMetricTile('pNN50', hrv.pnn50, '%',
-                low: 5, mid: 15, high: 30,
-                note: 'Vagal activity'),
+                low: 5, mid: 15, high: 30, note: 'Vagal activity'),
           ]),
           const SizedBox(height: 8),
           Row(children: [
             _hrvMetricTile('SD1', hrv.sd1, 'ms',
-                low: 10, mid: 25, high: 45,
-                note: 'Short-term (beat-to-beat)'),
+                low: 10, mid: 25, high: 45, note: 'Short-term (beat-to-beat)'),
             _hrvMetricTile('SD2', hrv.sd2, 'ms',
-                low: 20, mid: 50, high: 90,
-                note: 'Long-term variability'),
+                low: 20, mid: 50, high: 90, note: 'Long-term variability'),
             Expanded(
               child: Column(children: [
                 Text(hrv.stressLevel,
@@ -317,7 +327,8 @@ class _SessionVisualizationScreenState
                         fontWeight: FontWeight.bold,
                         color: _stressColor(hrv.stressLevel))),
                 const SizedBox(height: 2),
-                Text('Stress', style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+                Text('Stress',
+                    style: TextStyle(fontSize: 11, color: Colors.grey[600])),
                 const SizedBox(height: 2),
                 Text('${hrv.validIntervals}/${hrv.totalIntervals} valid',
                     style: TextStyle(fontSize: 10, color: Colors.grey[500])),
@@ -330,7 +341,10 @@ class _SessionVisualizationScreenState
   }
 
   Widget _hrvMetricTile(String label, double value, String unit,
-      {required double low, required double mid, required double high, required String note}) {
+      {required double low,
+      required double mid,
+      required double high,
+      required String note}) {
     final color = value >= high
         ? Colors.green
         : value >= mid
@@ -374,7 +388,8 @@ class _SessionVisualizationScreenState
             const Text('Poincaré Plot',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
             const SizedBox(width: 8),
-            Text('SD1 ${hrv.sd1.toStringAsFixed(1)} ms · SD2 ${hrv.sd2.toStringAsFixed(1)} ms',
+            Text(
+                'SD1 ${hrv.sd1.toStringAsFixed(1)} ms · SD2 ${hrv.sd2.toStringAsFixed(1)} ms',
                 style: TextStyle(fontSize: 11, color: Colors.grey[600])),
           ]),
           const SizedBox(height: 4),
@@ -390,12 +405,9 @@ class _SessionVisualizationScreenState
               minY: minRR,
               maxY: maxRR,
               borderData: FlBorderData(
-                  show: true,
-                  border: Border.all(color: Colors.grey.shade300)),
+                  show: true, border: Border.all(color: Colors.grey.shade300)),
               gridData: const FlGridData(
-                  show: true,
-                  horizontalInterval: 100,
-                  verticalInterval: 100),
+                  show: true, horizontalInterval: 100, verticalInterval: 100),
               titlesData: FlTitlesData(
                 leftTitles: AxisTitles(
                     axisNameWidget: const Text('RR[i+1] ms',
@@ -407,18 +419,18 @@ class _SessionVisualizationScreenState
                         getTitlesWidget: (v, _) => Text(v.toInt().toString(),
                             style: const TextStyle(fontSize: 9)))),
                 bottomTitles: AxisTitles(
-                    axisNameWidget: const Text('RR[i] ms',
-                        style: TextStyle(fontSize: 10)),
+                    axisNameWidget:
+                        const Text('RR[i] ms', style: TextStyle(fontSize: 10)),
                     sideTitles: SideTitles(
                         showTitles: true,
                         reservedSize: 28,
                         interval: 100,
                         getTitlesWidget: (v, _) => Text(v.toInt().toString(),
                             style: const TextStyle(fontSize: 9)))),
-                rightTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false)),
-                topTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false)),
+                rightTitles:
+                    const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                topTitles:
+                    const AxisTitles(sideTitles: SideTitles(showTitles: false)),
               ),
               scatterTouchData: ScatterTouchData(enabled: false),
             )),
@@ -430,9 +442,8 @@ class _SessionVisualizationScreenState
 
   /// Rolling RMSSD trend line
   Widget _buildRollingRmssdCard(List<({int index, double rmssd})> rolling) {
-    final spots = rolling
-        .map((p) => FlSpot(p.index.toDouble(), p.rmssd))
-        .toList();
+    final spots =
+        rolling.map((p) => FlSpot(p.index.toDouble(), p.rmssd)).toList();
     final maxY = spots.map((s) => s.y).reduce(max) + 10;
 
     return Card(
@@ -452,8 +463,7 @@ class _SessionVisualizationScreenState
               gridData: const FlGridData(
                   show: true, horizontalInterval: 20, verticalInterval: 20),
               borderData: FlBorderData(
-                  show: true,
-                  border: Border.all(color: Colors.grey.shade300)),
+                  show: true, border: Border.all(color: Colors.grey.shade300)),
               titlesData: FlTitlesData(
                 leftTitles: AxisTitles(
                     sideTitles: SideTitles(
@@ -462,12 +472,12 @@ class _SessionVisualizationScreenState
                         interval: 20,
                         getTitlesWidget: (v, _) => Text(v.toInt().toString(),
                             style: const TextStyle(fontSize: 9)))),
-                bottomTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false)),
-                rightTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false)),
-                topTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false)),
+                bottomTitles:
+                    const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                rightTitles:
+                    const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                topTitles:
+                    const AxisTitles(sideTitles: SideTitles(showTitles: false)),
               ),
               lineBarsData: [
                 LineChartBarData(
@@ -477,15 +487,11 @@ class _SessionVisualizationScreenState
                   barWidth: 2,
                   dotData: const FlDotData(show: false),
                   belowBarData: BarAreaData(
-                      show: true,
-                      color: Colors.teal.withValues(alpha: 0.15)),
+                      show: true, color: Colors.teal.withValues(alpha: 0.15)),
                 ),
                 // Reference line at 20ms (high stress threshold)
                 LineChartBarData(
-                  spots: [
-                    FlSpot(spots.first.x, 20),
-                    FlSpot(spots.last.x, 20)
-                  ],
+                  spots: [FlSpot(spots.first.x, 20), FlSpot(spots.last.x, 20)],
                   color: Colors.red.withValues(alpha: 0.4),
                   barWidth: 1,
                   dashArray: [4, 4],
@@ -529,7 +535,8 @@ class _SessionVisualizationScreenState
               style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  color: ratio < 0.25 ? Colors.orange[800] : Colors.green[800])),
+                  color:
+                      ratio < 0.25 ? Colors.orange[800] : Colors.green[800])),
         ]),
       ),
     );
@@ -543,8 +550,7 @@ class _SessionVisualizationScreenState
       ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
     final start = sorted.first.timestamp;
     final spots = sorted
-        .map((d) => FlSpot(
-            d.timestamp.difference(start).inSeconds.toDouble(),
+        .map((d) => FlSpot(d.timestamp.difference(start).inSeconds.toDouble(),
             d.heartRate.toDouble()))
         .toList();
     final minY = spots.map((s) => s.y).reduce(min) - 10;
@@ -555,16 +561,16 @@ class _SessionVisualizationScreenState
       maxY: maxY,
       gridData: const FlGridData(
           show: true, horizontalInterval: 20, verticalInterval: 60),
-      borderData:
-          FlBorderData(show: true, border: Border.all(color: Colors.grey.shade300)),
+      borderData: FlBorderData(
+          show: true, border: Border.all(color: Colors.grey.shade300)),
       titlesData: FlTitlesData(
         leftTitles: AxisTitles(
             sideTitles: SideTitles(
                 showTitles: true,
                 reservedSize: 36,
                 interval: 20,
-                getTitlesWidget: (v, _) =>
-                    Text(v.toInt().toString(), style: const TextStyle(fontSize: 9)))),
+                getTitlesWidget: (v, _) => Text(v.toInt().toString(),
+                    style: const TextStyle(fontSize: 9)))),
         bottomTitles: AxisTitles(
             sideTitles: SideTitles(
                 showTitles: true,
@@ -574,8 +580,7 @@ class _SessionVisualizationScreenState
                     style: const TextStyle(fontSize: 9)))),
         rightTitles:
             const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-        topTitles:
-            const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
       ),
       lineBarsData: [
         LineChartBarData(
@@ -584,8 +589,8 @@ class _SessionVisualizationScreenState
           color: Colors.red,
           barWidth: 2,
           dotData: const FlDotData(show: false),
-          belowBarData: BarAreaData(
-              show: true, color: Colors.red.withValues(alpha: 0.1)),
+          belowBarData:
+              BarAreaData(show: true, color: Colors.red.withValues(alpha: 0.1)),
         ),
       ],
       lineTouchData: LineTouchData(
@@ -593,8 +598,7 @@ class _SessionVisualizationScreenState
           getTooltipItems: (spots) => spots.map((s) {
             final m = (s.x / 60).floor();
             final sec = (s.x % 60).round();
-            return LineTooltipItem(
-                '${m}m ${sec}s\n${s.y.toInt()} bpm',
+            return LineTooltipItem('${m}m ${sec}s\n${s.y.toInt()} bpm',
                 const TextStyle(color: Colors.white, fontSize: 11));
           }).toList(),
         ),
@@ -606,16 +610,18 @@ class _SessionVisualizationScreenState
 
   Color _stressColor(String level) {
     switch (level) {
-      case 'Low': return Colors.green;
-      case 'Moderate': return Colors.orange;
-      case 'High': return Colors.deepOrange;
-      default: return Colors.red;
+      case 'Low':
+        return Colors.green;
+      case 'Moderate':
+        return Colors.orange;
+      case 'High':
+        return Colors.deepOrange;
+      default:
+        return Colors.red;
     }
   }
 
-  String _formatDate(DateTime dt) =>
-      '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')} '
-      '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+  String _formatDate(DateTime dt) => TimezoneUtils.formatDateTime(dt);
 
   String _formatDuration(int s) {
     final h = s ~/ 3600;

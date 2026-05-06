@@ -4,6 +4,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer, ReferenceLine,
 } from 'recharts'
+import { formatDateGMT8, formatDateTimeGMT8 } from '../lib/dateTime'
 
 const FEELING_LABELS = { 1: '😞 Very Bad', 2: '😕 Bad', 3: '😐 OK', 4: '🙂 Good', 5: '😄 Very Good' }
 
@@ -80,7 +81,7 @@ const ReadinessHistory = () => {
   const chartData = [...measurements]
     .sort((a, b) => new Date(a.measuredAt) - new Date(b.measuredAt))
     .map(m => ({
-      date: new Date(m.measuredAt).toLocaleDateString(),
+      date: formatDateGMT8(m.measuredAt),
       rmssd: m.rmssd != null ? Math.round(m.rmssd * 10) / 10 : null,
       readiness: m.readinessPct != null ? Math.round(m.readinessPct) : null,
       person: personMap[m.personId]?.name ?? 'Unknown',
@@ -259,7 +260,7 @@ const ReadinessHistory = () => {
                       onMouseEnter={e => e.currentTarget.style.background = '#fafafa'}
                       onMouseLeave={e => e.currentTarget.style.background = ''}
                     >
-                      <td style={tdStyle}>{new Date(m.measuredAt).toLocaleString()}</td>
+                      <td style={tdStyle}>{formatDateTimeGMT8(m.measuredAt, { seconds: true })}</td>
                       <td style={tdStyle}>{personMap[m.personId]?.name ?? 'Unknown'}</td>
                       <td style={{ ...tdStyle, fontWeight: 600, color: readinessColor(m.readinessPct) }}>
                         {m.readinessPct != null

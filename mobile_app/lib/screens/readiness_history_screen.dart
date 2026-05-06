@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../models/person.dart';
 import '../models/readiness_measurement.dart';
 import '../services/database_service.dart';
 import '../services/hrv_service.dart';
+import '../utils/timezone_utils.dart';
 
 class ReadinessHistoryScreen extends StatefulWidget {
   final Person? initialAthlete;
@@ -154,7 +154,7 @@ class _ReadinessMeasurementCard extends StatelessWidget {
         ),
         title: Text(person?.name ?? 'Unknown athlete'),
         subtitle: Text(
-          '${DateFormat('yyyy-MM-dd HH:mm').format(measurement.measuredAt)} • '
+          '${TimezoneUtils.formatDateTime(measurement.measuredAt)} • '
           'RMSSD ${measurement.rmssd.toStringAsFixed(1)} ms • '
           'RHR ${measurement.restingHR?.toString() ?? '--'} bpm',
         ),
@@ -265,8 +265,7 @@ class ReadinessMeasurementDetailScreen extends StatelessWidget {
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 8),
-                  Text(DateFormat('yyyy-MM-dd HH:mm')
-                      .format(measurement.measuredAt)),
+                  Text(TimezoneUtils.formatDateTime(measurement.measuredAt)),
                   const SizedBox(height: 8),
                   Text('Device: ${measurement.deviceId}'),
                   Text('Duration: ${measurement.durationSec}s'),

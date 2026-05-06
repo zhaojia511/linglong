@@ -8,6 +8,7 @@ import 'database_service.dart';
 import 'hrv_service.dart';
 import 'settings_service.dart';
 import 'supabase_repository.dart';
+import '../utils/timezone_utils.dart';
 
 class SyncService extends ChangeNotifier {
   bool _isSyncing = false;
@@ -23,9 +24,19 @@ class SyncService extends ChangeNotifier {
   }
 
   bool get isSyncing => _isSyncing;
-  bool get isAuthenticated => SupabaseClientProvider.client.auth.currentSession != null;
+  bool get isAuthenticated =>
+      SupabaseClientProvider.client.auth.currentSession != null;
 
   SupabaseClient get _client => SupabaseClientProvider.client;
+
+  List<Map<String, dynamic>> _normalizeHeartRateData(List<HeartRateData> data) {
+    return data
+        .map((entry) => {
+              ...entry.toJson(),
+              'timestamp': TimezoneUtils.toUtcIsoString(entry.timestamp),
+            })
+        .toList();
+  }
 
   Future<void> _syncOnLogin() async {
     if (_isSyncing) return;
@@ -88,15 +99,17 @@ class SyncService extends ChangeNotifier {
       'user_id': user.id,
       'person_id': session.personId,
       'title': session.title,
-      'start_time': session.startTime.toIso8601String(),
-      'end_time': session.endTime?.toIso8601String(),
+      'start_time': TimezoneUtils.toUtcIsoString(session.startTime),
+      'end_time': session.endTime != null
+          ? TimezoneUtils.toUtcIsoString(session.endTime!)
+          : null,
       'duration': session.duration,
       'avg_heart_rate': session.avgHeartRate,
       'max_heart_rate': session.maxHeartRate,
       'min_heart_rate': session.minHeartRate,
       'calories': session.calories,
       'training_type': session.trainingType,
-      'heart_rate_data': session.heartRateData.map((e) => e.toJson()).toList(),
+      'heart_rate_data': _normalizeHeartRateData(session.heartRateData),
       'notes': session.notes,
     }, onConflict: 'id');
   }

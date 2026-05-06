@@ -4,6 +4,7 @@ import '../models/person.dart';
 import '../models/training_session.dart';
 import '../services/database_service.dart';
 import '../services/settings_service.dart';
+import '../utils/timezone_utils.dart';
 
 class TrainingHistoryScreen extends StatefulWidget {
   const TrainingHistoryScreen({super.key});
@@ -22,8 +23,10 @@ class _TrainingHistoryScreenState extends State<TrainingHistoryScreen> {
   ) {
     return sessions.where((s) {
       final person = personMap[s.personId];
-      if (_selectedCategory != null && person?.category != _selectedCategory) return false;
-      if (_selectedGroup != null && person?.group != _selectedGroup) return false;
+      if (_selectedCategory != null && person?.category != _selectedCategory)
+        return false;
+      if (_selectedGroup != null && person?.group != _selectedGroup)
+        return false;
       return true;
     }).toList();
   }
@@ -55,8 +58,8 @@ class _TrainingHistoryScreenState extends State<TrainingHistoryScreen> {
                       label: 'Category',
                       options: categories,
                       selected: _selectedCategory,
-                      onSelected: (v) => setState(() =>
-                          _selectedCategory = _selectedCategory == v ? null : v),
+                      onSelected: (v) => setState(() => _selectedCategory =
+                          _selectedCategory == v ? null : v),
                     ),
                   ],
                   if (groups.isNotEmpty) ...[
@@ -116,7 +119,8 @@ class _FilterRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Text('$label:', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+        Text('$label:',
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
         const SizedBox(width: 8),
         Expanded(
           child: SingleChildScrollView(
@@ -157,8 +161,7 @@ class _SessionCard extends StatelessWidget {
   }
 
   String _formatDate(DateTime dt) {
-    return '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}  '
-        '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+    return TimezoneUtils.formatDateTime(dt);
   }
 
   @override
@@ -176,8 +179,11 @@ class _SessionCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    session.title.isNotEmpty ? session.title : session.trainingType,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    session.title.isNotEmpty
+                        ? session.title
+                        : session.trainingType,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 14),
                   ),
                 ),
                 if (!session.synced)
@@ -212,16 +218,23 @@ class _SessionCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _Stat(icon: Icons.calendar_today, label: _formatDate(session.startTime)),
+                      _Stat(
+                          icon: Icons.calendar_today,
+                          label: _formatDate(session.startTime)),
                       const SizedBox(height: 3),
-                      _Stat(icon: Icons.timer, label: _formatDuration(session.duration)),
+                      _Stat(
+                          icon: Icons.timer,
+                          label: _formatDuration(session.duration)),
                       const SizedBox(height: 3),
                       _Stat(icon: Icons.sports, label: session.trainingType),
                     ],
                   ),
                 ),
                 // Divider
-                Container(width: 1, height: 48, color: Colors.grey.withValues(alpha: 0.25),
+                Container(
+                    width: 1,
+                    height: 48,
+                    color: Colors.grey.withValues(alpha: 0.25),
                     margin: const EdgeInsets.symmetric(horizontal: 10)),
                 // Right: HR stats
                 Expanded(
@@ -229,18 +242,21 @@ class _SessionCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (session.avgHeartRate != null)
-                        _Stat(icon: Icons.favorite,
+                        _Stat(
+                            icon: Icons.favorite,
                             label: 'Avg  ${session.avgHeartRate} bpm',
                             color: Colors.orange),
                       if (session.maxHeartRate != null) ...[
                         const SizedBox(height: 3),
-                        _Stat(icon: Icons.trending_up,
+                        _Stat(
+                            icon: Icons.trending_up,
                             label: 'Max  ${session.maxHeartRate} bpm',
                             color: Colors.red),
                       ],
                       if (session.minHeartRate != null) ...[
                         const SizedBox(height: 3),
-                        _Stat(icon: Icons.trending_down,
+                        _Stat(
+                            icon: Icons.trending_down,
                             label: 'Min  ${session.minHeartRate} bpm',
                             color: Colors.blue),
                       ],
@@ -270,7 +286,8 @@ class _Stat extends StatelessWidget {
       children: [
         Icon(icon, size: 13, color: color ?? Colors.grey[600]),
         const SizedBox(width: 3),
-        Text(label, style: TextStyle(fontSize: 12, color: color ?? Colors.grey[700])),
+        Text(label,
+            style: TextStyle(fontSize: 12, color: color ?? Colors.grey[700])),
       ],
     );
   }

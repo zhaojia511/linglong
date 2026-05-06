@@ -10,6 +10,7 @@ import '../services/supabase_repository.dart';
 import '../models/training_session.dart';
 import '../models/hr_device.dart';
 import '../models/person.dart';
+import '../utils/timezone_utils.dart';
 import 'athlete_detail_screen.dart';
 import 'readiness_screen.dart';
 
@@ -59,7 +60,8 @@ class _DashboardScreenState extends State<DashboardScreen>
         await bleService.autoReconnectToSavedDevices();
 
         await _checkBluetoothStatus();
-        final updatedBleService = Provider.of<BLEService>(context, listen: false);
+        final updatedBleService =
+            Provider.of<BLEService>(context, listen: false);
         await updatedBleService.checkPermissions();
 
         // Only start scanning if permissions are granted and no devices already connected
@@ -87,7 +89,8 @@ class _DashboardScreenState extends State<DashboardScreen>
     _startBleCheckTimer();
   }
 
-  Future<void> _requestBlePermission(BuildContext ctx, BLEService bleService) async {
+  Future<void> _requestBlePermission(
+      BuildContext ctx, BLEService bleService) async {
     // Step 1: check current status before requesting
     final preScan = await Permission.bluetoothScan.status;
     final preConnect = await Permission.bluetoothConnect.status;
@@ -229,7 +232,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
       HrvService.instance.clearSessionData();
 
-      final timestamp = DateTime.now().toString().substring(0, 16);
+      final timestamp = TimezoneUtils.formatDateTime(DateTime.now());
       int created = 0;
 
       for (final device in bleService.connectedDevices) {
@@ -335,11 +338,12 @@ class _DashboardScreenState extends State<DashboardScreen>
         }
       });
       debugPrint('Timer started; activeSessions=${_activeSessions.length}');
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Recording $created athlete${created == 1 ? '' : 's'}'),
+            content:
+                Text('Recording $created athlete${created == 1 ? '' : 's'}'),
             backgroundColor: Colors.green,
             duration: const Duration(seconds: 2),
           ),
@@ -348,7 +352,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     } catch (e, stackTrace) {
       debugPrint('ERROR in _startRecording: $e');
       debugPrint('Stack trace: $stackTrace');
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -463,7 +467,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         if (!e.toString().contains('_isInitialized')) {
           errorMsg = 'Session saved locally (sync failed)';
         }
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(errorMsg),
@@ -487,7 +491,8 @@ class _DashboardScreenState extends State<DashboardScreen>
         toolbarHeight: 36,
         leading: Consumer<BLEService>(
           builder: (context, bleService, _) {
-            final count = bleService.connectedDevices.where((d) => d.isConnected).length;
+            final count =
+                bleService.connectedDevices.where((d) => d.isConnected).length;
             return InkWell(
               onTap: () => _showDeviceDialog(context),
               borderRadius: BorderRadius.circular(8),
@@ -528,11 +533,13 @@ class _DashboardScreenState extends State<DashboardScreen>
             builder: (context, bleService, child) {
               if (!bleService.permissionsGranted) {
                 return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   color: Colors.orange.shade50,
                   child: Row(
                     children: [
-                      Icon(Icons.warning_amber, color: Colors.orange.shade700, size: 20),
+                      Icon(Icons.warning_amber,
+                          color: Colors.orange.shade700, size: 20),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
@@ -545,7 +552,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                         ),
                       ),
                       TextButton(
-                        onPressed: () => _requestBlePermission(context, bleService),
+                        onPressed: () =>
+                            _requestBlePermission(context, bleService),
                         child: Text(
                           'Grant',
                           style: TextStyle(
@@ -568,7 +576,8 @@ class _DashboardScreenState extends State<DashboardScreen>
               color: Colors.red.shade50,
               child: Row(
                 children: [
-                  Icon(Icons.warning_amber, color: Colors.red.shade700, size: 20),
+                  Icon(Icons.warning_amber,
+                      color: Colors.red.shade700, size: 20),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -598,7 +607,8 @@ class _DashboardScreenState extends State<DashboardScreen>
 
                 return LayoutBuilder(
                   builder: (context, constraints) {
-                    final isLandscape = constraints.maxWidth > constraints.maxHeight;
+                    final isLandscape =
+                        constraints.maxWidth > constraints.maxHeight;
                     final cols = isLandscape ? 5 : 4;
                     final rows = isLandscape ? 4 : 5;
                     final totalSlots = cols * rows;
@@ -618,7 +628,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                           final device = connected[index];
                           final athlete = DatabaseService.instance
                               .getAthleteForSensor(device.id);
-                          return _buildSquareDeviceCard(device, index + 1, athlete);
+                          return _buildSquareDeviceCard(
+                              device, index + 1, athlete);
                         }
                         return _buildEmptySlot(index + 1);
                       },
@@ -632,9 +643,11 @@ class _DashboardScreenState extends State<DashboardScreen>
       ),
       floatingActionButton: Consumer<BLEService>(
         builder: (context, bleService, child) {
-          final connectedDevices = bleService.connectedDevices.where((d) => d.isConnected).toList();
-          debugPrint('FAB check: recording=$_isRecording, activeSessions=${_activeSessions.length}, connectedCount=${connectedDevices.length}');
-          
+          final connectedDevices =
+              bleService.connectedDevices.where((d) => d.isConnected).toList();
+          debugPrint(
+              'FAB check: recording=$_isRecording, activeSessions=${_activeSessions.length}, connectedCount=${connectedDevices.length}');
+
           VoidCallback? onPressed;
           if (!_isRecording && connectedDevices.isNotEmpty) {
             onPressed = () {
@@ -649,7 +662,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           } else {
             debugPrint('FAB disabled: no connected devices');
           }
-          
+
           return Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -667,8 +680,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                 heroTag: 'dashboard_fab',
                 onPressed: onPressed,
                 icon: Icon(_isRecording ? Icons.stop : Icons.play_arrow),
-                label: Text(
-                    _isRecording ? 'Stop Training (${_activeSessions.length})' : 'Start Training'),
+                label: Text(_isRecording
+                    ? 'Stop Training (${_activeSessions.length})'
+                    : 'Start Training'),
                 backgroundColor: _isRecording ? Colors.red : Colors.green,
               ),
             ],
@@ -697,7 +711,8 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  Widget _buildSquareDeviceCard(HRDevice device, int memberNumber, Person? athlete) {
+  Widget _buildSquareDeviceCard(
+      HRDevice device, int memberNumber, Person? athlete) {
     final zoneColor = _getHeartRateColorByTrainingZone(device.currentHeartRate);
 
     return Card(
@@ -768,7 +783,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                 children: [
                   // Card content
                   Padding(
-                    padding: EdgeInsets.fromLTRB(w * 0.06, h * 0.07, w * 0.06, stripH + sparklineH + zoneBarsH),
+                    padding: EdgeInsets.fromLTRB(w * 0.06, h * 0.07, w * 0.06,
+                        stripH + sparklineH + zoneBarsH),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -835,7 +851,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                         decoration: BoxDecoration(
                           color: hrvColor,
                           shape: BoxShape.circle,
-                          boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 2)],
+                          boxShadow: const [
+                            BoxShadow(color: Colors.black26, blurRadius: 2)
+                          ],
                         ),
                       ),
                     ),
@@ -843,7 +861,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                   // Zone bars — sits between sparkline and bottom strip
                   if (zoneSecs != null)
                     Positioned(
-                      left: w * 0.04, right: w * 0.04,
+                      left: w * 0.04,
+                      right: w * 0.04,
                       bottom: stripH,
                       height: zoneBarsH,
                       child: _ZoneBars(zoneSecs: zoneSecs, height: zoneBarsH),
@@ -852,7 +871,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                   // Sparkline — sits just above the zone bars (or strip if no session)
                   if (sparklineHistory.length >= 2)
                     Positioned(
-                      left: 0, right: 0,
+                      left: 0,
+                      right: 0,
                       bottom: stripH + (zoneSecs != null ? zoneBarsH : 0),
                       height: sparklineH,
                       child: ClipRect(
@@ -867,7 +887,9 @@ class _DashboardScreenState extends State<DashboardScreen>
 
                   // Bottom strip: zone name + signal + battery + assign button
                   Positioned(
-                    left: 0, right: 0, bottom: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
                     child: Container(
                       height: stripH,
                       decoration: const BoxDecoration(
@@ -892,7 +914,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                           Row(
                             children: [
                               // RSSI signal bars
-                              _SignalIcon(bars: signalBars, size: (h * 0.11).clamp(8.0, 16.0)),
+                              _SignalIcon(
+                                  bars: signalBars,
+                                  size: (h * 0.11).clamp(8.0, 16.0)),
                               SizedBox(width: w * 0.02),
                               if (device.batteryLevel != null)
                                 Text(
@@ -903,9 +927,12 @@ class _DashboardScreenState extends State<DashboardScreen>
                                 ),
                               SizedBox(width: w * 0.02),
                               GestureDetector(
-                                onTap: () => _showSensorAssignmentDialog(context, device, athlete),
+                                onTap: () => _showSensorAssignmentDialog(
+                                    context, device, athlete),
                                 child: Icon(
-                                  athlete == null ? Icons.person_add : Icons.swap_horiz,
+                                  athlete == null
+                                      ? Icons.person_add
+                                      : Icons.swap_horiz,
                                   color: Colors.white70,
                                   size: (h * 0.12).clamp(10.0, 18.0),
                                 ),
@@ -925,7 +952,6 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-
   /// Gets color based on training zones (more detailed than basic HR color)
   /// Zone 1 (Recovery): < 120 bpm - Light blue
   /// Zone 2 (Aerobic): 120-150 bpm - Green
@@ -935,11 +961,13 @@ class _DashboardScreenState extends State<DashboardScreen>
   // Standard 5-zone colors (Polar/Garmin convention)
   Color _getHeartRateColorByTrainingZone(int? heartRate) {
     if (heartRate == null) return const Color(0xFF757575); // grey — no data
-    if (heartRate < 120) return const Color(0xFF4FC3F7); // Z1 light blue — Recovery
+    if (heartRate < 120)
+      return const Color(0xFF4FC3F7); // Z1 light blue — Recovery
     if (heartRate < 150) return const Color(0xFF66BB6A); // Z2 green — Aerobic
     if (heartRate < 170) return const Color(0xFFFDD835); // Z3 yellow — Tempo
-    if (heartRate < 190) return const Color(0xFFFF7043); // Z4 orange — Threshold
-    return const Color(0xFFE53935);                       // Z5 red — Anaerobic
+    if (heartRate < 190)
+      return const Color(0xFFFF7043); // Z4 orange — Threshold
+    return const Color(0xFFE53935); // Z5 red — Anaerobic
   }
 
   int _getZoneIndex(int heartRate) {
@@ -960,7 +988,8 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   void _markLap() {
-    final lapNum = _sessionMarkers.where((m) => m.label.startsWith('Lap')).length + 1;
+    final lapNum =
+        _sessionMarkers.where((m) => m.label.startsWith('Lap')).length + 1;
     final marker = (time: DateTime.now(), label: 'Lap $lapNum');
     setState(() => _sessionMarkers.add(marker));
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -1024,7 +1053,8 @@ class _DashboardScreenState extends State<DashboardScreen>
     return 1;
   }
 
-  void _showSensorAssignmentDialog(BuildContext context, HRDevice device, Person? currentAthlete) {
+  void _showSensorAssignmentDialog(
+      BuildContext context, HRDevice device, Person? currentAthlete) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -1041,7 +1071,8 @@ class _DashboardScreenState extends State<DashboardScreen>
             if (currentAthlete != null)
               Text(
                 'Currently assigned to: ${currentAthlete.name}',
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                style:
+                    const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
               ),
             const SizedBox(height: 16),
             const Text(
@@ -1060,7 +1091,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                 if (context.mounted) Navigator.pop(context);
                 setState(() {});
               },
-              child: const Text('Unassign', style: TextStyle(color: Colors.red)),
+              child:
+                  const Text('Unassign', style: TextStyle(color: Colors.red)),
             ),
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -1075,7 +1107,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   /// Displays simulated heart rate data with training zone colors
   Widget _buildAthleteList(HRDevice device) {
     final athletes = DatabaseService.instance.getAthletes();
-    
+
     if (athletes.isEmpty) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 16),
@@ -1085,7 +1117,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         ),
       );
     }
-    
+
     return Container(
       constraints: const BoxConstraints(maxHeight: 300),
       child: SingleChildScrollView(
@@ -1114,7 +1146,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                 style: const TextStyle(fontSize: 11),
               ),
               trailing: isAssigned
-                  ? const Icon(Icons.check_circle, color: Colors.green, size: 20)
+                  ? const Icon(Icons.check_circle,
+                      color: Colors.green, size: 20)
                   : null,
               onTap: () async {
                 await DatabaseService.instance.assignSensorToAthlete(
@@ -1211,7 +1244,9 @@ class _SparklinePainter extends CustomPainter {
     final path = Path();
     for (int i = 0; i < points.length; i++) {
       final x = i / (points.length - 1) * size.width;
-      final y = size.height - ((points[i].value - minVal) / range) * size.height * 0.9 - size.height * 0.05;
+      final y = size.height -
+          ((points[i].value - minVal) / range) * size.height * 0.9 -
+          size.height * 0.05;
       if (i == 0) {
         path.moveTo(x, y);
       } else {
@@ -1270,11 +1305,11 @@ class _DeviceDialogState extends State<DeviceDialog> {
   @override
   void initState() {
     super.initState();
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // Don't reset BLE service - preserve connected devices
       final bleService = Provider.of<BLEService>(context, listen: false);
-      
+
       await _checkBluetoothAvailability();
       await bleService.checkPermissions(); // Check permissions on startup
       final error = await bleService.startScan();
@@ -1415,68 +1450,93 @@ class _DeviceDialogState extends State<DeviceDialog> {
                                 shrinkWrap: true,
                                 itemCount: bleService.discoveredDevices.length,
                                 itemBuilder: (context, index) {
-                                  final device = bleService.discoveredDevices[index];
-                            final isConnected = device.isConnected;
-                            final isConnecting =
-                                _connectingDevices.contains(device.id);
+                                  final device =
+                                      bleService.discoveredDevices[index];
+                                  final isConnected = device.isConnected;
+                                  final isConnecting =
+                                      _connectingDevices.contains(device.id);
 
-                            return ListTile(
-                              leading: const Icon(Icons.bluetooth),
-                              title: Text(device.name),
-                              subtitle:
-                                  Text('Signal: ${device.rssi} dBm'),
-                              trailing: isConnected
-                                  ? const Icon(Icons.check, color: Colors.green)
-                                  : bleService.connectedDevices.length >= 10
-                                      ? const Tooltip(
-                                          message: 'Max devices connected',
-                                          child: Icon(Icons.lock, color: Colors.grey),
-                                        )
-                                      : Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            ElevatedButton(
-                                              onPressed: isConnecting
-                                                  ? null
-                                                  : () async {
-                                                      setState(() {
-                                                        _connectingDevices.add(device.id);
-                                                      });
+                                  return ListTile(
+                                    leading: const Icon(Icons.bluetooth),
+                                    title: Text(device.name),
+                                    subtitle:
+                                        Text('Signal: ${device.rssi} dBm'),
+                                    trailing: isConnected
+                                        ? const Icon(Icons.check,
+                                            color: Colors.green)
+                                        : bleService.connectedDevices.length >=
+                                                10
+                                            ? const Tooltip(
+                                                message:
+                                                    'Max devices connected',
+                                                child: Icon(Icons.lock,
+                                                    color: Colors.grey),
+                                              )
+                                            : Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  ElevatedButton(
+                                                    onPressed: isConnecting
+                                                        ? null
+                                                        : () async {
+                                                            setState(() {
+                                                              _connectingDevices
+                                                                  .add(device
+                                                                      .id);
+                                                            });
 
-                                                      try {
-                                                        final success = await bleService.connectDevice(device);
-                                                        if (mounted) {
-                                                          if (success) {
-                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                              SnackBar(content: Text('Connected to ${device.name}')),
-                                                            );
-                                                          } else {
-                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                              SnackBar(
-                                                                content: Text('Failed to connect to ${device.name}'),
-                                                                backgroundColor: Colors.red,
-                                                              ),
-                                                            );
-                                                          }
-                                                        }
-                                                      } finally {
-                                                        setState(() {
-                                                          _connectingDevices.remove(device.id);
-                                                        });
-                                                      }
-                                                    },
-                                              child: isConnecting
-                                                  ? const SizedBox(
-                                                      height: 16,
-                                                      width: 16,
-                                                      child: CircularProgressIndicator(strokeWidth: 2),
-                                                    )
-                                                  : const Text('Connect'),
-                                            ),
-                                            const SizedBox(width: 0),
-                                          ],
-                                        ),
-                            );
+                                                            try {
+                                                              final success =
+                                                                  await bleService
+                                                                      .connectDevice(
+                                                                          device);
+                                                              if (mounted) {
+                                                                if (success) {
+                                                                  ScaffoldMessenger.of(
+                                                                          context)
+                                                                      .showSnackBar(
+                                                                    SnackBar(
+                                                                        content:
+                                                                            Text('Connected to ${device.name}')),
+                                                                  );
+                                                                } else {
+                                                                  ScaffoldMessenger.of(
+                                                                          context)
+                                                                      .showSnackBar(
+                                                                    SnackBar(
+                                                                      content: Text(
+                                                                          'Failed to connect to ${device.name}'),
+                                                                      backgroundColor:
+                                                                          Colors
+                                                                              .red,
+                                                                    ),
+                                                                  );
+                                                                }
+                                                              }
+                                                            } finally {
+                                                              setState(() {
+                                                                _connectingDevices
+                                                                    .remove(
+                                                                        device
+                                                                            .id);
+                                                              });
+                                                            }
+                                                          },
+                                                    child: isConnecting
+                                                        ? const SizedBox(
+                                                            height: 16,
+                                                            width: 16,
+                                                            child:
+                                                                CircularProgressIndicator(
+                                                                    strokeWidth:
+                                                                        2),
+                                                          )
+                                                        : const Text('Connect'),
+                                                  ),
+                                                  const SizedBox(width: 0),
+                                                ],
+                                              ),
+                                  );
                                 },
                               ),
                       ),
@@ -1484,53 +1544,96 @@ class _DeviceDialogState extends State<DeviceDialog> {
                       const SizedBox(height: 8),
                       // Saved devices (previously connected) - useful when sensor doesn't advertise
                       FutureBuilder<List<HRDevice>>(
-                        future: Provider.of<BLEService>(context, listen: false).getSavedConnectedDevices(),
+                        future: Provider.of<BLEService>(context, listen: false)
+                            .getSavedConnectedDevices(),
                         builder: (context, snap) {
-                          if (!snap.hasData || snap.data!.isEmpty) return const SizedBox.shrink();
-                          
+                          if (!snap.hasData || snap.data!.isEmpty)
+                            return const SizedBox.shrink();
+
                           // Filter out devices that are already discovered or connected
                           final savedDevices = snap.data!
-                              .where((sd) => !bleService.discoveredDevices.any((d) => d.id == sd.id) &&
-                                            !bleService.connectedDevices.any((d) => d.id == sd.id))
+                              .where((sd) =>
+                                  !bleService.discoveredDevices
+                                      .any((d) => d.id == sd.id) &&
+                                  !bleService.connectedDevices
+                                      .any((d) => d.id == sd.id))
                               .toList();
-                          
-                          if (savedDevices.isEmpty) return const SizedBox.shrink();
-                          
+
+                          if (savedDevices.isEmpty)
+                            return const SizedBox.shrink();
+
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('Saved Devices', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey)),
+                              const Text('Saved Devices',
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.grey)),
                               const SizedBox(height: 6),
                               SizedBox(
-                                height: (savedDevices.length * 56).toDouble().clamp(0, 200),
+                                height: (savedDevices.length * 56)
+                                    .toDouble()
+                                    .clamp(0, 200),
                                 child: ListView.builder(
                                   itemCount: savedDevices.length,
                                   itemBuilder: (context, i) {
                                     final sd = savedDevices[i];
-                                    final isConnecting = _connectingDevices.contains(sd.id);
+                                    final isConnecting =
+                                        _connectingDevices.contains(sd.id);
                                     return ListTile(
-                                      leading: const Icon(Icons.history, color: Colors.grey),
-                                      title: Text(sd.name, style: const TextStyle(fontSize: 12)),
-                                      subtitle: Text(sd.id, style: const TextStyle(fontSize: 10)),
+                                      leading: const Icon(Icons.history,
+                                          color: Colors.grey),
+                                      title: Text(sd.name,
+                                          style: const TextStyle(fontSize: 12)),
+                                      subtitle: Text(sd.id,
+                                          style: const TextStyle(fontSize: 10)),
                                       trailing: ElevatedButton(
                                         onPressed: isConnecting
                                             ? null
                                             : () async {
-                                                setState(() { _connectingDevices.add(sd.id); });
+                                                setState(() {
+                                                  _connectingDevices.add(sd.id);
+                                                });
                                                 try {
-                                                  final success = await Provider.of<BLEService>(context, listen: false).connectDevice(sd);
+                                                  final success = await Provider
+                                                          .of<BLEService>(
+                                                              context,
+                                                              listen: false)
+                                                      .connectDevice(sd);
                                                   if (mounted) {
                                                     if (success) {
-                                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Restored ${sd.name}')));
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(SnackBar(
+                                                              content: Text(
+                                                                  'Restored ${sd.name}')));
                                                     } else {
-                                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to restore ${sd.name}'), backgroundColor: Colors.red));
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(SnackBar(
+                                                              content: Text(
+                                                                  'Failed to restore ${sd.name}'),
+                                                              backgroundColor:
+                                                                  Colors.red));
                                                     }
                                                   }
                                                 } finally {
-                                                  setState(() { _connectingDevices.remove(sd.id); });
+                                                  setState(() {
+                                                    _connectingDevices
+                                                        .remove(sd.id);
+                                                  });
                                                 }
                                               },
-                                        child: isConnecting ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('Restore', style: TextStyle(fontSize: 11)),
+                                        child: isConnecting
+                                            ? const SizedBox(
+                                                height: 16,
+                                                width: 16,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                        strokeWidth: 2))
+                                            : const Text('Restore',
+                                                style: TextStyle(fontSize: 11)),
                                       ),
                                     );
                                   },

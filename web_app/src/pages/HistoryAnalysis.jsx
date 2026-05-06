@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { sessionService, personService } from '../services/api'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts'
 import { getZoneForHR, ZONE_DEFINITIONS } from '../lib/trainingZones'
+import { formatDateGMT8, formatMonthKeyGMT8, formatMonthLabelGMT8 } from '../lib/dateTime'
 
 const HistoryAnalysis = () => {
   const [stats, setStats] = useState(null)
@@ -73,7 +74,7 @@ const HistoryAnalysis = () => {
       .sort((a, b) => new Date(a.startTime) - new Date(b.startTime))
       .slice(-20)
       .map(session => ({
-        date: new Date(session.startTime).toLocaleDateString(),
+        date: formatDateGMT8(session.startTime),
         avgHR: session.avgHeartRate,
         maxHR: session.maxHeartRate,
         person: persons.find(p => p.id === session.personId)?.name || 'Unknown'
@@ -92,11 +93,11 @@ const HistoryAnalysis = () => {
   const prepareMonthlyData = () => {
     const monthlyStats = {}
     sessions.forEach(session => {
-      const date = new Date(session.startTime)
-      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+      const monthKey = formatMonthKeyGMT8(session.startTime)
       if (!monthlyStats[monthKey]) {
         monthlyStats[monthKey] = {
-          month: date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' }),
+          month: formatMonthLabelGMT8(session.startTime),
+          monthKey,
           sessions: 0,
           totalDuration: 0,
           totalCalories: 0
@@ -106,7 +107,7 @@ const HistoryAnalysis = () => {
       monthlyStats[monthKey].totalDuration += session.duration || 0
       monthlyStats[monthKey].totalCalories += session.calories || 0
     })
-    return Object.values(monthlyStats).sort((a, b) => a.month.localeCompare(b.month))
+    return Object.values(monthlyStats).sort((a, b) => a.monthKey.localeCompare(b.monthKey))
   }
 
   const prepareZoneSummary = () => {
@@ -314,7 +315,7 @@ const HistoryAnalysis = () => {
                   onMouseEnter={e => e.currentTarget.style.background = '#fafafa'}
                   onMouseLeave={e => e.currentTarget.style.background = ''}
                 >
-                  <td style={tdStyle}>{new Date(session.startTime).toLocaleDateString()}</td>
+                  <td style={tdStyle}>{formatDateGMT8(session.startTime)}</td>
                   <td style={tdStyle}>{persons.find(p => p.id === session.personId)?.name || 'Unknown'}</td>
                   <td style={{ ...tdStyle, textTransform: 'capitalize' }}>{session.trainingType || '-'}</td>
                   <td style={tdStyle}>{session.duration ? `${Math.floor(session.duration / 60)}m ${session.duration % 60}s` : '-'}</td>
