@@ -17,7 +17,6 @@ const Sidebar = () => {
         <nav className="sidebar-nav">
           <Link to="/" className="nav-link">Dashboard</Link>
           <Link to="/persons" className="nav-link">Persons</Link>
-          <Link to="/recordings" className="nav-link">Recordings</Link>
           <Link to="/analysis" className="nav-link">Analysis</Link>
           <Link to="/sessions" className="nav-link">All Sessions</Link>
           <button onClick={handleLogout} className="btn btn-primary sidebar-logout">Logout</button>

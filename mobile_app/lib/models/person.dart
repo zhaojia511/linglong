@@ -46,6 +46,9 @@ class Person extends HiveObject {
   @HiveField(13)
   String? group;
 
+  @HiveField(14)
+  String? photoPath; // local file path to athlete photo
+
   Person({
     required this.id,
     required this.name,
@@ -61,6 +64,7 @@ class Person extends HiveObject {
     List<String>? assignedSensorIds,
     this.category,
     this.group,
+    this.photoPath,
   }) : assignedSensorIds = assignedSensorIds ?? [];
 
   Map<String, dynamic> toJson() => {

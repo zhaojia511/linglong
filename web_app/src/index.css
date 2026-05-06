@@ -14,9 +14,8 @@ body {
 }
 
 .container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
+  width: 100%;
+  padding: 0;
 }
 
 .card {
@@ -37,12 +36,12 @@ body {
 }
 
 .btn-primary {
-  background-color: #007bff;
+  background-color: #e0192f;
   color: white;
 }
 
 .btn-primary:hover {
-  background-color: #0056b3;
+  background-color: #b3001b;
 }
 
 .header {
@@ -85,47 +84,42 @@ body {
 }
 
 .nav a.active {
-  background: #007bff;
+  background: #e0192f;
   color: white;
 }
 
-/* New layout with top header and left tabs */
+/* ── App layout ───────────────────────────────────────────── */
 .app-layout {
   display: flex;
-  flex-direction: column;
   min-height: 100vh;
 }
 
 .main-content {
-  display: flex;
   flex: 1;
-  margin-top: 60px;
-  margin-left: 280px;
-  padding: 24px 20px;
-  overflow: auto;
+  margin-left: 220px;
+  padding: 28px 32px;
+  min-width: 0;
+  width: calc(100% - 220px);
+  box-sizing: border-box;
 }
 
 /* Hide old sidebar and header */
-.sidebar {
-  display: none !important;
-}
+.sidebar  { display: none !important; }
+.header   { display: none !important; }
 
-.header {
-  display: none !important;
-}
-
-/* Responsive: adjust main-content for smaller screens */
+/* ── Responsive ───────────────────────────────────────────── */
 @media (max-width: 1024px) {
   .main-content {
-    margin-left: 240px;
+    padding: 24px 20px;
   }
 }
 
 @media (max-width: 768px) {
   .main-content {
     margin-left: 0;
-    margin-top: 120px;
-    padding: 16px;
+    margin-top: 0;
+    padding: 16px 14px;
+    padding-bottom: 72px; /* space for bottom nav */
   }
 }
 
@@ -147,7 +141,7 @@ body {
 .stat-value {
   font-size: 32px;
   font-weight: bold;
-  color: #007bff;
+  color: #e0192f;
   margin: 10px 0;
 }
 
@@ -221,14 +215,14 @@ body {
 .link-btn {
   background: none;
   border: none;
-  color: #007bff;
+  color: #e0192f;
   cursor: pointer;
   text-decoration: underline;
   padding: 0.5rem 0;
 }
 
 .link-btn:hover {
-  color: #0056b3;
+  color: #b3001b;
 }
 
 .auth-links {

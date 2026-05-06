@@ -32,7 +32,7 @@ const Header = () => {
 
   return (
     <header className="top-header">
-      <div className="header-spacer"></div>
+      <span className="header-logo">Linglong</span>
       <div className="header-right">
         <div className="user-menu-container">
           <button 

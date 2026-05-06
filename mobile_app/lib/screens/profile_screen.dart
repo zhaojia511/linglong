@@ -7,6 +7,13 @@ import '../services/settings_service.dart';
 import '../services/sync_service.dart';
 import 'readiness_screen.dart';
 
+// All athlete photos bundled in assets
+const _assetPhotos = [
+  'assets/bolt.jpg',
+  'assets/ronaldo.jpg',
+  'assets/isinbayeva.jpg',
+];
+
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -80,10 +87,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: ListTile(
                   leading: CircleAvatar(
                     backgroundColor: _getColorForPerson(index),
-                    child: Text(
-                      person.name.isNotEmpty ? person.name[0].toUpperCase() : '?',
-                      style: const TextStyle(color: Colors.white),
-                    ),
+                    backgroundImage: person.photoPath != null
+                        ? AssetImage(person.photoPath!)
+                        : null,
+                    child: person.photoPath == null
+                        ? Text(
+                            person.name.isNotEmpty ? person.name[0].toUpperCase() : '?',
+                            style: const TextStyle(color: Colors.white),
+                          )
+                        : null,
                   ),
                   title: Text(person.name),
                   subtitle: Text(_buildSubtitle(person)),
@@ -166,6 +178,7 @@ class _PersonDetailScreenState extends State<PersonDetailScreen> {
   late final TextEditingController _categoryController;
   late final TextEditingController _groupController;
   late String _gender;
+  String? _photoPath;
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -191,7 +204,58 @@ class _PersonDetailScreenState extends State<PersonDetailScreen> {
       _categoryController.text = widget.person!.category ?? '';
       _groupController.text = widget.person!.group ?? '';
       _gender = widget.person!.gender;
+      _photoPath = widget.person!.photoPath;
     }
+  }
+
+  void _pickPhoto() {
+    showDialog(
+      context: context,
+      builder: (ctx) => SimpleDialog(
+        title: const Text('Choose Photo'),
+        children: [
+          // Option to clear photo
+          if (_photoPath != null)
+            SimpleDialogOption(
+              onPressed: () {
+                setState(() => _photoPath = null);
+                Navigator.pop(ctx);
+              },
+              child: const Row(
+                children: [
+                  Icon(Icons.delete_outline, color: Colors.red),
+                  SizedBox(width: 8),
+                  Text('Remove photo', style: TextStyle(color: Colors.red)),
+                ],
+              ),
+            ),
+          // Asset photo options
+          ..._assetPhotos.map((path) {
+            final name = path.split('/').last.split('.').first;
+            return SimpleDialogOption(
+              onPressed: () {
+                setState(() => _photoPath = path);
+                Navigator.pop(ctx);
+              },
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundImage: AssetImage(path),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(name[0].toUpperCase() + name.substring(1)),
+                  if (_photoPath == path) ...[
+                    const Spacer(),
+                    const Icon(Icons.check, color: Colors.green, size: 18),
+                  ],
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
+    );
   }
 
   @override
@@ -229,6 +293,7 @@ class _PersonDetailScreenState extends State<PersonDetailScreen> {
                 : null,
             category: _categoryController.text.isEmpty ? null : _categoryController.text,
             group: _groupController.text.isEmpty ? null : _groupController.text,
+            photoPath: _photoPath,
           );
 
           // Always upsert to Supabase
@@ -257,6 +322,7 @@ class _PersonDetailScreenState extends State<PersonDetailScreen> {
               : null;
           widget.person!.category = _categoryController.text.isEmpty ? null : _categoryController.text;
           widget.person!.group = _groupController.text.isEmpty ? null : _groupController.text;
+          widget.person!.photoPath = _photoPath;
 
           await dbService.updatePerson(widget.person!);
 
@@ -332,6 +398,11 @@ class _PersonDetailScreenState extends State<PersonDetailScreen> {
       appBar: AppBar(
         title: null,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.check),
+            onPressed: _savePerson,
+            tooltip: 'Save',
+          ),
           if (widget.person != null)
             IconButton(
               icon: const Icon(Icons.delete),
@@ -347,14 +418,30 @@ class _PersonDetailScreenState extends State<PersonDetailScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              CircleAvatar(
-                radius: 50,
-                backgroundColor: Colors.blue.shade100,
-                child: Text(
-                  _nameController.text.isNotEmpty
-                      ? _nameController.text[0].toUpperCase()
-                      : '?',
-                  style: const TextStyle(fontSize: 32, color: Colors.blue),
+              GestureDetector(
+                onTap: _pickPhoto,
+                child: Stack(
+                  alignment: Alignment.bottomRight,
+                  children: [
+                    CircleAvatar(
+                      radius: 50,
+                      backgroundColor: Colors.blue.shade100,
+                      backgroundImage: _photoPath != null ? AssetImage(_photoPath!) : null,
+                      child: _photoPath == null
+                          ? Text(
+                              _nameController.text.isNotEmpty
+                                  ? _nameController.text[0].toUpperCase()
+                                  : '?',
+                              style: const TextStyle(fontSize: 32, color: Colors.blue),
+                            )
+                          : null,
+                    ),
+                    CircleAvatar(
+                      radius: 14,
+                      backgroundColor: Colors.white,
+                      child: Icon(Icons.camera_alt, size: 16, color: Colors.blue.shade700),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 24),

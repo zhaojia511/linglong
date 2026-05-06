@@ -40,7 +40,6 @@ class _TrainingHistoryScreenState extends State<TrainingHistoryScreen> {
     final filtered = _filteredSessions(sessions, personMap);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Training History'), toolbarHeight: 48),
       body: Column(
         children: [
           // Filter bar

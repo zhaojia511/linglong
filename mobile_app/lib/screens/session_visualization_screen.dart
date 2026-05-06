@@ -62,7 +62,7 @@ class _SessionVisualizationScreenState
       appBar: AppBar(
         title: Text(session.title.isNotEmpty ? session.title : session.trainingType,
             style: const TextStyle(fontSize: 16)),
-        toolbarHeight: 48,
+        toolbarHeight: 36,
         actions: [
           Icon(
             session.synced ? Icons.cloud_done : Icons.cloud_upload,

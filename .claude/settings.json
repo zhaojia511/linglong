@@ -19,7 +19,17 @@
       "Bash(grep -r \"signUp\\\\|register\" /d/github/linglong/web_app/src --include=*.jsx --include=*.js -A 5 -B 2)",
       "Bash(grep -r \"supabase.auth.reset\\\\|supabase.auth.sign\" /d/github/linglong --include=*.js --include=*.jsx --include=*.dart)",
       "Bash(xargs cat:*)",
-      "Bash(grep -r \"auth\\\\|Auth\" /d/github/linglong --include=*.md)"
+      "Bash(grep -r \"auth\\\\|Auth\" /d/github/linglong --include=*.md)",
+      "Bash(python3 -c \"from PIL import Image; print\\(''PIL ok''\\)\")",
+      "Bash(python -c \"from PIL import Image; print\\(''PIL ok''\\)\")",
+      "Bash(node -e \"require\\(''canvas''\\)\")",
+      "Bash(node -e \"require\\(''sharp''\\)\")",
+      "mcp__plugin_playwright_playwright__browser_run_code",
+      "mcp__plugin_playwright_playwright__browser_take_screenshot",
+      "Bash(node -e \":*)",
+      "Bash(dart run:*)",
+      "WebFetch(domain:www.themomentum.ai)",
+      "WebFetch(domain:pub.dev)"
     ]
   }
 }

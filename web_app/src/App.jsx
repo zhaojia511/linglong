@@ -8,7 +8,6 @@ import Dashboard from './pages/Dashboard'
 import Sessions from './pages/Sessions'
 import SessionDetail from './pages/SessionDetail'
 import PersonsManagement from './pages/PersonsManagement'
-import RecordingManagement from './pages/RecordingManagement'
 import HistoryAnalysis from './pages/HistoryAnalysis'
 import Settings from './pages/Settings'
 import { authService } from './services/api'
@@ -67,7 +66,6 @@ function App() {
             <Route path="/sessions" element={<PrivateRoute><Sessions /></PrivateRoute>} />
             <Route path="/sessions/:id" element={<PrivateRoute><SessionDetail /></PrivateRoute>} />
             <Route path="/persons" element={<PrivateRoute><PersonsManagement /></PrivateRoute>} />
-            <Route path="/recordings" element={<PrivateRoute><RecordingManagement /></PrivateRoute>} />
             <Route path="/analysis" element={<PrivateRoute><HistoryAnalysis /></PrivateRoute>} />
             <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
             <Route path="*" element={<Navigate to="/" />} />
