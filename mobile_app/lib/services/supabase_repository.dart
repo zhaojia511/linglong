@@ -9,6 +9,12 @@ class SupabaseRepository {
 
   final SupabaseClient _client;
 
+  static bool isMissingReadinessMeasurementsTable(Object error) {
+    if (error is! PostgrestException) return false;
+    return error.code == 'PGRST205' &&
+        error.message.contains('readiness_measurements');
+  }
+
   List<Map<String, dynamic>> _normalizeHeartRateData(
       List<Map<String, dynamic>> data) {
     return data.map((entry) {

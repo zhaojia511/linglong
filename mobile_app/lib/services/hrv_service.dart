@@ -204,7 +204,8 @@ class HrvService extends ChangeNotifier {
       if (raw == null) continue;
       ReadinessMeasurement m;
       try {
-        m = ReadinessMeasurement.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+        m = ReadinessMeasurement.fromJson(
+            jsonDecode(raw) as Map<String, dynamic>);
       } catch (e) {
         debugPrint('[HrvService] Failed to decode readiness record $key: $e');
         continue;
@@ -251,7 +252,14 @@ class HrvService extends ChangeNotifier {
         await _readinessBox!.put(m.id, jsonEncode(synced.toJson()));
         debugPrint('[HrvService] Synced readiness measurement ${m.id}');
       } catch (e) {
-        debugPrint('[HrvService] Failed to sync readiness measurement ${m.id}: $e');
+        if (SupabaseRepository.isMissingReadinessMeasurementsTable(e)) {
+          debugPrint(
+              '[HrvService] Skipping readiness sync because Supabase is missing public.readiness_measurements. Apply migration 003_readiness_measurements.sql to the remote project.');
+          notifyListeners();
+          return;
+        }
+        debugPrint(
+            '[HrvService] Failed to sync readiness measurement ${m.id}: $e');
         firstError ??= e;
       }
     }
@@ -267,7 +275,13 @@ class HrvService extends ChangeNotifier {
     try {
       remote = await repo.fetchReadinessMeasurements();
     } catch (e) {
-      debugPrint('[HrvService] Failed to fetch readiness measurements from cloud: $e');
+      if (SupabaseRepository.isMissingReadinessMeasurementsTable(e)) {
+        debugPrint(
+            '[HrvService] Skipping readiness download because Supabase is missing public.readiness_measurements. Apply migration 003_readiness_measurements.sql to the remote project.');
+        return;
+      }
+      debugPrint(
+          '[HrvService] Failed to fetch readiness measurements from cloud: $e');
       return;
     }
     for (final row in remote) {
@@ -299,7 +313,8 @@ class HrvService extends ChangeNotifier {
         await _readinessBox!.put(id, jsonEncode(m.toJson()));
         debugPrint('[HrvService] Pulled readiness measurement $id from cloud');
       } catch (e) {
-        debugPrint('[HrvService] Failed to store cloud readiness record $id: $e');
+        debugPrint(
+            '[HrvService] Failed to store cloud readiness record $id: $e');
       }
     }
     notifyListeners();
