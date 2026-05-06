@@ -7,6 +7,7 @@ import 'package:uuid/uuid.dart';
 import '../models/daily_hrv_snapshot.dart';
 import '../models/readiness_measurement.dart';
 import '../utils/hrv_analysis.dart';
+import 'supabase_repository.dart';
 
 class HrvService extends ChangeNotifier {
   static final HrvService instance = HrvService._internal();
@@ -186,6 +187,117 @@ class HrvService extends ChangeNotifier {
   Future<void> deleteReadinessMeasurement(String id) async {
     if (_readinessBox == null) return;
     await _readinessBox!.delete(id);
+    notifyListeners();
+  }
+
+  // ── Cloud sync ────────────────────────────────────────────────────────────
+
+  /// Push all local readiness measurements with [synced == false] to Supabase.
+  /// On success each record is updated to [synced: true]. Failures are logged
+  /// and skipped so the rest of the batch still completes.
+  Future<void> syncAllUnsyncedReadiness(SupabaseRepository repo) async {
+    if (_readinessBox == null) return;
+    for (final key in List<dynamic>.from(_readinessBox!.keys)) {
+      final raw = _readinessBox!.get(key as String);
+      if (raw == null) continue;
+      ReadinessMeasurement m;
+      try {
+        m = ReadinessMeasurement.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+      } catch (e) {
+        debugPrint('[HrvService] Failed to decode readiness record $key: $e');
+        continue;
+      }
+      if (m.synced) continue;
+      try {
+        await repo.upsertReadinessMeasurement({
+          'id': m.id,
+          'person_id': m.personId,
+          'device_id': m.deviceId,
+          'measured_at': m.measuredAt.toIso8601String(),
+          'duration_sec': m.durationSec,
+          'rr_intervals': m.rrIntervals,
+          'rmssd': m.rmssd,
+          'sdnn': m.sdnn,
+          'pnn50': m.pnn50,
+          'mean_rr': m.meanRR,
+          'sd1': m.sd1,
+          'sd2': m.sd2,
+          'resting_hr': m.restingHR,
+          'quality_pct': m.qualityPct,
+          'readiness_pct': m.readinessPct,
+          'feeling': m.feelingScore,
+        });
+        final synced = ReadinessMeasurement(
+          id: m.id,
+          personId: m.personId,
+          deviceId: m.deviceId,
+          measuredAt: m.measuredAt,
+          durationSec: m.durationSec,
+          rrIntervals: m.rrIntervals,
+          rmssd: m.rmssd,
+          sdnn: m.sdnn,
+          pnn50: m.pnn50,
+          meanRR: m.meanRR,
+          sd1: m.sd1,
+          sd2: m.sd2,
+          restingHR: m.restingHR,
+          qualityPct: m.qualityPct,
+          readinessPct: m.readinessPct,
+          feelingScore: m.feelingScore,
+          synced: true,
+        );
+        await _readinessBox!.put(m.id, jsonEncode(synced.toJson()));
+        debugPrint('[HrvService] Synced readiness measurement ${m.id}');
+      } catch (e) {
+        debugPrint('[HrvService] Failed to sync readiness measurement ${m.id}: $e');
+      }
+    }
+    notifyListeners();
+  }
+
+  /// Pull readiness measurements from Supabase and insert any that are missing
+  /// locally. Existing local records are not overwritten (local wins).
+  Future<void> syncDownReadinessFromCloud(SupabaseRepository repo) async {
+    if (_readinessBox == null) return;
+    List<Map<String, dynamic>> remote;
+    try {
+      remote = await repo.fetchReadinessMeasurements();
+    } catch (e) {
+      debugPrint('[HrvService] Failed to fetch readiness measurements from cloud: $e');
+      return;
+    }
+    for (final row in remote) {
+      final id = row['id'] as String?;
+      if (id == null) continue;
+      if (_readinessBox!.containsKey(id)) continue; // local wins
+      try {
+        final m = ReadinessMeasurement(
+          id: id,
+          personId: (row['person_id'] as String?) ?? '',
+          deviceId: (row['device_id'] as String?) ?? '',
+          measuredAt: DateTime.parse(row['measured_at'] as String),
+          durationSec: (row['duration_sec'] as num?)?.toInt() ?? 0,
+          rrIntervals: (row['rr_intervals'] as List<dynamic>? ?? const [])
+              .map((v) => (v as num).toInt())
+              .toList(),
+          rmssd: (row['rmssd'] as num).toDouble(),
+          sdnn: (row['sdnn'] as num?)?.toDouble() ?? 0,
+          pnn50: (row['pnn50'] as num?)?.toDouble() ?? 0,
+          meanRR: (row['mean_rr'] as num?)?.toDouble() ?? 0,
+          sd1: (row['sd1'] as num?)?.toDouble() ?? 0,
+          sd2: (row['sd2'] as num?)?.toDouble() ?? 0,
+          restingHR: (row['resting_hr'] as num?)?.toInt(),
+          qualityPct: (row['quality_pct'] as num?)?.toDouble() ?? 0,
+          readinessPct: (row['readiness_pct'] as num?)?.toDouble(),
+          feelingScore: (row['feeling'] as num?)?.toInt(),
+          synced: true,
+        );
+        await _readinessBox!.put(id, jsonEncode(m.toJson()));
+        debugPrint('[HrvService] Pulled readiness measurement $id from cloud');
+      } catch (e) {
+        debugPrint('[HrvService] Failed to store cloud readiness record $id: $e');
+      }
+    }
     notifyListeners();
   }
 

@@ -5,6 +5,7 @@ import '../models/training_session.dart';
 import '../supabase/supabase_client.dart';
 import 'app_initializer.dart';
 import 'database_service.dart';
+import 'hrv_service.dart';
 import 'settings_service.dart';
 import 'supabase_repository.dart';
 
@@ -35,12 +36,15 @@ class SyncService extends ChangeNotifier {
       await AppInitializer.instance.initFuture;
       final db = DatabaseService.instance;
       final settings = SettingsService.instance;
+      final hrv = HrvService.instance;
       // Pull cloud data down first
       await settings.syncDownFromCloud(_repo);
       await db.syncDownFromCloud(_repo);
+      await hrv.syncDownReadinessFromCloud(_repo);
       // Push local data up
       await settings.syncUpToCloud(_repo);
       await db.syncAllUnsyncedSessions(_repo);
+      await hrv.syncAllUnsyncedReadiness(_repo);
     } finally {
       _isSyncing = false;
       notifyListeners();

@@ -257,6 +257,30 @@ class SupabaseRepository {
     }, onConflict: 'platform');
   }
 
+  // Readiness measurements
+
+  /// Upsert a readiness measurement to Supabase. Idempotent on `id`.
+  Future<void> upsertReadinessMeasurement(Map<String, dynamic> measurement) async {
+    final userId = _client.auth.currentUser?.id;
+    if (userId == null) throw Exception('Not authenticated');
+    await _client.from('readiness_measurements').upsert({
+      ...measurement,
+      'user_id': userId,
+    }, onConflict: 'id');
+  }
+
+  /// Fetch all readiness measurements for the authenticated user.
+  Future<List<Map<String, dynamic>>> fetchReadinessMeasurements() async {
+    final userId = _client.auth.currentUser?.id;
+    if (userId == null) return [];
+    final res = await _client
+        .from('readiness_measurements')
+        .select()
+        .eq('user_id', userId)
+        .order('measured_at', ascending: false);
+    return List<Map<String, dynamic>>.from(res);
+  }
+
   double _estimateCalories(int avgHr, int durationSec, double weightKg, int age, String gender) {
     final durationMin = durationSec / 60.0;
     if (gender == 'male') {
