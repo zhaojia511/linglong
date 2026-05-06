@@ -95,6 +95,9 @@ web_app/coverage/
 ehthumbs.db
 Thumbs.db
 
+# Supabase CLI local state
+supabase/.temp/
+
 # Misc
 *.log
 .env
