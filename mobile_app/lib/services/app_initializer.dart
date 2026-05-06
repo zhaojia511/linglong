@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../supabase/supabase_client.dart';
 import 'database_service.dart';
+import 'hrv_service.dart';
 import 'settings_service.dart';
 
 class AppInitializer {
@@ -35,6 +36,7 @@ class AppInitializer {
       // Initialize application services (DB, settings)
       await DatabaseService.instance.init();
       await SettingsService.instance.init();
+      await HrvService.instance.init();
 
       _completer.complete();
 

@@ -5,13 +5,15 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 import '../models/daily_hrv_snapshot.dart';
+import '../models/readiness_measurement.dart';
 import '../utils/hrv_analysis.dart';
 
 class HrvService extends ChangeNotifier {
   static final HrvService instance = HrvService._internal();
   HrvService._internal();
 
-  Box<String>? _box;
+  Box<String>? _snapshotBox;
+  Box<String>? _readinessBox;
 
   // Accumulated RR intervals per device during an active session.
   final Map<String, List<int>> _sessionRRByDevice = {};
@@ -20,7 +22,8 @@ class HrvService extends ChangeNotifier {
   final Map<String, List<int>> _lastKnownRR = {};
 
   Future<void> init() async {
-    _box = await Hive.openBox<String>('hrv_snapshots');
+    _snapshotBox = await Hive.openBox<String>('hrv_snapshots');
+    _readinessBox = await Hive.openBox<String>('readiness_measurements');
   }
 
   // ── Session accumulation ──────────────────────────────────────────────────
@@ -41,8 +44,7 @@ class HrvService extends ChangeNotifier {
     _lastKnownRR.clear();
   }
 
-  List<int> getSessionRR(String deviceId) =>
-      _sessionRRByDevice[deviceId] ?? [];
+  List<int> getSessionRR(String deviceId) => _sessionRRByDevice[deviceId] ?? [];
 
   /// Live RMSSD from accumulated session RR intervals.
   /// Returns null if fewer than 50 intervals have been collected.
@@ -58,7 +60,7 @@ class HrvService extends ChangeNotifier {
   /// Compute HRV from accumulated session data and persist a snapshot.
   Future<void> saveSessionHrv(
       String personId, String deviceId, int? restingHR) async {
-    if (_box == null) return;
+    if (_snapshotBox == null) return;
     final rr = getSessionRR(deviceId);
     if (rr.length < 50) return;
     final result = HrvAnalysis.analyze(rr);
@@ -75,7 +77,7 @@ class HrvService extends ChangeNotifier {
       sampleCount: result.validIntervals,
     );
 
-    await _box!.put(snapshot.id, jsonEncode(snapshot.toJson()));
+    await _snapshotBox!.put(snapshot.id, jsonEncode(snapshot.toJson()));
     notifyListeners();
   }
 
@@ -85,36 +87,51 @@ class HrvService extends ChangeNotifier {
     required String personId,
     required String deviceId,
     required List<int> rrIntervals,
+    required int durationSec,
     int? restingHR,
     int? feelingScore,
   }) async {
-    if (_box == null) return;
+    if (_readinessBox == null) return;
     if (rrIntervals.length < 20) return;
     final result = HrvAnalysis.analyze(rrIntervals);
     if (result.rmssd <= 0) return;
 
-    final snapshot = DailyHrvSnapshot(
+    final baseline = getBaseline(personId);
+    final readinessPct = baseline != null && baseline > 0
+        ? (result.rmssd / baseline * 100).clamp(0.0, 150.0)
+        : null;
+    final measurement = ReadinessMeasurement(
       id: const Uuid().v4(),
       personId: personId,
-      timestamp: DateTime.now(),
+      deviceId: deviceId,
+      measuredAt: DateTime.now(),
+      durationSec: durationSec,
+      rrIntervals: List<int>.from(result.filteredRR),
       rmssd: result.rmssd,
       sdnn: result.sdnn,
+      pnn50: result.pnn50,
       meanRR: result.meanRR,
+      sd1: result.sd1,
+      sd2: result.sd2,
       restingHR: restingHR,
-      sampleCount: result.validIntervals,
+      qualityPct: result.totalIntervals == 0
+          ? 0
+          : result.validIntervals / result.totalIntervals * 100,
+      readinessPct: readinessPct,
+      feelingScore: feelingScore,
     );
 
-    await _box!.put(snapshot.id, jsonEncode(snapshot.toJson()));
+    await _readinessBox!.put(measurement.id, jsonEncode(measurement.toJson()));
     notifyListeners();
   }
 
   // ── Query ─────────────────────────────────────────────────────────────────
 
   List<DailyHrvSnapshot> getSnapshots(String personId, {int days = 60}) {
-    if (_box == null) return [];
+    if (_snapshotBox == null) return [];
     final cutoff = DateTime.now().subtract(Duration(days: days));
     final results = <DailyHrvSnapshot>[];
-    for (final raw in _box!.values) {
+    for (final raw in _snapshotBox!.values) {
       try {
         final s = DailyHrvSnapshot.fromJson(jsonDecode(raw));
         if (s.personId == personId && s.timestamp.isAfter(cutoff)) {
@@ -126,9 +143,36 @@ class HrvService extends ChangeNotifier {
     return results;
   }
 
+  List<ReadinessMeasurement> getReadinessMeasurements(
+    String personId, {
+    int days = 60,
+  }) {
+    if (_readinessBox == null) return [];
+    final cutoff = DateTime.now().subtract(Duration(days: days));
+    final results = <ReadinessMeasurement>[];
+    for (final raw in _readinessBox!.values) {
+      try {
+        final measurement = ReadinessMeasurement.fromJson(
+            jsonDecode(raw) as Map<String, dynamic>);
+        if (measurement.personId == personId &&
+            measurement.measuredAt.isAfter(cutoff)) {
+          results.add(measurement);
+        }
+      } catch (_) {}
+    }
+    results.sort((a, b) => a.measuredAt.compareTo(b.measuredAt));
+    return results;
+  }
+
   /// Rolling baseline RMSSD from last 60 days. Returns null if fewer than
   /// 3 snapshots exist (not enough data to establish a baseline).
   double? getBaseline(String personId) {
+    final measurements = getReadinessMeasurements(personId, days: 60);
+    if (measurements.length >= 3) {
+      return measurements.map((m) => m.rmssd).reduce((a, b) => a + b) /
+          measurements.length;
+    }
+
     final snapshots = getSnapshots(personId, days: 60);
     if (snapshots.length < 3) return null;
     return snapshots.map((s) => s.rmssd).reduce((a, b) => a + b) /
@@ -144,8 +188,13 @@ class HrvService extends ChangeNotifier {
 
     double? rmssd = currentRmssd;
     if (rmssd == null) {
-      final recent = getSnapshots(personId, days: 1);
-      rmssd = recent.isEmpty ? null : recent.last.rmssd;
+      final recentMeasurement = getReadinessMeasurements(personId, days: 1);
+      if (recentMeasurement.isNotEmpty) {
+        rmssd = recentMeasurement.last.rmssd;
+      } else {
+        final recent = getSnapshots(personId, days: 1);
+        rmssd = recent.isEmpty ? null : recent.last.rmssd;
+      }
     }
     if (rmssd == null) return null;
 
@@ -189,17 +238,25 @@ class HrvService extends ChangeNotifier {
         .whereType<ReadinessScore>()
         .toList();
     if (scores.isEmpty) return null;
-    return scores.map((s) => s.percent).reduce((a, b) => a + b) /
-        scores.length;
+    return scores.map((s) => s.percent).reduce((a, b) => a + b) / scores.length;
   }
 
   // ── Manual snapshot (morning HRV) ─────────────────────────────────────────
 
   /// Persist a snapshot computed externally (e.g. morning measurement screen).
   Future<void> saveDirectSnapshot(DailyHrvSnapshot snapshot) async {
-    if (_box == null) return;
-    await _box!.put(snapshot.id, jsonEncode(snapshot.toJson()));
+    if (_snapshotBox == null) return;
+    await _snapshotBox!.put(snapshot.id, jsonEncode(snapshot.toJson()));
     notifyListeners();
+  }
+
+  @visibleForTesting
+  void setTestBoxes({
+    required Box<String> snapshotBox,
+    required Box<String> readinessBox,
+  }) {
+    _snapshotBox = snapshotBox;
+    _readinessBox = readinessBox;
   }
 
   // ── Helpers ───────────────────────────────────────────────────────────────
@@ -220,8 +277,8 @@ enum FatigueLevel { low, elevated, high, veryHigh }
 class FatigueScore {
   final FatigueLevel level;
   final double windowAvgRmssd; // avg RMSSD for the window period
-  final double baseline;       // 60-day RMSSD baseline
-  final int days;              // window size (7 = acute, 28 = chronic)
+  final double baseline; // 60-day RMSSD baseline
+  final int days; // window size (7 = acute, 28 = chronic)
 
   const FatigueScore({
     required this.level,
@@ -265,8 +322,8 @@ class FatigueScore {
 enum ReadinessZone { veryLow, low, normal, high }
 
 class ReadinessScore {
-  final double percent;      // 0–150 (100 = exactly at baseline)
-  final double baseline;     // personal RMSSD baseline (ms)
+  final double percent; // 0–150 (100 = exactly at baseline)
+  final double baseline; // personal RMSSD baseline (ms)
   final double currentRmssd; // current RMSSD (ms)
 
   const ReadinessScore({
