@@ -7,6 +7,7 @@ mobile_app/.pub-cache/
 mobile_app/.pub/
 mobile_app/build/
 mobile_app/flutter_*.png
+mobile_app/pubspec.lock
 mobile_app/linked_*.ds
 mobile_app/unlinked.ds
 mobile_app/unlinked_spec.ds
@@ -33,6 +34,7 @@ mobile_app/ios/Podfile.lock
 mobile_app/ios/.symlinks/
 
 # Android
+mobile_app/android/app/src/main/java/io/flutter/plugins
 mobile_app/android/app/debug
 mobile_app/android/app/profile
 mobile_app/android/app/release

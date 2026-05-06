@@ -18,9 +18,6 @@ import 'services/app_initializer.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Supabase
-  await SupabaseClientProvider.init();
-
   // Add global error handling
   FlutterError.onError = (FlutterErrorDetails details) {
     debugPrint('Flutter Error: ${details.exception}');

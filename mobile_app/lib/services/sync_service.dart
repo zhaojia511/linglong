@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/person.dart';
@@ -10,10 +11,24 @@ import 'supabase_repository.dart';
 
 class SyncService extends ChangeNotifier {
   bool _isSyncing = false;
+  bool _initialized = false;
   final SupabaseRepository _repo = SupabaseRepository();
+  StreamSubscription<AuthState>? _authSubscription;
 
-  SyncService() {
-    _client.auth.onAuthStateChange.listen((data) {
+  SyncService();
+
+  /// Initialize after Supabase is ready. Safe to call multiple times.
+  Future<void> ensureInitialized() async {
+    if (_initialized) return;
+    await AppInitializer.instance.initFuture;
+    _setupAuthListener();
+    _initialized = true;
+    debugPrint('[SyncService] Initialized');
+  }
+
+  void _setupAuthListener() {
+    if (_authSubscription != null) return;
+    _authSubscription = _client.auth.onAuthStateChange.listen((data) {
       if (data.event == AuthChangeEvent.signedIn) {
         debugPrint('[SyncService] Signed in — triggering bidirectional sync');
         _syncOnLogin();
@@ -22,11 +37,15 @@ class SyncService extends ChangeNotifier {
   }
 
   bool get isSyncing => _isSyncing;
-  bool get isAuthenticated => SupabaseClientProvider.client.auth.currentSession != null;
+  bool get isAuthenticated {
+    if (!_initialized) return false;
+    return _client.auth.currentSession != null;
+  }
 
   SupabaseClient get _client => SupabaseClientProvider.client;
 
   Future<void> _syncOnLogin() async {
+    await ensureInitialized();
     if (_isSyncing) return;
     _isSyncing = true;
     notifyListeners();
@@ -48,16 +67,19 @@ class SyncService extends ChangeNotifier {
   }
 
   Future<void> login(String email, String password) async {
+    await ensureInitialized();
     await _client.auth.signInWithPassword(email: email, password: password);
     notifyListeners();
   }
 
   Future<void> logout() async {
+    await ensureInitialized();
     await _client.auth.signOut();
     notifyListeners();
   }
 
   Future<void> syncPerson(Person person) async {
+    await ensureInitialized();
     if (!isAuthenticated) return;
     final user = _client.auth.currentUser!;
     await _client.from('persons').upsert({
@@ -77,6 +99,7 @@ class SyncService extends ChangeNotifier {
   }
 
   Future<void> syncSession(TrainingSession session) async {
+    await ensureInitialized();
     if (!isAuthenticated) return;
     final user = _client.auth.currentUser!;
     await _client.from('training_sessions').upsert({
@@ -98,9 +121,22 @@ class SyncService extends ChangeNotifier {
   }
 
   Future<void> syncAll() async {
+    await ensureInitialized();
     if (!isAuthenticated || _isSyncing) return;
     await _syncOnLogin();
   }
 
-  Stream<AuthState> get authStateChanges => _client.auth.onAuthStateChange;
+  Stream<AuthState> get authStateChanges {
+    if (!_initialized) {
+      return const Stream.empty();
+    }
+    return _client.auth.onAuthStateChange;
+  }
+
+  @override
+  void dispose() {
+    _authSubscription?.cancel();
+    _authSubscription = null;
+    super.dispose();
+  }
 }
