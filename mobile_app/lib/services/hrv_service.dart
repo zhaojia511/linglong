@@ -295,7 +295,8 @@ class HrvService extends ChangeNotifier {
       } catch (e) {
         debugPrint(
             '[HrvService] Failed to sync readiness measurement ${m.id}: $e');
-        rethrow;
+        throw Exception(
+            'Failed to sync readiness measurement ${m.id}: $e');
       }
     }
     if (anyUpdated) notifyListeners();
@@ -319,7 +320,8 @@ class HrvService extends ChangeNotifier {
     } catch (e) {
       debugPrint(
           '[HrvService] Failed to fetch readiness measurements from cloud: $e');
-      rethrow;
+      throw Exception(
+          'Failed to fetch readiness measurements from cloud: $e');
     }
   }
 
