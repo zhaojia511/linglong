@@ -83,7 +83,7 @@ class HrvService extends ChangeNotifier {
 
   /// Save a dedicated readiness measurement snapshot (from the readiness screen).
   /// Accepts the raw [rrIntervals] directly rather than pulling from session state.
-  Future<void> saveReadinessSnapshot({
+  Future<bool> saveReadinessSnapshot({
     required String personId,
     required String deviceId,
     required List<int> rrIntervals,
@@ -91,10 +91,10 @@ class HrvService extends ChangeNotifier {
     int? restingHR,
     int? feelingScore,
   }) async {
-    if (_readinessBox == null) return;
-    if (rrIntervals.length < 20) return;
+    if (_readinessBox == null) return false;
+    if (rrIntervals.length < 20) return false;
     final result = HrvAnalysis.analyze(rrIntervals);
-    if (result.rmssd <= 0) return;
+    if (result.rmssd <= 0) return false;
 
     final baseline = getBaseline(personId);
     final readinessPct = baseline != null && baseline > 0
@@ -123,6 +123,7 @@ class HrvService extends ChangeNotifier {
 
     await _readinessBox!.put(measurement.id, jsonEncode(measurement.toJson()));
     notifyListeners();
+    return true;
   }
 
   // ── Query ─────────────────────────────────────────────────────────────────
@@ -162,6 +163,30 @@ class HrvService extends ChangeNotifier {
     }
     results.sort((a, b) => a.measuredAt.compareTo(b.measuredAt));
     return results;
+  }
+
+  List<ReadinessMeasurement> getAllReadinessMeasurements({int? days}) {
+    if (_readinessBox == null) return [];
+    final results = <ReadinessMeasurement>[];
+    final cutoff =
+        days == null ? null : DateTime.now().subtract(Duration(days: days));
+    for (final raw in _readinessBox!.values) {
+      try {
+        final measurement = ReadinessMeasurement.fromJson(
+            jsonDecode(raw) as Map<String, dynamic>);
+        if (cutoff == null || measurement.measuredAt.isAfter(cutoff)) {
+          results.add(measurement);
+        }
+      } catch (_) {}
+    }
+    results.sort((a, b) => b.measuredAt.compareTo(a.measuredAt));
+    return results;
+  }
+
+  Future<void> deleteReadinessMeasurement(String id) async {
+    if (_readinessBox == null) return;
+    await _readinessBox!.delete(id);
+    notifyListeners();
   }
 
   /// Rolling baseline RMSSD from last 60 days. Returns null if fewer than
