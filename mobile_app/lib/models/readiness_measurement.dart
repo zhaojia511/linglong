@@ -57,6 +57,28 @@ class ReadinessMeasurement {
         'synced': synced,
       };
 
+  ReadinessMeasurement copyWith({bool? synced}) {
+    return ReadinessMeasurement(
+      id: id,
+      personId: personId,
+      deviceId: deviceId,
+      measuredAt: measuredAt,
+      durationSec: durationSec,
+      rrIntervals: rrIntervals,
+      rmssd: rmssd,
+      sdnn: sdnn,
+      pnn50: pnn50,
+      meanRR: meanRR,
+      sd1: sd1,
+      sd2: sd2,
+      restingHR: restingHR,
+      qualityPct: qualityPct,
+      readinessPct: readinessPct,
+      feelingScore: feelingScore,
+      synced: synced ?? this.synced,
+    );
+  }
+
   factory ReadinessMeasurement.fromJson(Map<String, dynamic> json) {
     return ReadinessMeasurement(
       id: json['id'] as String,

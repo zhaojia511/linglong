@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../models/readiness_measurement.dart';
 import '../supabase/supabase_client.dart';
 
 class SupabaseRepository {
@@ -255,6 +256,42 @@ class SupabaseRepository {
       'min_supported_version': minSupportedVersion,
       'updated_at': DateTime.now().toIso8601String(),
     }, onConflict: 'platform');
+  }
+
+  // Readiness Measurements
+
+  /// Upsert a single readiness measurement to Supabase.
+  Future<void> upsertReadinessMeasurement(ReadinessMeasurement m) async {
+    final userId = _client.auth.currentUser?.id;
+    if (userId == null) throw Exception('Not authenticated');
+    await _client.from('readiness_measurements').upsert({
+      'id': m.id,
+      'user_id': userId,
+      'person_id': m.personId,
+      'device_id': m.deviceId,
+      'measured_at': m.measuredAt.toIso8601String(),
+      'duration_sec': m.durationSec,
+      'rr_intervals': m.rrIntervals,
+      'rmssd': m.rmssd,
+      'sdnn': m.sdnn,
+      'pnn50': m.pnn50,
+      'mean_rr': m.meanRR,
+      'sd1': m.sd1,
+      'sd2': m.sd2,
+      'resting_hr': m.restingHR,
+      'quality_pct': m.qualityPct,
+      'readiness_pct': m.readinessPct,
+      'feeling': m.feelingScore,
+    });
+  }
+
+  /// Fetch all readiness measurements for the current user from Supabase.
+  Future<List<Map<String, dynamic>>> fetchReadinessMeasurements() async {
+    final res = await _client
+        .from('readiness_measurements')
+        .select()
+        .order('measured_at', ascending: false);
+    return List<Map<String, dynamic>>.from(res);
   }
 
   double _estimateCalories(int avgHr, int durationSec, double weightKg, int age, String gender) {
