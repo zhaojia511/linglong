@@ -760,10 +760,13 @@ class SyncDialog extends StatelessWidget {
                             );
                           }
                         } catch (e) {
+                          debugPrint('[SyncDialog] Sync failed: $e');
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Sync failed: $e'),
+                              const SnackBar(
+                                content: Text(
+                                  'Sync failed. Please check your connection and try again.',
+                                ),
                                 backgroundColor: Colors.red,
                               ),
                             );
