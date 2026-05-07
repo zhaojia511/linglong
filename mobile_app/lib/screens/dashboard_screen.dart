@@ -1360,9 +1360,105 @@ class _DeviceDialogState extends State<DeviceDialog> {
                 Flexible(
                   child: Column(
                     children: [
-                      // Discovered devices list
+                      // Connected devices section
+                      if (bleService.connectedDevices.isNotEmpty) ...[
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Connected Devices (${bleService.connectedDevices.length})',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: bleService.connectedDevices.length,
+                          itemBuilder: (context, index) {
+                            final device = bleService.connectedDevices[index];
+                            final isDisconnecting = _connectingDevices.contains(device.id);
+
+                            return ListTile(
+                              dense: true,
+                              leading: const Icon(Icons.bluetooth_connected, color: Colors.green),
+                              title: Text(device.name),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (device.currentHeartRate != null)
+                                    Text(
+                                      'HR: ${device.currentHeartRate} bpm',
+                                      style: const TextStyle(fontSize: 11),
+                                    ),
+                                  if (device.batteryLevel != null)
+                                    Text(
+                                      'Battery: ${device.batteryLevel}%',
+                                      style: const TextStyle(fontSize: 11),
+                                    ),
+                                ],
+                              ),
+                              trailing: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red.shade50,
+                                  foregroundColor: Colors.red,
+                                ),
+                                onPressed: isDisconnecting
+                                    ? null
+                                    : () async {
+                                        setState(() {
+                                          _connectingDevices.add(device.id);
+                                        });
+
+                                        try {
+                                          await bleService.disconnectDevice(device);
+                                          if (mounted) {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(content: Text('Disconnected from ${device.name}')),
+                                            );
+                                          }
+                                        } finally {
+                                          if (mounted) {
+                                            setState(() {
+                                              _connectingDevices.remove(device.id);
+                                            });
+                                          }
+                                        }
+                                      },
+                                child: isDisconnecting
+                                    ? const SizedBox(
+                                        height: 16,
+                                        width: 16,
+                                        child: CircularProgressIndicator(strokeWidth: 2),
+                                      )
+                                    : const Text('Disconnect'),
+                              ),
+                            );
+                          },
+                        ),
+                        const Divider(height: 16),
+                      ],
+
+                      // Discovered devices section
+                      if (bleService.discoveredDevices.isNotEmpty)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          alignment: Alignment.centerLeft,
+                          child: const Text(
+                            'Available Devices',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
+
                       Expanded(
-                        child: bleService.discoveredDevices.isEmpty
+                        child: bleService.discoveredDevices.isEmpty && bleService.connectedDevices.isEmpty
                             ? Center(
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -1392,67 +1488,69 @@ class _DeviceDialogState extends State<DeviceDialog> {
                                 itemCount: bleService.discoveredDevices.length,
                                 itemBuilder: (context, index) {
                                   final device = bleService.discoveredDevices[index];
-                            final isConnected = device.isConnected;
-                            final isConnecting =
-                                _connectingDevices.contains(device.id);
+                                  final isConnected = bleService.connectedDevices.any((d) => d.id == device.id);
+                                  final isConnecting =
+                                      _connectingDevices.contains(device.id);
 
-                            return ListTile(
-                              leading: const Icon(Icons.bluetooth),
-                              title: Text(device.name),
-                              subtitle:
-                                  Text('Signal: ${device.rssi} dBm'),
-                              trailing: isConnected
-                                  ? const Icon(Icons.check, color: Colors.green)
-                                  : bleService.connectedDevices.length >= 10
-                                      ? const Tooltip(
-                                          message: 'Max devices connected',
-                                          child: Icon(Icons.lock, color: Colors.grey),
-                                        )
-                                      : Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            ElevatedButton(
-                                              onPressed: isConnecting
-                                                  ? null
-                                                  : () async {
-                                                      setState(() {
-                                                        _connectingDevices.add(device.id);
-                                                      });
+                                  if (isConnected) {
+                                    return const SizedBox.shrink();
+                                  }
 
-                                                      try {
-                                                        final success = await bleService.connectDevice(device);
-                                                        if (mounted) {
-                                                          if (success) {
-                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                              SnackBar(content: Text('Connected to ${device.name}')),
-                                                            );
-                                                          } else {
-                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                              SnackBar(
-                                                                content: Text('Failed to connect to ${device.name}'),
-                                                                backgroundColor: Colors.red,
-                                                              ),
-                                                            );
-                                                          }
-                                                        }
-                                                      } finally {
+                                  return ListTile(
+                                    leading: const Icon(Icons.bluetooth),
+                                    title: Text(device.name),
+                                    subtitle:
+                                        Text('Signal: ${device.rssi} dBm'),
+                                    trailing: bleService.connectedDevices.length >= 10
+                                        ? const Tooltip(
+                                            message: 'Max devices connected',
+                                            child: Icon(Icons.lock, color: Colors.grey),
+                                          )
+                                        : Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              ElevatedButton(
+                                                onPressed: isConnecting
+                                                    ? null
+                                                    : () async {
                                                         setState(() {
-                                                          _connectingDevices.remove(device.id);
+                                                          _connectingDevices.add(device.id);
                                                         });
-                                                      }
-                                                    },
-                                              child: isConnecting
-                                                  ? const SizedBox(
-                                                      height: 16,
-                                                      width: 16,
-                                                      child: CircularProgressIndicator(strokeWidth: 2),
-                                                    )
-                                                  : const Text('Connect'),
-                                            ),
-                                            const SizedBox(width: 0),
-                                          ],
-                                        ),
-                            );
+
+                                                        try {
+                                                          final success = await bleService.connectDevice(device);
+                                                          if (mounted) {
+                                                            if (success) {
+                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                SnackBar(content: Text('Connected to ${device.name}')),
+                                                              );
+                                                            } else {
+                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                SnackBar(
+                                                                  content: Text('Failed to connect to ${device.name}'),
+                                                                  backgroundColor: Colors.red,
+                                                                ),
+                                                              );
+                                                            }
+                                                          }
+                                                        } finally {
+                                                          setState(() {
+                                                            _connectingDevices.remove(device.id);
+                                                          });
+                                                        }
+                                                      },
+                                                child: isConnecting
+                                                    ? const SizedBox(
+                                                        height: 16,
+                                                        width: 16,
+                                                        child: CircularProgressIndicator(strokeWidth: 2),
+                                                      )
+                                                    : const Text('Connect'),
+                                              ),
+                                              const SizedBox(width: 0),
+                                            ],
+                                          ),
+                                  );
                                 },
                               ),
                       ),
