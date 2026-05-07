@@ -319,9 +319,12 @@ class DatabaseService extends ChangeNotifier {
       // Mark session as synced in local database
       session.synced = true;
       await _sessionBox!.put(session.id, session);
-      
+
       debugPrint('Session ${session.id} marked as synced in local database');
       debugPrint('Session synced flag is now: ${session.synced}');
+
+      // Notify listeners to update UI
+      notifyListeners();
       
       return true;
     } catch (e) {
