@@ -7,22 +7,12 @@ import '../services/ble_service.dart';
 import '../services/database_service.dart';
 import '../services/hrv_service.dart';
 import '../services/supabase_repository.dart';
+import '../services/session_service.dart';
 import '../models/training_session.dart';
 import '../models/hr_device.dart';
 import '../models/person.dart';
 import 'athlete_detail_screen.dart';
 import 'readiness_screen.dart';
-
-// Data point for heart rate with timestamp
-class HeartRateDataPoint {
-  final DateTime timestamp;
-  final double value;
-
-  HeartRateDataPoint({
-    required this.timestamp,
-    required this.value,
-  });
-}
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -40,10 +30,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   bool _bleEnabled = true;
   Timer? _bleCheckTimer;
 
-  final Map<String, List<HeartRateDataPoint>> _heartRateHistoryByDevice = {};
   final Map<String, DateTime> _lastAlertTime = {};
-  // seconds spent in each zone index 0-4 per device
-  final Map<String, List<int>> _zoneSecondsByDevice = {};
   // timestamped lap/drill markers during a session
   final List<({DateTime time, String label})> _sessionMarkers = [];
 
@@ -268,10 +255,9 @@ class _DashboardScreenState extends State<DashboardScreen>
 
       setState(() {
         _isRecording = true;
-        _heartRateHistoryByDevice.clear();
-        _zoneSecondsByDevice.clear();
         _sessionMarkers.clear();
       });
+      SessionService.instance.startRecording();
       debugPrint('State updated, activeSessions=${_activeSessions.length}');
 
       _recordTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
@@ -315,17 +301,16 @@ class _DashboardScreenState extends State<DashboardScreen>
             HrvService.instance.addRRIntervals(device.id, device.rrIntervals!);
           }
 
-          _heartRateHistoryByDevice.putIfAbsent(device.id, () => []);
-          final history = _heartRateHistoryByDevice[device.id]!;
-          history.add(HeartRateDataPoint(
-            timestamp: now,
-            value: device.currentHeartRate!.toDouble(),
-          ));
-          if (history.length > 60) history.removeAt(0);
-
-          _zoneSecondsByDevice.putIfAbsent(device.id, () => [0, 0, 0, 0, 0]);
-          final zoneIdx = _getZoneIndex(device.currentHeartRate!);
-          _zoneSecondsByDevice[device.id]![zoneIdx]++;
+          // Update session service
+          SessionService.instance.addHeartRateData(
+            device.id,
+            HeartRateDataPoint(
+              timestamp: now,
+              value: device.currentHeartRate!.toDouble(),
+            ),
+          );
+          final zoneIdx = SessionService.getZoneIndex(device.currentHeartRate!);
+          SessionService.instance.addZoneSecond(device.id, zoneIdx);
 
           _checkAlerts(device);
         }
@@ -396,10 +381,9 @@ class _DashboardScreenState extends State<DashboardScreen>
     setState(() {
       _isRecording = false;
       _activeSessions.clear();
-      _heartRateHistoryByDevice.clear();
-      _zoneSecondsByDevice.clear();
       _sessionMarkers.clear();
     });
+    SessionService.instance.stopRecording();
 
     _syncSessionsToCloud(sessionsSnapshot);
 
@@ -712,12 +696,12 @@ class _DashboardScreenState extends State<DashboardScreen>
               context,
               MaterialPageRoute(
                 builder: (_) => AthleteDetailScreen(
-                  device: device,
+                  deviceId: device.id,
                   athlete: athlete,
                   hrHistory: List.unmodifiable(
-                      _heartRateHistoryByDevice[device.id] ?? []),
-                  zoneSecs: _zoneSecondsByDevice[device.id] != null
-                      ? List.unmodifiable(_zoneSecondsByDevice[device.id]!)
+                      SessionService.instance.getHistoryForDevice(device.id) ?? []),
+                  zoneSecs: SessionService.instance.getZoneSecondsForDevice(device.id) != null
+                      ? List.unmodifiable(SessionService.instance.getZoneSecondsForDevice(device.id)!)
                       : null,
                 ),
               ),
@@ -751,8 +735,8 @@ class _DashboardScreenState extends State<DashboardScreen>
             final textColor = isDarkText ? Colors.black87 : Colors.white;
             final subTextColor = isDarkText ? Colors.black54 : Colors.white70;
 
-            final sparklineHistory = _heartRateHistoryByDevice[device.id] ?? [];
-            final zoneSecs = _zoneSecondsByDevice[device.id];
+            final sparklineHistory = SessionService.instance.getHistoryForDevice(device.id) ?? [];
+            final zoneSecs = SessionService.instance.getZoneSecondsForDevice(device.id);
             final hrvColor = _hrvTrafficLight(device);
             final signalBars = _rssiToBars(device.rssi);
             final stripH = h * 0.28;
@@ -940,14 +924,6 @@ class _DashboardScreenState extends State<DashboardScreen>
     if (heartRate < 170) return const Color(0xFFFDD835); // Z3 yellow — Tempo
     if (heartRate < 190) return const Color(0xFFFF7043); // Z4 orange — Threshold
     return const Color(0xFFE53935);                       // Z5 red — Anaerobic
-  }
-
-  int _getZoneIndex(int heartRate) {
-    if (heartRate < 120) return 0;
-    if (heartRate < 150) return 1;
-    if (heartRate < 170) return 2;
-    if (heartRate < 190) return 3;
-    return 4;
   }
 
   String _getTrainingZoneName(int? heartRate) {

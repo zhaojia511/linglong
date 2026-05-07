@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'dart:math' as math;
 import '../models/hr_device.dart';
 import '../models/person.dart';
-import 'dashboard_screen.dart';
+import '../services/ble_service.dart';
+import '../services/session_service.dart';
 
-class AthleteDetailScreen extends StatelessWidget {
-  final HRDevice device;
+class AthleteDetailScreen extends StatefulWidget {
+  final String deviceId;
   final Person? athlete;
-  final List<HeartRateDataPoint> hrHistory;
-  final List<int>? zoneSecs;
+  final List<HeartRateDataPoint> initialHrHistory;
+  final List<int>? initialZoneSecs;
 
   static const _zoneColors = [
     Color(0xFF4FC3F7),
@@ -21,20 +23,30 @@ class AthleteDetailScreen extends StatelessWidget {
 
   const AthleteDetailScreen({
     super.key,
-    required this.device,
+    required this.deviceId,
     required this.athlete,
-    required this.hrHistory,
-    this.zoneSecs,
-  });
+    required List<HeartRateDataPoint> hrHistory,
+    List<int>? zoneSecs,
+  })  : initialHrHistory = hrHistory,
+        initialZoneSecs = zoneSecs;
 
-  Color get _zoneColor {
-    final hr = device.currentHeartRate;
+  @override
+  State<AthleteDetailScreen> createState() => _AthleteDetailScreenState();
+}
+
+class _AthleteDetailScreenState extends State<AthleteDetailScreen> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Color _zoneColor(int? hr) {
     if (hr == null) return const Color(0xFF757575);
-    if (hr < 120) return _zoneColors[0];
-    if (hr < 150) return _zoneColors[1];
-    if (hr < 170) return _zoneColors[2];
-    if (hr < 190) return _zoneColors[3];
-    return _zoneColors[4];
+    if (hr < 120) return AthleteDetailScreen._zoneColors[0];
+    if (hr < 150) return AthleteDetailScreen._zoneColors[1];
+    if (hr < 170) return AthleteDetailScreen._zoneColors[2];
+    if (hr < 190) return AthleteDetailScreen._zoneColors[3];
+    return AthleteDetailScreen._zoneColors[4];
   }
 
   double? _computeRmssd(List<int>? rr) {
@@ -45,137 +57,6 @@ class AthleteDetailScreen extends StatelessWidget {
       sumSq += d * d;
     }
     return math.sqrt(sumSq / (rr.length - 1));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final bg = _zoneColor;
-    final isDark = bg == const Color(0xFFFDD835);
-    final textColor = isDark ? Colors.black87 : Colors.white;
-    final subColor = isDark ? Colors.black54 : Colors.white70;
-    final rmssd = _computeRmssd(device.rrIntervals);
-
-    return Scaffold(
-      backgroundColor: bg,
-      appBar: AppBar(
-        backgroundColor: Colors.black26,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        title: Text(athlete?.name ?? device.name,
-            style: const TextStyle(color: Colors.white)),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Large BPM + zone name
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    device.currentHeartRate?.toString() ?? '--',
-                    style: TextStyle(
-                      fontSize: 96,
-                      fontWeight: FontWeight.bold,
-                      color: textColor,
-                      height: 1.0,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('bpm', style: TextStyle(fontSize: 20, color: subColor)),
-                        Text(
-                          _zoneName(device.currentHeartRate),
-                          style: TextStyle(
-                              fontSize: 16,
-                              color: textColor,
-                              fontWeight: FontWeight.w600),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 8),
-
-              // Stats row: HRV, battery, signal
-              Row(
-                children: [
-                  if (rmssd != null) ...[
-                    _statChip(
-                      label: 'HRV',
-                      value: '${rmssd.toStringAsFixed(0)}ms',
-                      dotColor: rmssd >= 40
-                          ? Colors.greenAccent
-                          : rmssd >= 20
-                              ? Colors.yellowAccent
-                              : Colors.redAccent,
-                      textColor: textColor,
-                      subColor: subColor,
-                    ),
-                    const SizedBox(width: 16),
-                  ],
-                  if (device.batteryLevel != null) ...[
-                    _statChip(
-                      label: 'Battery',
-                      value: '${device.batteryLevel}%',
-                      textColor: textColor,
-                      subColor: subColor,
-                    ),
-                    const SizedBox(width: 16),
-                  ],
-                  _statChip(
-                    label: 'Signal',
-                    value: '${device.rssi} dBm',
-                    textColor: textColor,
-                    subColor: subColor,
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 24),
-
-              // HR sparkline — full width
-              if (hrHistory.length >= 2) ...[
-                Text('Heart Rate (last 60s)',
-                    style: TextStyle(fontSize: 13, color: subColor)),
-                const SizedBox(height: 6),
-                SizedBox(
-                  height: 100,
-                  child: CustomPaint(
-                    size: const Size(double.infinity, 100),
-                    painter: _DetailSparklinePainter(
-                      points: hrHistory,
-                      color: textColor.withValues(alpha: 0.85),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-              ],
-
-              // Zone bars with labels
-              if (zoneSecs != null && zoneSecs!.fold(0, (a, b) => a + b) > 0) ...[
-                Text('Time in Zone',
-                    style: TextStyle(fontSize: 13, color: subColor)),
-                const SizedBox(height: 8),
-                _buildZoneBars(textColor),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
   }
 
   String _zoneName(int? hr) {
@@ -217,8 +98,7 @@ class AthleteDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildZoneBars(Color textColor) {
-    final secs = zoneSecs!;
+  Widget _buildZoneBars(Color textColor, List<int> secs) {
     final total = secs.fold(0, (a, b) => a + b);
     return Column(
       children: List.generate(5, (i) {
@@ -233,7 +113,7 @@ class AthleteDetailScreen extends StatelessWidget {
             children: [
               SizedBox(
                 width: 72,
-                child: Text(_zoneNames[i],
+                child: Text(AthleteDetailScreen._zoneNames[i],
                     style: TextStyle(fontSize: 12, color: textColor)),
               ),
               Expanded(
@@ -251,7 +131,7 @@ class AthleteDetailScreen extends StatelessWidget {
                       child: Container(
                         height: 18,
                         decoration: BoxDecoration(
-                          color: _zoneColors[i].withValues(alpha: 0.9),
+                          color: AthleteDetailScreen._zoneColors[i].withValues(alpha: 0.9),
                           borderRadius: BorderRadius.circular(3),
                         ),
                       ),
@@ -270,6 +150,151 @@ class AthleteDetailScreen extends StatelessWidget {
           ),
         );
       }),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer2<BLEService, SessionService>(
+      builder: (context, bleService, sessionService, child) {
+        // Find the device from BLE service
+        final device = bleService.connectedDevices.firstWhere(
+          (d) => d.id == widget.deviceId,
+          orElse: () => HRDevice(id: widget.deviceId, name: 'Unknown', address: '', rssi: 0, isConnected: false),
+        );
+
+        // Get latest data from session service
+        final hrHistory = sessionService.getHistoryForDevice(widget.deviceId) ?? widget.initialHrHistory;
+        final zoneSecs = sessionService.getZoneSecondsForDevice(widget.deviceId) ?? widget.initialZoneSecs;
+
+        final bg = _zoneColor(device.currentHeartRate);
+        final isDark = bg == const Color(0xFFFDD835);
+        final textColor = isDark ? Colors.black87 : Colors.white;
+        final subColor = isDark ? Colors.black54 : Colors.white70;
+        final rmssd = _computeRmssd(device.rrIntervals);
+
+        return Scaffold(
+          backgroundColor: bg,
+          appBar: AppBar(
+            backgroundColor: Colors.black26,
+            foregroundColor: Colors.white,
+            elevation: 0,
+            title: Text(widget.athlete?.name ?? device.name,
+                style: const TextStyle(color: Colors.white)),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ),
+          body: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Large BPM + zone name
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        device.currentHeartRate?.toString() ?? '--',
+                        style: TextStyle(
+                          fontSize: 96,
+                          fontWeight: FontWeight.bold,
+                          color: textColor,
+                          height: 1.0,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('bpm', style: TextStyle(fontSize: 20, color: subColor)),
+                            Text(
+                              _zoneName(device.currentHeartRate),
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: textColor,
+                                  fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  // Stats row: HRV, battery, signal
+                  Row(
+                    children: [
+                      if (rmssd != null) ...[
+                        _statChip(
+                          label: 'HRV',
+                          value: '${rmssd.toStringAsFixed(0)}ms',
+                          dotColor: rmssd >= 40
+                              ? Colors.greenAccent
+                              : rmssd >= 20
+                                  ? Colors.yellowAccent
+                                  : Colors.redAccent,
+                          textColor: textColor,
+                          subColor: subColor,
+                        ),
+                        const SizedBox(width: 16),
+                      ],
+                      if (device.batteryLevel != null) ...[
+                        _statChip(
+                          label: 'Battery',
+                          value: '${device.batteryLevel}%',
+                          textColor: textColor,
+                          subColor: subColor,
+                        ),
+                        const SizedBox(width: 16),
+                      ],
+                      _statChip(
+                        label: 'Signal',
+                        value: '${device.rssi} dBm',
+                        textColor: textColor,
+                        subColor: subColor,
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // HR sparkline — full width
+                  if (hrHistory.length >= 2) ...[
+                    Text('Heart Rate (last 60s)',
+                        style: TextStyle(fontSize: 13, color: subColor)),
+                    const SizedBox(height: 6),
+                    SizedBox(
+                      height: 100,
+                      child: CustomPaint(
+                        size: const Size(double.infinity, 100),
+                        painter: _DetailSparklinePainter(
+                          points: hrHistory,
+                          color: textColor.withValues(alpha: 0.85),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
+
+                  // Zone bars with labels
+                  if (zoneSecs != null && zoneSecs.fold(0, (a, b) => a + b) > 0) ...[
+                    Text('Time in Zone',
+                        style: TextStyle(fontSize: 13, color: subColor)),
+                    const SizedBox(height: 8),
+                    _buildZoneBars(textColor, zoneSecs),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

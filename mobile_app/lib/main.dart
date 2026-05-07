@@ -12,7 +12,7 @@ import 'services/database_service.dart';
 import 'services/settings_service.dart';
 import 'services/sync_service.dart';
 import 'services/auth_service.dart';
-import 'supabase/supabase_client.dart';
+import 'services/session_service.dart';
 import 'services/app_initializer.dart';
 
 void main() async {
@@ -84,6 +84,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => DatabaseService.instance),
         ChangeNotifierProvider(create: (_) => SyncService()),
         ChangeNotifierProvider(create: (_) => SettingsService.instance),
+        ChangeNotifierProvider(create: (_) => SessionService.instance),
       ],
       child: MaterialApp(
         title: 'Linglong HR Monitor',
