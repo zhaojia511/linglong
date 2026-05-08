@@ -1,21 +1,24 @@
+
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import '../models/person.dart';
 import '../models/training_session.dart';
 import '../utils/hr_data_processing.dart';
 import '../utils/hrv_analysis.dart';
+import '../utils/heart_rate_zones.dart';
 
 class SessionVisualizationScreen extends StatefulWidget {
   final TrainingSession session;
-  const SessionVisualizationScreen({super.key, required this.session});
+  final Person? person;
+  const SessionVisualizationScreen({super.key, required this.session, this.person});
 
   @override
   State<SessionVisualizationScreen> createState() =>
       _SessionVisualizationScreenState();
 }
 
-class _SessionVisualizationScreenState
-    extends State<SessionVisualizationScreen>
+class _SessionVisualizationScreenState extends State<SessionVisualizationScreen>
     with SingleTickerProviderStateMixin {
   bool _trimEnabled = false;
   bool _noiseFilter = false;
@@ -24,6 +27,7 @@ class _SessionVisualizationScreenState
   late TabController _tabController;
 
   TrainingSession get session => widget.session;
+  Person? get person => widget.person;
 
   List<HeartRateData> get _processedData {
     var data = session.heartRateData;
@@ -40,10 +44,27 @@ class _SessionVisualizationScreenState
       .map((d) => (60000 / d.heartRate).round())
       .toList();
 
+  /// Get max heart rate (from person or calculate)
+  int get _maxHeartRate {
+    if (person?.maxHeartRate != null) {
+      return person!.maxHeartRate!;
+    }
+    if (person != null) {
+      return HeartRateZones.calculateMaxHeartRate(person!.age);
+    }
+    // Default if no person data
+    return 180;
+  }
+
+  /// Get resting heart rate (from person or default)
+  int get _restingHeartRate {
+    return person?.restingHeartRate ?? 60;
+  }
+
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     if (session.heartRateData.isNotEmpty) {
       _warmupSec = HrDataProcessing.detectWarmup(session.heartRateData);
       _cooldownSec = HrDataProcessing.detectCooldown(session.heartRateData);
@@ -74,6 +95,7 @@ class _SessionVisualizationScreenState
           controller: _tabController,
           tabs: const [
             Tab(text: 'Heart Rate'),
+            Tab(text: 'Zones'),
             Tab(text: 'HRV'),
           ],
         ),
@@ -88,6 +110,7 @@ class _SessionVisualizationScreenState
               controller: _tabController,
               children: [
                 _buildHRTab(),
+                _buildZonesTab(),
                 _buildHRVTab(),
               ],
             ),
@@ -223,6 +246,226 @@ class _SessionVisualizationScreenState
         ],
       ),
     );
+  }
+
+  // ── Zones tab ─────────────────────────────────────────────────────────────
+
+  Widget _buildZonesTab() {
+    if (session.heartRateData.isEmpty) {
+      return const Center(child: Text('No heart rate data'));
+    }
+
+    // Get zone times - use saved data if available, otherwise calculate
+    List<int> zoneTimes = session.zoneTimes ?? _calculateZoneTimes(_processedData);
+    final totalTime = zoneTimes.fold(0, (a, b) => a + b);
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Summary card with person info
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Heart Rate Zone Distribution',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Total time: ${_formatZoneDuration(totalTime)}',
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  ),
+                  if (person != null) ...[
+                    const SizedBox(height: 8),
+                    _buildPersonInfo(),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Zone breakdown with bars
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Time in Each Zone',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 12),
+                  ...List.generate(5, (index) => _buildZoneRow(
+                    index,
+                    zoneTimes[index],
+                    totalTime,
+                  )),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Zone distribution chart
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Zone Distribution',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildZoneDistributionChart(zoneTimes, totalTime),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPersonInfo() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.blue.shade50,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Personalized for: ${person!.name}',
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Max HR: $_maxHeartRate bpm, Resting HR: $_restingHeartRate bpm',
+            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildZoneRow(int zoneIndex, int timeSeconds, int totalTime) {
+    final percentage = totalTime > 0 ? (timeSeconds / totalTime * 100).toStringAsFixed(1) : '0';
+    final zoneRange = HeartRateZones.getZoneRangeString(zoneIndex, _maxHeartRate, _restingHeartRate);
+    final zoneColor = Color(HeartRateZones.zoneColors[zoneIndex]);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 12,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: zoneColor,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${HeartRateZones.zoneNames[zoneIndex]} ($zoneRange)',
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                  ),
+                ],
+              ),
+              Text(
+                '${_formatZoneDuration(timeSeconds)} · $percentage%',
+                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: totalTime > 0 ? timeSeconds / totalTime : 0,
+              backgroundColor: Colors.grey[200],
+              valueColor: AlwaysStoppedAnimation<Color>(zoneColor),
+              minHeight: 8,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildZoneDistributionChart(List<int> zoneTimes, int totalTime) {
+    if (totalTime == 0) {
+      return const Center(child: Text('No data'));
+    }
+
+    return Row(
+      children: List.generate(5, (index) {
+        final flex = zoneTimes[index];
+        final zoneColor = Color(HeartRateZones.zoneColors[index]);
+        return Expanded(
+          flex: flex > 0 ? flex : 0,
+          child: Container(
+            height: 80,
+            color: zoneColor,
+            child: flex > 0
+                ? Center(
+                    child: Text(
+                      '${(zoneTimes[index] / totalTime * 100).toStringAsFixed(0)}%',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  )
+                : null,
+          ),
+        );
+      }),
+    );
+  }
+
+  List<int> _calculateZoneTimes(List<HeartRateData> heartRateData) {
+    if (heartRateData.length < 2) return [0, 0, 0, 0, 0];
+
+    final zoneTimes = [0, 0, 0, 0, 0];
+    final sortedData = List<HeartRateData>.from(heartRateData)
+      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
+    for (int i = 1; i < sortedData.length; i++) {
+      final previous = sortedData[i - 1];
+      final current = sortedData[i];
+      final duration = current.timestamp.difference(previous.timestamp).inSeconds;
+      final avgHr = ((previous.heartRate + current.heartRate) / 2).round();
+      final zoneIndex = HeartRateZones.getZoneIndex(avgHr, _maxHeartRate, _restingHeartRate);
+      zoneTimes[zoneIndex] += duration;
+    }
+
+    return zoneTimes;
+  }
+
+  String _formatZoneDuration(int s) {
+    final m = s ~/ 60;
+    final sec = s % 60;
+    if (m > 0) return '${m}m ${sec}s';
+    return '${sec}s';
   }
 
   Widget _slider(String label, int value, void Function(int) onSet) =>
@@ -401,7 +644,6 @@ class _SessionVisualizationScreenState
                     axisNameWidget: const Text('RR[i+1] ms',
                         style: TextStyle(fontSize: 10)),
                     sideTitles: SideTitles(
-                        showTitles: true,
                         reservedSize: 36,
                         interval: 100,
                         getTitlesWidget: (v, _) => Text(v.toInt().toString(),
@@ -410,15 +652,12 @@ class _SessionVisualizationScreenState
                     axisNameWidget: const Text('RR[i] ms',
                         style: TextStyle(fontSize: 10)),
                     sideTitles: SideTitles(
-                        showTitles: true,
                         reservedSize: 28,
                         interval: 100,
                         getTitlesWidget: (v, _) => Text(v.toInt().toString(),
                             style: const TextStyle(fontSize: 9)))),
-                rightTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false)),
-                topTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false)),
+                rightTitles: const AxisTitles(),
+                topTitles: const AxisTitles(),
               ),
               scatterTouchData: ScatterTouchData(enabled: false),
             )),
@@ -457,17 +696,13 @@ class _SessionVisualizationScreenState
               titlesData: FlTitlesData(
                 leftTitles: AxisTitles(
                     sideTitles: SideTitles(
-                        showTitles: true,
                         reservedSize: 32,
                         interval: 20,
                         getTitlesWidget: (v, _) => Text(v.toInt().toString(),
                             style: const TextStyle(fontSize: 9)))),
-                bottomTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false)),
-                rightTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false)),
-                topTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false)),
+                bottomTitles: const AxisTitles(),
+                rightTitles: const AxisTitles(),
+                topTitles: const AxisTitles(),
               ),
               lineBarsData: [
                 LineChartBarData(
@@ -475,7 +710,7 @@ class _SessionVisualizationScreenState
                   isCurved: true,
                   color: Colors.teal,
                   barWidth: 2,
-                  dotData: const FlDotData(show: false),
+                  dotData: const FlDotData(),
                   belowBarData: BarAreaData(
                       show: true,
                       color: Colors.teal.withValues(alpha: 0.15)),
@@ -488,8 +723,8 @@ class _SessionVisualizationScreenState
                   ],
                   color: Colors.red.withValues(alpha: 0.4),
                   barWidth: 1,
-                  dashArray: [4, 4],
-                  dotData: const FlDotData(show: false),
+                  dashArray: const [4, 4],
+                  dotData: const FlDotData(),
                 ),
               ],
             )),
@@ -560,22 +795,18 @@ class _SessionVisualizationScreenState
       titlesData: FlTitlesData(
         leftTitles: AxisTitles(
             sideTitles: SideTitles(
-                showTitles: true,
                 reservedSize: 36,
                 interval: 20,
                 getTitlesWidget: (v, _) =>
                     Text(v.toInt().toString(), style: const TextStyle(fontSize: 9)))),
         bottomTitles: AxisTitles(
             sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: 24,
+                reservedSize: 28,
                 interval: 120,
                 getTitlesWidget: (v, _) => Text('${(v / 60).round()}m',
                     style: const TextStyle(fontSize: 9)))),
-        rightTitles:
-            const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-        topTitles:
-            const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        rightTitles: const AxisTitles(),
+        topTitles: const AxisTitles(),
       ),
       lineBarsData: [
         LineChartBarData(
@@ -583,7 +814,7 @@ class _SessionVisualizationScreenState
           isCurved: true,
           color: Colors.red,
           barWidth: 2,
-          dotData: const FlDotData(show: false),
+          dotData: const FlDotData(),
           belowBarData: BarAreaData(
               show: true, color: Colors.red.withValues(alpha: 0.1)),
         ),
@@ -602,7 +833,7 @@ class _SessionVisualizationScreenState
     ));
   }
 
-  // ── Helpers ───────────────────────────────────────────────────────────────
+  // ── Helpers ──────────────────────────────────────────────────────────────
 
   Color _stressColor(String level) {
     switch (level) {

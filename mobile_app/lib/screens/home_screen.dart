@@ -462,10 +462,12 @@ class _TrainingHistoryWidgetState extends State<TrainingHistoryWidget> {
                         _toggleSessionSelection(session.id);
                       } else {
                         // Navigate to visualization screen
+                        final dbService = Provider.of<DatabaseService>(context, listen: false);
+                        final person = dbService.getPersonById(session.personId);
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => SessionVisualizationScreen(session: session),
+                            builder: (context) => SessionVisualizationScreen(session: session, person: person),
                           ),
                         );
                       }
