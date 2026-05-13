@@ -1,19 +1,21 @@
+
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uuid/uuid.dart';
 import '../models/person.dart';
 import '../models/training_session.dart';
+import '../utils/heart_rate_zones.dart';
 import 'supabase_repository.dart';
 
 class DatabaseService extends ChangeNotifier {
   static final DatabaseService instance = DatabaseService._internal();
-  
+
   Box<Person>? _personBox;
   Box<TrainingSession>? _sessionBox;
-  
+
   Person? _currentPerson;
-  
+
   DatabaseService._internal();
 
   Future<void> init() async {
@@ -85,7 +87,7 @@ class DatabaseService extends ChangeNotifier {
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );
-    
+
     await _personBox!.put(person.id, person);
     // Do not auto-select newly created person to avoid unexpected "selected" state
     notifyListeners();
@@ -122,7 +124,7 @@ class DatabaseService extends ChangeNotifier {
         await _personBox!.put(person.id, person);
       }
     }
-    
+
     // Then assign to the target athlete
     final athlete = _personBox!.get(athleteId);
     if (athlete != null) {
@@ -209,7 +211,7 @@ class DatabaseService extends ChangeNotifier {
     if (session != null) {
       session.endTime = DateTime.now();
       session.duration = session.endTime!.difference(session.startTime).inSeconds;
-      
+
       // Calculate statistics
       if (session.heartRateData.isNotEmpty) {
         final heartRates = session.heartRateData.map((d) => d.heartRate).toList();
@@ -228,11 +230,35 @@ class DatabaseService extends ChangeNotifier {
             age: sessionPerson.age,
             gender: sessionPerson.gender,
           );
+
+          // Calculate heart rate zone times for this person
+          session.zoneTimes = _calculateZoneTimes(session.heartRateData, sessionPerson);
         }
       }
-      
+
       await updateSession(session);
     }
+  }
+
+  /// Calculate time spent in each heart rate zone for a specific person
+  /// Returns [zone0, zone1, zone2, zone3, zone4] in seconds
+  List<int> _calculateZoneTimes(List<HeartRateData> heartRateData, Person person) {
+    if (heartRateData.length < 2) return [0, 0, 0, 0, 0];
+
+    final zoneTimes = [0, 0, 0, 0, 0];
+    final sortedData = List<HeartRateData>.from(heartRateData)
+      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
+    for (int i = 1; i < sortedData.length; i++) {
+      final previous = sortedData[i - 1];
+      final current = sortedData[i];
+      final duration = current.timestamp.difference(previous.timestamp).inSeconds;
+      final avgHr = ((previous.heartRate + current.heartRate) / 2).round();
+      final zoneIndex = HeartRateZones.getZoneIndexForPerson(avgHr, person);
+      zoneTimes[zoneIndex] += duration;
+    }
+
+    return zoneTimes;
   }
 
   List<TrainingSession> getAllSessions() {
@@ -263,14 +289,14 @@ class DatabaseService extends ChangeNotifier {
     // Calories = ((Age × 0.2017) + (Weight × 0.1988) + (Heart Rate × 0.6309) — 55.0969) × Time / 4.184
     final durationMinutes = duration / 60;
     final genderOffset = gender.toLowerCase() == 'male' ? 0 : -20;
-    
-    final calories = ((age * 0.2017) + 
-                      (weight * 0.1988) + 
-                      (avgHeartRate * 0.6309) - 
-                      55.0969 + 
-                      genderOffset) * 
+
+    final calories = ((age * 0.2017) +
+                      (weight * 0.1988) +
+                      (avgHeartRate * 0.6309) -
+                      55.0969 +
+                      genderOffset) *
                      durationMinutes / 4.184;
-    
+
     return calories.clamp(0, double.infinity);
   }
 
@@ -286,14 +312,14 @@ class DatabaseService extends ChangeNotifier {
       }
 
       debugPrint('Starting sync for session ${session.id}');
-      
+
       // Prepare heart rate data
       final heartRateData = session.heartRateData
           .map((d) => {
-                'timestamp': d.timestamp.toIso8601String(),
-                'heartRate': d.heartRate,
-                'deviceId': d.deviceId,
-              })
+            'timestamp': d.timestamp.toIso8601String(),
+            'heartRate': d.heartRate,
+            'deviceId': d.deviceId,
+          })
           .toList();
 
       // Sync to Supabase
@@ -315,7 +341,7 @@ class DatabaseService extends ChangeNotifier {
       );
 
       debugPrint('Supabase upload successful for session ${session.id}');
-      
+
       // Mark session as synced in local database
       session.synced = true;
       await _sessionBox!.put(session.id, session);
@@ -325,7 +351,7 @@ class DatabaseService extends ChangeNotifier {
 
       // Notify listeners to update UI
       notifyListeners();
-      
+
       return true;
     } catch (e) {
       debugPrint('Error syncing session to cloud: $e');
@@ -412,7 +438,7 @@ class DatabaseService extends ChangeNotifier {
     try {
       final unsyncedSessions = getUnsyncedSessions();
       debugPrint('Found ${unsyncedSessions.length} unsynced sessions to upload');
-      
+
       int syncedCount = 0;
 
       for (var session in unsyncedSessions) {
@@ -431,11 +457,11 @@ class DatabaseService extends ChangeNotifier {
         debugPrint('Notifying listeners after syncing $syncedCount sessions');
         notifyListeners();
       }
-      
+
       // Verify badge count after sync
       final remainingUnsynced = getUnsyncedSessions().length;
       debugPrint('After sync: $remainingUnsynced unsynced sessions remaining');
-      
+
       return syncedCount;
     } catch (e) {
       debugPrint('Error syncing all unsynced sessions: $e');

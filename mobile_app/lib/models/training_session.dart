@@ -49,6 +49,9 @@ class TrainingSession extends HiveObject {
   @HiveField(14)
   String? notes;
 
+  @HiveField(15)
+  List<int>? zoneTimes; // 5 elements: [zone0, zone1, zone2, zone3, zone4] in seconds
+
   TrainingSession({
     required this.id,
     required this.personId,
@@ -65,6 +68,7 @@ class TrainingSession extends HiveObject {
     required this.heartRateData,
     this.synced = false,
     this.notes,
+    this.zoneTimes,
   });
 
   Map<String, dynamic> toJson() => {
@@ -83,6 +87,7 @@ class TrainingSession extends HiveObject {
     'heartRateData': heartRateData.map((e) => e.toJson()).toList(),
     'synced': synced,
     'notes': notes,
+    'zoneTimes': zoneTimes,
   };
 
   factory TrainingSession.fromJson(Map<String, dynamic> json) => TrainingSession(
@@ -103,6 +108,9 @@ class TrainingSession extends HiveObject {
         .toList(),
     synced: json['synced'] ?? false,
     notes: json['notes'],
+    zoneTimes: json['zoneTimes'] != null
+        ? List<int>.from(json['zoneTimes'])
+        : null,
   );
 }
 
