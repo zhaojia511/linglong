@@ -123,6 +123,38 @@ class _ReadinessScreenState extends State<ReadinessScreen> {
         _selectedSensor == null) {
       return;
     }
+
+    // Check if we have a resting HR measurement and ask to update the athlete
+    if (_liveHR != null && mounted) {
+      final shouldUpdate = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Update Resting Heart Rate?'),
+          content: Text(
+            'Measured resting heart rate: $_liveHR bpm.\n\n'
+            'Would you like to update ${_selectedAthlete!.name}\'s resting heart rate to this value?'
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('No'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Yes'),
+            ),
+          ],
+        ),
+      );
+
+      if (shouldUpdate == true && mounted) {
+        final dbService = Provider.of<DatabaseService>(context, listen: false);
+        final updatedAthlete = _selectedAthlete!
+          ..restingHeartRate = _liveHR;
+        await dbService.updatePerson(updatedAthlete);
+      }
+    }
+
     // Save HRV snapshot via HrvService
     final saved = await HrvService.instance.saveReadinessSnapshot(
       personId: _selectedAthlete!.id,

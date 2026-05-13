@@ -1,4 +1,6 @@
 
+import '../models/person.dart';
+
 /// Utility class for calculating personalized heart rate zones
 class HeartRateZones {
   /// Heart rate zone definitions
@@ -10,6 +12,19 @@ class HeartRateZones {
     0xFFFF7043,
     0xFFE53935,
   ];
+
+  /// Default resting heart rate when no measurement available
+  static const int defaultRestingHeartRate = 60;
+
+  /// Get effective max heart rate for a person (user value or calculated)
+  static int getEffectiveMaxHeartRate(Person person) {
+    return person.maxHeartRate ?? calculateMaxHeartRate(person.age);
+  }
+
+  /// Get effective resting heart rate for a person (user value or default)
+  static int getEffectiveRestingHeartRate(Person person) {
+    return person.restingHeartRate ?? defaultRestingHeartRate;
+  }
 
   /// Calculate maximum heart rate using the standard formula (220 - age)
   static int calculateMaxHeartRate(int age) {
@@ -69,5 +84,39 @@ class HeartRateZones {
       return '≥$minHr';
     }
     return '$minHr-$maxHr';
+  }
+
+  // --- Person-based convenience methods ---
+
+  static (int, int) getZoneRangeForPerson(int zoneIndex, Person person) {
+    return getZoneRange(
+      zoneIndex,
+      getEffectiveMaxHeartRate(person),
+      getEffectiveRestingHeartRate(person),
+    );
+  }
+
+  static int getZoneIndexForPerson(int heartRate, Person person) {
+    return getZoneIndex(
+      heartRate,
+      getEffectiveMaxHeartRate(person),
+      getEffectiveRestingHeartRate(person),
+    );
+  }
+
+  static String getZoneLabelForPerson(int zoneIndex, Person person) {
+    return getZoneLabel(
+      zoneIndex,
+      getEffectiveMaxHeartRate(person),
+      getEffectiveRestingHeartRate(person),
+    );
+  }
+
+  static String getZoneRangeStringForPerson(int zoneIndex, Person person) {
+    return getZoneRangeString(
+      zoneIndex,
+      getEffectiveMaxHeartRate(person),
+      getEffectiveRestingHeartRate(person),
+    );
   }
 }

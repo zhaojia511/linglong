@@ -5,6 +5,7 @@ mobile_app/.flutter-plugins-dependencies
 mobile_app/.packages
 mobile_app/.pub-cache/
 mobile_app/.pub/
+mobile_app/.claude/
 mobile_app/build/
 mobile_app/flutter_*.png
 mobile_app/pubspec.lock

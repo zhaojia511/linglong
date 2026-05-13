@@ -336,6 +336,9 @@ class _SessionVisualizationScreenState extends State<SessionVisualizationScreen>
   }
 
   Widget _buildPersonInfo() {
+    final maxHrSource = person!.maxHeartRate != null ? 'Manual' : 'Calculated (220 - age)';
+    final restingHrSource = person!.restingHeartRate != null ? 'Manual' : 'Default (60 bpm)';
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -351,7 +354,11 @@ class _SessionVisualizationScreenState extends State<SessionVisualizationScreen>
           ),
           const SizedBox(height: 4),
           Text(
-            'Max HR: $_maxHeartRate bpm, Resting HR: $_restingHeartRate bpm',
+            'Max HR: $_maxHeartRate bpm ($maxHrSource)',
+            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+          ),
+          Text(
+            'Resting HR: $_restingHeartRate bpm ($restingHrSource)',
             style: TextStyle(fontSize: 12, color: Colors.grey[600]),
           ),
         ],
@@ -361,7 +368,9 @@ class _SessionVisualizationScreenState extends State<SessionVisualizationScreen>
 
   Widget _buildZoneRow(int zoneIndex, int timeSeconds, int totalTime) {
     final percentage = totalTime > 0 ? (timeSeconds / totalTime * 100).toStringAsFixed(1) : '0';
-    final zoneRange = HeartRateZones.getZoneRangeString(zoneIndex, _maxHeartRate, _restingHeartRate);
+    final zoneRange = person != null
+        ? HeartRateZones.getZoneRangeStringForPerson(zoneIndex, person!)
+        : HeartRateZones.getZoneRangeString(zoneIndex, _maxHeartRate, _restingHeartRate);
     final zoneColor = Color(HeartRateZones.zoneColors[zoneIndex]);
 
     return Padding(
@@ -454,7 +463,9 @@ class _SessionVisualizationScreenState extends State<SessionVisualizationScreen>
       final current = sortedData[i];
       final duration = current.timestamp.difference(previous.timestamp).inSeconds;
       final avgHr = ((previous.heartRate + current.heartRate) / 2).round();
-      final zoneIndex = HeartRateZones.getZoneIndex(avgHr, _maxHeartRate, _restingHeartRate);
+      final zoneIndex = person != null
+          ? HeartRateZones.getZoneIndexForPerson(avgHr, person!)
+          : HeartRateZones.getZoneIndex(avgHr, _maxHeartRate, _restingHeartRate);
       zoneTimes[zoneIndex] += duration;
     }
 

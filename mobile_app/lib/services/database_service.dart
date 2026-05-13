@@ -245,11 +245,6 @@ class DatabaseService extends ChangeNotifier {
   List<int> _calculateZoneTimes(List<HeartRateData> heartRateData, Person person) {
     if (heartRateData.length < 2) return [0, 0, 0, 0, 0];
 
-    // Get max HR (use person's value or calculate if missing)
-    final maxHr = person.maxHeartRate ?? HeartRateZones.calculateMaxHeartRate(person.age);
-    // Get resting HR (use person's value or default to 60 if missing)
-    final restingHr = person.restingHeartRate ?? 60;
-
     final zoneTimes = [0, 0, 0, 0, 0];
     final sortedData = List<HeartRateData>.from(heartRateData)
       ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
@@ -259,7 +254,7 @@ class DatabaseService extends ChangeNotifier {
       final current = sortedData[i];
       final duration = current.timestamp.difference(previous.timestamp).inSeconds;
       final avgHr = ((previous.heartRate + current.heartRate) / 2).round();
-      final zoneIndex = HeartRateZones.getZoneIndex(avgHr, maxHr, restingHr);
+      final zoneIndex = HeartRateZones.getZoneIndexForPerson(avgHr, person);
       zoneTimes[zoneIndex] += duration;
     }
 

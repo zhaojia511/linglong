@@ -7,6 +7,7 @@ import '../services/settings_service.dart';
 import '../services/sync_service.dart';
 import 'readiness_history_screen.dart';
 import 'readiness_screen.dart';
+import '../utils/heart_rate_zones.dart';
 
 // All athlete photos bundled in assets
 const _assetPhotos = [
@@ -225,6 +226,8 @@ class _PersonDetailScreenState extends State<PersonDetailScreen> {
       _groupController.text = widget.person!.group ?? '';
       _gender = widget.person!.gender;
       _photoPath = widget.person!.photoPath;
+    } else {
+      // For new persons, we'll auto-fill max HR when age is entered
     }
   }
 
@@ -562,6 +565,16 @@ class _PersonDetailScreenState extends State<PersonDetailScreen> {
                         suffixText: 'years',
                       ),
                       keyboardType: TextInputType.number,
+                      onChanged: (value) {
+                        // Auto-calculate max HR when age changes and no manual value exists
+                        if (widget.person == null || widget.person!.maxHeartRate == null) {
+                          final age = int.tryParse(value);
+                          if (age != null && age > 0 && age <= 120) {
+                            final calculatedMaxHR = 220 - age;
+                            _maxHRController.text = calculatedMaxHR.toString();
+                          }
+                        }
+                      },
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Required';
@@ -658,26 +671,85 @@ class _PersonDetailScreenState extends State<PersonDetailScreen> {
               Row(
                 children: [
                   Expanded(
-                    child: TextFormField(
-                      controller: _maxHRController,
-                      decoration: const InputDecoration(
-                        labelText: 'Max HR',
-                        border: OutlineInputBorder(),
-                        suffixText: 'bpm',
-                      ),
-                      keyboardType: TextInputType.number,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextFormField(
+                          controller: _maxHRController,
+                          decoration: const InputDecoration(
+                            labelText: 'Max HR',
+                            border: OutlineInputBorder(),
+                            suffixText: 'bpm',
+                          ),
+                          keyboardType: TextInputType.number,
+                        ),
+                        const SizedBox(height: 4),
+                        if (widget.person != null)
+                          Text(
+                            widget.person!.maxHeartRate != null
+                                ? 'Manual entry'
+                                : 'Auto: 220 - age = ${220 - widget.person!.age} bpm',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                            ),
+                          )
+                        else if (_ageController.text.isNotEmpty)
+                          FutureBuilder<int?>(
+                            future: () async {
+                              final age = int.tryParse(_ageController.text);
+                              return age != null ? 220 - age : null;
+                            }(),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                return Text(
+                                  'Auto: 220 - age = ${snapshot.data} bpm',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                  ),
+                                );
+                              }
+                              return const SizedBox.shrink();
+                            },
+                          ),
+                      ],
                     ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
-                    child: TextFormField(
-                      controller: _restingHRController,
-                      decoration: const InputDecoration(
-                        labelText: 'Resting HR',
-                        border: OutlineInputBorder(),
-                        suffixText: 'bpm',
-                      ),
-                      keyboardType: TextInputType.number,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextFormField(
+                          controller: _restingHRController,
+                          decoration: const InputDecoration(
+                            labelText: 'Resting HR',
+                            border: OutlineInputBorder(),
+                            suffixText: 'bpm',
+                          ),
+                          keyboardType: TextInputType.number,
+                        ),
+                        const SizedBox(height: 4),
+                        if (widget.person != null)
+                          Text(
+                            widget.person!.restingHeartRate != null
+                                ? 'Manual entry'
+                                : 'Default: ${HeartRateZones.defaultRestingHeartRate} bpm',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                            ),
+                          )
+                        else
+                          Text(
+                            'Default: ${HeartRateZones.defaultRestingHeartRate} bpm',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                 ],
